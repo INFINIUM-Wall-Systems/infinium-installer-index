@@ -132,7 +132,13 @@ On October 7, before the work was staged:
 - `npm run check:columns` (R8): PASS, 0 differences.
 - `npm run check:published`: PASS, 11 lines.
 
-The results with the work staged, and the commits, are in "Git" below.
+With the work staged, before commit `eeeaa1d`, all five passed again: `npm run check` (R1 to R7
+and J19, 41 tracked files, R6's GitHub half NOT YET SHOWN), `npm run check:selftest` (259
+cases), `npm run check:job` (66 cases in 62 tests), `npm run check:columns` (0 differences)
+and `npm run check:published` (11 lines).
+
+QuickBase calls in the whole run: 30, all reads, no refusal, no retry: R8 twice (6 each) and
+one rehearsal (two runs of 9).
 
 ## J1 to J19
 
@@ -161,7 +167,12 @@ not yet shown by a check.
 
 ## Git
 
-This file's final results are added after the work's commit.
+- `404141f` "Daily data refresh", by github-actions[bot]: the first run on GitHub, started by
+  hand; `public/data/build.json`, `installers.json` and `territory.json`, nothing else.
+- `eeeaa1d` "Daily schedule on at 09:20 UTC; check of the published files", pushed to
+  `origin main` on October 7. Nothing under `public/data` in it.
+- This file's final results are the commit after `eeeaa1d`.
+- From October 8 the job adds a "Daily data refresh" commit to `main` every morning.
 
 ## Not built
 
