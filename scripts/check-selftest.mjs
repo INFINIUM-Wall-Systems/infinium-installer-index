@@ -6,7 +6,10 @@
  *
  * It then runs every test of the job (scripts\job-tests.mjs): each passing on its sound cases
  * and failing on each broken input or broken stand-in. npm run check:job runs the sound cases
- * alone.
+ * alone. Last, it runs the tests of npm run check:published and of the rehearsal's part that
+ * sets this laptop's files beside the published ones (scripts\published-tests.mjs), which
+ * npm run check:job does not run. A broken case that carries mustSay must also fail for that
+ * reason.
  *
  * It works on temporary git repositories and folders in the system temp folder, deleted at the
  * end, and on values held in memory. It never changes this repository, never loads the real
@@ -24,6 +27,7 @@ import { join, resolve } from 'node:path';
 import * as C from './checks.mjs';
 import { makeClient } from '../job/lib/quickbase.mjs';
 import { TESTS } from './job-tests.mjs';
+import { PUBLISHED_TESTS } from './published-tests.mjs';
 import { removeTemps } from './job-standins.mjs';
 
 globalThis.fetch = async () => { throw new Error('the self-test never reaches the network'); };
@@ -213,13 +217,16 @@ try {
     expect('J19', 'a hand edit to territory.json', false, await C.checkJ19(d), 'territory.json does not match its fingerprint');
   }
 
-  /* The job's tests: each passing on its sound cases and failing on each broken one */
-  for (const t of TESTS) {
-    for (const [cs, want] of [[t.sound, true], [t.broken, false]]) {
-      for (const c of cs) {
-        let r;
-        try { r = await c.run(); } catch (e) { r = { ok: false, why: `stopped: ${e && e.constructor ? e.constructor.name : 'error'}: ${e && e.message}` }; }
-        expect(`job ${t.line}`, `${t.label}: ${want ? 'sound' : 'broken'}: ${c.label}`, want, r);
+  /* The job's tests, then the tests of check:published and of the rehearsal beside the
+     published files: each passing on its sound cases and failing on each broken one */
+  for (const [group, tests] of [['job', TESTS], ['published', PUBLISHED_TESTS]]) {
+    for (const t of tests) {
+      for (const [cs, want] of [[t.sound, true], [t.broken, false]]) {
+        for (const c of cs) {
+          let r;
+          try { r = await c.run(); } catch (e) { r = { ok: false, why: `stopped: ${e && e.constructor ? e.constructor.name : 'error'}: ${e && e.message}` }; }
+          expect(`${group} ${t.line}`, `${t.label}: ${want ? 'sound' : 'broken'}: ${c.label}`, want, r, want ? null : c.mustSay || null);
+        }
       }
     }
   }

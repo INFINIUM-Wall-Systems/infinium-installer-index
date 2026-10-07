@@ -11,6 +11,7 @@
     "check:selftest": "node scripts/check-selftest.mjs",
     "check:columns": "node scripts/check-columns.mjs",
     "check:job": "node scripts/check-job.mjs",
+    "check:published": "node scripts/check-published.mjs",
     "quickbase:columns": "node job/quickbase-columns.mjs",
     "job:rehearse": "node job/rehearse.mjs"
   }

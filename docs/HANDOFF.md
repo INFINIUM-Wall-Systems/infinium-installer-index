@@ -1,46 +1,47 @@
 # Handoff: state for the next Claude Code chat
 
-**Written:** October 7, 2026, at the end of the daily job's first prompt (Joe's prompt
-revision 2: build the job and rehearse it on the laptop; nothing published).
+**Written:** October 7, 2026, at the end of the daily job's second prompt (Joe's prompt
+revision 1: check what was published, then switch the daily schedule on).
+
+## Where things stand
+
+- **The first run on GitHub, started by hand, passed and published.** It ended green in 19
+  seconds and saved `build.json`, `installers.json` and `territory.json` into `public\data\`
+  in commit `404141f`, by github-actions[bot], "Daily data refresh". That commit changed
+  those three files and nothing else. It was pulled to the laptop in this run.
+- **The published files were checked on the laptop** by the new `npm run check:published`:
+  every line passed (below).
+- **This laptop writes the same bytes as GitHub.** The rehearsal read the same records and
+  wrote `installers.json` and `territory.json` byte for byte the same as the published ones
+  (SHA-256), and both published files are in the order this laptop's own rule gives.
+- **The daily schedule is on:** `.github\workflows\daily-data.yml` now starts the job every day
+  at 09:20 UTC, as well as by hand. The first scheduled run is on the morning of October 8.
+- The page is not built.
 
 ## What the repository holds
 
-- `CLAUDE.md` and `docs\SPEC.md` (eighth revision): Joe's text, carried in the prompt and
-  checked by SHA-256 in a temporary folder, in place, and as committed. `docs\ACCEPTANCE.md`
-  is unchanged; its header still says it goes with the seventh revision, which is known.
-- `README.md`: filled in by this run, as the prompt asked: the secret's name, how to start
-  the job by hand, and that the schedule is not on yet.
+- `CLAUDE.md`, `docs\SPEC.md` (eighth revision) and `docs\ACCEPTANCE.md`: Joe's text,
+  unchanged in this run.
+- `README.md`, for Kuna: the schedule and its hour in Eastern time, starting the job by hand
+  and what the box does, where the runs are and what a red run means, `npm run check:published`,
+  and how GitHub ties a schedule to the main branch and to the account that last changed it.
 - `docs\quickbase\columns.json`: unchanged. R8 found 0 differences on October 7.
-- `job\`, the job:
-  - `run.mjs`: the job from start to finish (read, shape, check, write), and its command line.
-  - `fields.mjs`: the one place that lists the field ids: the 69 watched, the 62 asked for.
-  - `read.mjs`: reads the three tables' fields, then their records, through the client.
-  - `shape.mjs`: turns what was read into installers.json and territory.json, and the counts
-    and gap counts; no network and no files.
-  - `row-contacts.mjs`: the people for a row (section 4.8).
-  - `checks.mjs`: the seven checks of section 3.5.
-  - `write.mjs`: writes the three files, all or nothing.
-  - `rehearse.mjs`: the rehearsal on the laptop (`npm run job:rehearse`).
-  - `build-counties.mjs`: builds `public\geo\counties.json` from installer-application's
-    county list.
-  - `lib\quickbase.mjs`: the read-only client. `lib\order.mjs`: the one way text is put in
-    order, by character codes, never by the machine's language settings.
-  - `quickbase-columns.mjs`: rewrites `columns.json` (unchanged).
-- `public\geo\counties.json`: 3,193 counties (3,144 in the United States, 49 in Ontario), 52
-  states, 318 ids that begin with a zero, every id text. Built from
-  installer-application's `public/data/counties.meta.json` at commit `a6fc6db`, read with
-  `git show`. The source writes states as two-letter codes, ON for Ontario; 3,020 of the
-  3,193 names carry the word County.
-- `.github\workflows\daily-data.yml`: runs the job on GitHub. Started by hand only; no
-  schedule.
-- `scripts\`: `checks.mjs` (R1 to R7, J19, and the workflow file's shape), `check.mjs`
-  (`npm run check`), `check-selftest.mjs` (`npm run check:selftest`), `check-columns.mjs`
-  (R8, `npm run check:columns`), `check-job.mjs` (`npm run check:job`), `job-tests.mjs` (the
-  job's tests), `job-standins.mjs` (stand-ins for QuickBase, the clock and the key),
-  `fixtures\installers.json` (27 made-up installers, 62 contacts, 14 territory rows) and
-  `fixtures\fingerprints.json`, `r5-allowed.json` (still empty).
-- `.gitkeep` is left only in `public\js`, `public\css` and `public\vendor`.
-- `review-screens\` exists on the laptop and is ignored by git. `public\data\` does not exist.
+- `public\data\`: the three files the first run on GitHub wrote. Only the job writes there.
+- `job\`, the job: `run.mjs`, `fields.mjs`, `read.mjs`, `shape.mjs`, `row-contacts.mjs`,
+  `checks.mjs`, `write.mjs`, `lib\quickbase.mjs`, `lib\order.mjs`, all unchanged in this run;
+  `quickbase-columns.mjs` and `build-counties.mjs`, unchanged; and `rehearse.mjs`, the
+  rehearsal on the laptop (`npm run job:rehearse`), which gained one part in this run (below).
+- `public\geo\counties.json`: 3,193 counties, 52 states, 318 ids that begin with a zero.
+- `.github\workflows\daily-data.yml`: runs the job on GitHub, every day and by hand.
+- `scripts\`:
+  - `checks.mjs` (R1 to R7, J19, and the one shape the workflow file may have), `check.mjs`
+    (`npm run check`), `check-columns.mjs` (R8, `npm run check:columns`), `check-job.mjs`
+    (`npm run check:job`), `check-selftest.mjs` (`npm run check:selftest`).
+  - `check-published.mjs`: new, `npm run check:published`.
+  - `job-tests.mjs`: the job's tests. `published-tests.mjs`: new, the tests of
+    `check:published` and of the rehearsal's new part.
+  - `job-standins.mjs`, `fixtures\installers.json` (27 made-up installers, 62 contacts, 14
+    territory rows), `fixtures\fingerprints.json`, `r5-allowed.json` (still empty).
 
 ## The job
 
@@ -51,198 +52,152 @@ revision 2: build the job and rehearse it on the laptop; nothing published).
   "true". On GitHub the key, the realm and the app id come from `QB_USER_TOKEN`,
   `QB_REALM_HOSTNAME` and `QB_APP_ID`, and nowhere else.
 - `--skip-count-guard`: leaves the count guard out for one run; at least one installer is
-  still asked for; build.json writes `skipped` for the first check.
+  still asked for; build.json writes `skipped` for the first check. Only a run started by
+  hand with the box ticked passes it.
 - Order of work: the three tables' fields (3 calls), check 7, the records (6 calls with 5,000
   rows to a page), the rows read compared with QuickBase's totals, shaping twice (check 6),
   checks 1 to 6, and only then the write. A failed check writes nothing and names the check,
   its number, its name and counts.
-- It prints the time, where the key came from, the rows read and the rows to a page, the
-  counts, each check, and each call by method and address with how many times. An error is
-  printed by its kind and step and, for a QuickBase refusal, the status number; never its
-  text.
-- Only the command-line start of `job\run.mjs` reads the real environment. `main` is handed
-  its environment values and the repository's folder, with no default for either.
 
-## The client, changed in this run
+## The workflow file
 
-- The limit of 60 requests counts for one client (it was one count for the whole process).
-- `readAll` asks for 5,000 rows to a page and returns `{ rows, total }`. It stops at
-  QuickBase's total, not at a short page, and stops with an error if the total is missing or
-  changes between pages.
-- The reading of an answer's body is inside the retry, under the same 60-second timer.
-- `timeoutSignal` is a timer a test can stand in for; the Retry-After date is worked out from
-  `now`. The client keeps `sentAt`. `ApiError` carries `status`.
-- `keyFrom(env, path)`: where the key comes from, as above.
-- Shown by tests, each working as written: at least 150 ms between calls; after a 429 it
-  waits as Retry-After says, or backs off, up to six attempts; it tries again after a 5xx or
-  a network error within the same six; an attempt with no answer after 60 seconds is tried
-  again.
+- Starts two ways: `schedule` with one time, `cron: '20 9 * * *'` (09:20 UTC every day), and
+  `workflow_dispatch` with the box `skip_count_guard`. Nothing else it does changed.
+- On a scheduled run there is no box: `inputs.skip_count_guard` is empty, the line that runs
+  the job adds nothing, and the scheduled run never skips the count guard. A comment on a
+  line of its own above that line says so.
+- `checkWorkflow` in `scripts\checks.mjs` holds the one shape the file may have, now with the
+  two ways to start and that one time. A failure names the first line of the file that is not
+  as the shape has it, by its line number in the file, and what the shape has there; it never
+  repeats a line of the file.
 
-## Git
+## check:published
 
-- `a38f807` "Daily job: read, shape, check and write; tests with made-up installers; county
-  list; workflow started by hand only", pushed to `origin main` on October 7. In it,
-  `CLAUDE.md` and `docs\SPEC.md` match their SHA-256 values, nothing is under
-  `public/data`, and every text file that is not empty is stored with LF.
-- The workflow file is on GitHub. Nothing runs until Joe starts it.
-- This file's final results are the commit after `a38f807`.
+`node scripts/check-published.mjs [folder]` reads the three files in `public\data`, or in the
+folder given. It has its own code: the names, the seven check names, the five statuses and the
+two roles are written out from section 3.6 of `docs\SPEC.md`, not taken from the job. Each line
+prints PASS or FAIL with counts: `files`, `build.json`, `checks`, `fingerprints`, `counts`,
+`J11`, `J12`, `J13`, `J14`, `empties`, `dates`; then builtAt, the counts of installers,
+contacts and territory rows build.json gives, whether the first check was skipped, and the
+three sizes. An error is printed by its kind and step only.
+
+On the published files, October 7:
+
+| Line | Result |
+|---|---|
+| files | PASS: the three files are there, each reads as JSON |
+| build.json | PASS: the names of section 3.6 in order, schema 1, builtAt reads as it should |
+| checks | PASS: the seven checks by number and name, each passed; the first was skipped: no |
+| fingerprints | PASS: installers.json and territory.json match their SHA-256 in build.json |
+| counts | PASS: installers 73; contacts 221; CONFIRMED BY PARTNER 54; DORMANT - NO RESPONSE 14; INACTIVE 2; PENDING - UPDATE EXPECTED 2; HELD - BUSINESS DECISION 1; with territory 52; without 21; counties covered 3,193 |
+| J11 | PASS: 3,193 county ids, all in territory.json, 0 not text, 318 begin with a zero |
+| J12 | PASS: gap counts 25, 29, 23; from the contacts' roles 25, 29, 23; from the rows' gaps 25, 29, 23 |
+| J13 | PASS: lastConfirmed on 54 installers, 0 with another status |
+| J14 | PASS: 130 row places filled, 0 hold a departed contact, 0 point at no contact; 11 contacts marked departed |
+| empties | PASS: null 0, empty text 0, empty list 0, empty group 0 |
+| dates | PASS: 112 dates, 0 not written like 2026-10-06 |
+
+builtAt 2026-10-07T13:31:41Z. build.json gives installers 73, contacts 221, territory rows
+17,745. Sizes: installers.json 119,198 bytes; territory.json 358,681; build.json 1,745.
+
+## The rehearsal's new part: this laptop beside the published files
+
+After its own checks, and held back with the rest until the leak scan has found nothing,
+`job\rehearse.mjs` sets the `installers.json` and `territory.json` the rehearsal wrote beside
+the two in `public\data` (`compareWithPublished`). For each file it prints SAME BYTES or
+DIFFERENT (by SHA-256); when different, counts only: installers or counties in one file and not
+the other, and those in both written differently; and whether the published file is IN ORDER
+by this laptop's own rule (`job\lib\order.mjs`: installers by company then id, each one's
+contacts and territory states; states by code, counties by id, the installer ids of each
+tier). Then the counts of installers, contacts and territory rows, published beside now. A
+published file that is not in order fails the rehearsal. With no `public\data` it says so and
+goes on.
+
+October 7, one rehearsal: installers.json SAME BYTES, IN ORDER; territory.json SAME BYTES,
+IN ORDER; installers 73 beside 73, contacts 221 beside 221, territory rows 17,745 beside
+17,745. Two runs, 9 calls each; every check passed in both; the two runs wrote the same files;
+every count equal to October 6's. The leak scan looked for 702 values, skipped 5, and found
+nothing. The folder `installer-index-rehearsal` was deleted.
 
 ## The checks
 
-On October 7, with the work staged, before commit `a38f807`:
+On October 7, before the work was staged:
 
-- `npm run check`: R1 to R7 and J19 PASS. R6's GitHub half is NOT YET SHOWN.
-- `npm run check:selftest`: PASS, 201 cases: 42 for R1 to R7 and J19, 159 for the job's tests.
-- `npm run check:job`: PASS, 66 sound cases in 62 tests.
+- `npm run check`: R1 to R7 and J19 PASS; J19 now runs on the published files. R6's GitHub half
+  is still printed as NOT YET SHOWN.
+- `npm run check:selftest`: PASS, 259 cases (201 before this run): the workflow file's
+  broken copies are now eight, and 56 cases are new for `check:published` and the rehearsal's
+  new part.
+- `npm run check:job`: PASS, 66 cases in 62 tests.
 - `npm run check:columns` (R8): PASS, 0 differences.
-- QuickBase calls in the whole run: 30, all reads, no refusal, no retry: R8 twice (6 each)
-  and the rehearsal's two runs (9 each).
+- `npm run check:published`: PASS, 11 lines.
+
+The results with the work staged, and the commits, are in "Git" below.
 
 ## J1 to J19
 
 | Check | Where it stands |
 |---|---|
 | J1 | Shown with made-up installers and on the real records: every call listed by method and address |
-| J2 | Shown with made-up installers (a stand-in total that differs stops the job) and on the real records (73, 221, 17,745) |
-| J3 | Shown with made-up installers: falls in each count, an unreadable build.json, the first run, `--skip-count-guard`. On GitHub the first run has no last good run |
-| J4 to J7 | Shown with made-up installers (planted orphans, an unknown county, a second id, a blank company, a sixth status); passed on the real records |
-| J8 | Shown with made-up installers (a changed label, a changed type) and on the real records |
-| J9 | Shown with made-up installers in a made-up repository. Waits for GitHub for "nothing is saved into the repository" and "the run shows as failed" |
-| J10 | Shown with made-up installers and on the real records (two runs, same SHA-256). Waits for GitHub for Linux and Node 22 writing the same bytes: the fingerprints test runs there first |
-| J11 | Shown with made-up installers and on the real records: 3,193 ids, all text, 318 begin with a zero |
-| J12 | Shown with made-up installers and on the real records: 25, 29, 23, equal to the second count |
-| J13 | Shown with made-up installers and on the real records |
-| J14 | Shown with made-up installers and on the real records |
+| J2 | Shown with made-up installers and on the real records (73, 221, 17,745). The published build.json gives the same three counts, and the job on GitHub stops if the rows read differ from QuickBase's totals |
+| J3 | Shown with made-up installers. On GitHub the first run had no last good run and passed with at least one installer; the scheduled run of October 8 is the first with a last good run |
+| J4 to J7 | Shown with made-up installers; passed on the real records and in the published build.json (checks 2 to 5 passed) |
+| J8 | Shown with made-up installers and on the real records; check 7 passed in the published build.json; R8 0 differences |
+| J9 | Shown with made-up installers in a made-up repository. Waits for GitHub for "nothing is saved into the repository" and "the run shows as failed": no run on GitHub has failed |
+| J10 | Shown with made-up installers and on the real records (two runs, same SHA-256). Now also across machines: GitHub (Linux, Node 22) and this laptop (Windows, Node 24.15.0) wrote the same bytes from the same records |
+| J11 | Shown with made-up installers, and on the published files: 3,193 ids, all text, 318 begin with a zero |
+| J12 | Shown with made-up installers, and on the published files: 25, 29, 23, equal to both other counts |
+| J13 | Shown with made-up installers, and on the published files: on 54 installers, 0 with another status |
+| J14 | Shown with made-up installers, and on the published files: 0 row places hold a departed contact |
 | J15 | Shown with a stand-in clock and on the real records (at most 18 calls in any 10 seconds) |
-| J16 | Shown with made-up installers: a clean run, each check failing in turn, an error thrown on purpose and a refusal whose text holds made-up values. The rehearsal's leak scan found nothing on the real records |
-| J17 | Waits for GitHub: the schedule is not on yet |
-| J18 | Waits for GitHub: Joe's first run by hand |
-| J19 | Shown in a temporary repository; in `npm run check`, passes with `public\data` not there |
+| J16 | Shown with made-up installers. The rehearsal's leak scan found nothing on the real records |
+| J17 | Waits for GitHub: the first two scheduled runs, on the mornings of October 8 and 9; builtAt must move forward on both |
+| J18 | Started by hand: shown, the run of `404141f` passed and published. "Does the same thing as the scheduled one": waits for the first scheduled run; the workflow's shape check allows one job for both ways to start |
+| J19 | Shown in a temporary repository; in `npm run check`, passes on the published files: both match their fingerprint and git shows no change under `public/data` |
 
-## What the rehearsal counted (October 7)
+R6: the repository half passes. The GitHub half is printed as NOT YET SHOWN. The run on GitHub
+read QuickBase, so it read the key from the secret; that nothing it printed holds the key is
+not yet shown by a check.
 
-One rehearsal: two runs, 9 calls each, 18 in all. Every check passed in both runs, and both
-runs wrote the same installers.json and territory.json. The leak scan looked for 702 values,
-skipped 5, and found nothing. The folder `installer-index-rehearsal` was deleted.
+## Git
 
-Every count equals what QuickBase held on October 6: installers 73; contacts 221; territory
-rows 17,745; counted twice 0; with territory 52, without 21; counties covered 3,193; states
-covered 52; CONFIRMED BY PARTNER 54, DORMANT - NO RESPONSE 14, INACTIVE 2, PENDING - UPDATE
-EXPECTED 2, HELD - BUSINESS DECISION 1; no quoting contact 25, no scheduling contact 29,
-neither 23; rates written Non-Union ST 45, Non-Union OT 46, Union ST 52, Union OT 51, all four
-34, none 9; mobilization 65; rates valid through 58.
-
-Counted for the first time:
-
-- Quoting place: a quoting contact 48, a stand-in 25, nobody 0.
-- Scheduling place: a scheduling contact 44, a stand-in 13, nobody 16.
-- One person fills both places on 12 rows. A contact who cannot be reached fills a place on
-  0 rows.
-- Sizes: installers.json 119,198 bytes; territory.json 358,681; build.json 1,745.
-- Rows to a page: MASTER 73; Contacts 221; Territory 5,000, 5,000, 5,000, 2,745.
-- In the files: no null, empty text, empty list or empty group; 0 installers with no
-  contact; 0 contacts with nothing filled. 112 dates, all written like 2026-10-06. 73 office
-  states, all among the county list's two-letter codes.
-
-How QuickBase hands over a blank: as an empty text for text, long text, choice, date, email
-and phone; as nothing (null) for currency and number; as false for a box; as an empty list
-for several choices. No column came back with a value left out of a record or of another
-kind.
-
-How each of the 62 columns asked for came back (run 1):
-
-| Table | Field | Label | Type | Came back as |
-|---|---|---|---|---|
-| MASTER | 6 | Installer ID | text | text 73 |
-| MASTER | 25 | Company | text | text 73 |
-| MASTER | 13 | Record status | choice | text 73 |
-| MASTER | 14 | Last confirmed | date | text 61, empty text 12 |
-| MASTER | 28 | Street 1 | text | text 72, empty text 1 |
-| MASTER | 29 | Street 2 | text | text 7, empty text 66 |
-| MASTER | 30 | City | text | text 73 |
-| MASTER | 31 | State/Region | choice | text 73 |
-| MASTER | 32 | Postal Code | text | text 72, empty text 1 |
-| MASTER | 33 | Country | text | text 2, empty text 71 |
-| MASTER | 35 | Street 1 | text | text 47, empty text 26 |
-| MASTER | 36 | Street 2 | text | text 5, empty text 68 |
-| MASTER | 37 | City | text | text 44, empty text 29 |
-| MASTER | 38 | State/Region | choice | text 43, empty text 30 |
-| MASTER | 39 | Postal Code | text | text 44, empty text 29 |
-| MASTER | 40 | Country | text | text 1, empty text 72 |
-| MASTER | 60 | Shipping Address - Not applicable | box | true 15, false 58 |
-| MASTER | 47 | Street 1 | text | text 4, empty text 69 |
-| MASTER | 48 | Street 2 | text | text 3, empty text 70 |
-| MASTER | 49 | City | text | text 4, empty text 69 |
-| MASTER | 50 | State/Region | choice | text 4, empty text 69 |
-| MASTER | 51 | Postal Code | text | text 3, empty text 70 |
-| MASTER | 52 | Country | text | empty text 73 |
-| MASTER | 61 | Second Shipping Address - Not applicable | box | true 46, false 27 |
-| MASTER | 41 | Non-Union ST | currency | number 45, null 28 |
-| MASTER | 42 | Non-Union OT | currency | number 46, null 27 |
-| MASTER | 43 | Union ST | currency | number 52, null 21 |
-| MASTER | 44 | Union OT | currency | number 51, null 22 |
-| MASTER | 21 | Mobilization / demobilization - Rate / basis | text | text 65, empty text 8 |
-| MASTER | 20 | Rates valid through | date | text 58, empty text 15 |
-| MASTER | 19 | Shop / labor status | choice | text 64, empty text 9 |
-| MASTER | 63 | Outreach pricing notes | long text | text 6, empty text 67 |
-| MASTER | 54 | Tier 2 basis | choice | text 27, empty text 46 |
-| MASTER | 55 | Tier 2 charge unit | choice | text 6, empty text 67 |
-| MASTER | 56 | Tier 2 charge unit - other | text | text 3, empty text 70 |
-| MASTER | 57 | Tier 2 charge amount | number | number 4, null 69 |
-| MASTER | 58 | Tier 2 charge relation | choice | text 6, empty text 67 |
-| MASTER | 26 | Coverage Area | long text | text 16, empty text 57 |
-| MASTER | 53 | Travel note | long text | text 14, empty text 59 |
-| MASTER | 62 | Travel note - Not applicable | box | true 13, false 60 |
-| MASTER | 45 | Warehousing Available | choice | text 56, empty text 17 |
-| MASTER | 59 | Warehousing at our addresses | several choices | list 46, empty list 27 |
-| MASTER | 22 | Current EMR | text | text 35, empty text 38 |
-| MASTER | 23 | Current EMR - Not applicable | box | true 10, false 63 |
-| MASTER | 9 | Valid COI on File? | choice | text 45, empty text 28 |
-| MASTER | 10 | COI Valid Through | date | empty text 73 |
-| MASTER | 11 | Installer Agreement on File? | choice | text 64, empty text 9 |
-| MASTER | 12 | Notes / Comments | long text | text 50, empty text 23 |
-| MASTER | 24 | Anything else | long text | text 8, empty text 65 |
-| Contacts | 6 | Parent reference | text | text 221 |
-| Contacts | 7 | Name | text | text 214, empty text 7 |
-| Contacts | 8 | Title | text | empty text 221 |
-| Contacts | 9 | Email | email | text 207, empty text 14 |
-| Contacts | 10 | Second email | email | text 20, empty text 201 |
-| Contacts | 11 | Phone | phone | text 188, empty text 33 |
-| Contacts | 12 | Roles | several choices | list 174, empty list 47 |
-| Contacts | 13 | Procedure | text | empty text 221 |
-| Contacts | 14 | Departed | box | true 11, false 210 |
-| Contacts | 15 | Confirmed the record | box | true 54, false 167 |
-| Territory | 6 | Parent reference | text | text 17,745 |
-| Territory | 7 | County id | text | text 17,745 |
-| Territory | 11 | Tier | choice | text 17,745 |
+This file's final results are added after the work's commit.
 
 ## Not built
 
-The page; the daily schedule; `public\data\`, which the first run on GitHub writes; the
-county shapes, the state map and the ZIP list of `public\geo\`; the Netlify test copy.
+The page; the county shapes, the state map and the ZIP list of `public\geo\`; the Netlify test
+copy.
 
 ## What comes next
 
-1. Joe types the QuickBase key into the repository's settings on GitHub as the repository
-   secret `QB_USER_TOKEN`, if he has not already.
-2. Joe starts the job by hand from the repository's Actions page (`README.md` says where).
-   That run is the first to write `public\data\` and save installer records into the
-   repository.
-3. A prompt that checks the files that run published (J2 and J10 to J14) and adds the daily
-   schedule.
+1. The first two scheduled runs, on the mornings of October 8 and 9, at 09:20 UTC or some
+   minutes later. Each should end green and commit "Daily data refresh" with a later builtAt
+   (J17). A run that ends red saved nothing; its report names the step or check.
+2. A prompt that checks those two runs (J17, J18), with `git pull` and
+   `npm run check:published`.
+3. Then the page.
 
 ## Worth knowing
 
+- Every chat starts with `git pull`: the job now commits to `main` every day, and a push from
+  the laptop can meet a main that has moved. Only "Daily data refresh" commits by
+  github-actions[bot], changing `public/data` alone, are expected there.
+- `npm run check:job` does not run `scripts\published-tests.mjs`: those tests check what is
+  done on the laptop, not the job, so a fault in them can never stop the daily run on GitHub.
+  `npm run check:selftest` runs them.
+- A broken case in the job's tests or in `published-tests.mjs` may carry `mustSay`: the
+  self-test then also asks that the failure says it. The workflow file's eight broken copies
+  each ask that the failure names the line that was changed.
 - `scripts\fixtures\fingerprints.json` holds the SHA-256 of the three files the made-up
-  installers give with builtAt held fixed. If the files' shape is changed on purpose, by a
-  new revision of the specification, it is written again; otherwise a change there means the
-  job no longer writes the same bytes.
-- The workflow runs `npm run check:job` before the job, so a machine that writes different
-  bytes stops before it reads QuickBase.
+  installers give with builtAt held fixed. A change there means the job no longer writes the
+  same bytes.
 - The office state (MASTER 31) holds two-letter codes on all 73 installers, though the choice
   list `columns.json` records for State/Region holds full state names.
 - Title and Procedure are empty on all 221 contacts.
-- 7 installers that are not CONFIRMED BY PARTNER carry a "Last confirmed" date; the job
-  leaves it out of their entries, as ruled.
+- 7 installers that are not CONFIRMED BY PARTNER carry a "Last confirmed" date in QuickBase;
+  the job leaves it out of their entries, as ruled.
 - The rehearsal reads the real records only through `npm run job:rehearse`, holds back all
   it prints until its leak scan has found nothing, and deletes its folder whatever happens.
+- How each of the 62 columns asked for came back from QuickBase, how a blank comes back by
+  kind of column, and the client's changes of the first prompt are in this file as it was at
+  commit `8c3f17b`. The rehearsal of October 7 in this run found the same.

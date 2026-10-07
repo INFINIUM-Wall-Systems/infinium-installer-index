@@ -4,7 +4,9 @@
  *
  * Each test has sound cases, on which it must pass, and broken cases (a broken input or a
  * broken stand-in), on which it must fail. npm run check:job (scripts\check-job.mjs) runs the
- * sound cases. npm run check:selftest runs both, so that a test that cannot fail is caught.
+ * sound cases. npm run check:selftest runs both, so that a test that cannot fail is caught. A
+ * broken case may carry mustSay: the self-test then also asks that the failure says it, so
+ * that a case fails for the reason it was broken.
  *
  * Nothing here reaches QuickBase, loads the real key, reads the real environment or changes
  * the repository. Temporary folders are made in the system temp directory with names that
@@ -946,7 +948,8 @@ test('client', 'where the key comes from, on GitHub and on the laptop',
 
 /* ===================================================== the environment, read as text */
 
-const TEST_FILES = ['scripts/check-job.mjs', 'scripts/job-tests.mjs', 'scripts/job-standins.mjs', 'scripts/check-selftest.mjs'];
+const TEST_FILES = ['scripts/check-job.mjs', 'scripts/job-tests.mjs', 'scripts/job-standins.mjs', 'scripts/check-selftest.mjs',
+  'scripts/published-tests.mjs'];
 // Written so that this line does not match itself.
 const ENV_READ = /process\s*\.\s*env|process\s*\[|from\s+['"](?:node:)?process(?=['"])/;
 const ENV_READS = new RegExp(ENV_READ.source, 'g');
@@ -971,20 +974,33 @@ test('environment', 'nothing else in job/ reads the real environment, and no tes
 
 const WORKFLOW = resolve(ROOT, '.github', 'workflows', 'daily-data.yml');
 const workflowText = () => (existsSync(WORKFLOW) ? readFileSync(WORKFLOW, 'utf8') : '');
-const breakWorkflow = (find, replace) => async () => {
+/**
+ * A broken copy of the workflow file: `find` replaced by `replace`. mustSay asks that the check
+ * fails at the line that was changed, named by its number in the copy (`changed` is that line's
+ * text), and that it says what the shape has there (`want`). A copy that could not be made has
+ * no such line, so its failure cannot pass for the right one.
+ */
+const breakWorkflow = (label, find, replace, changed, want) => {
   const t = workflowText();
-  if (!t.includes(find)) return no('the copy could not be made: the text to change is not in the file');
-  return checkWorkflow(t.replace(find, replace));
+  const copy = t.includes(find) ? t.replace(find, replace) : null;
+  const at = copy === null ? 0 : copy.replace(/\r/g, '').split('\n').indexOf(changed) + 1;
+  return {
+    label,
+    run: async () => (copy === null ? no('the copy could not be made: the text to change is not in the file') : checkWorkflow(copy)),
+    mustSay: `line ${at} of the file differs from the shape, which has here: "${want}"`,
+  };
 };
 test('workflow', '.github/workflows/daily-data.yml has the one shape it is allowed',
   [{ label: 'the file as it is', run: async () => checkWorkflow(workflowText()) }],
   [
-    { label: 'a copy with a schedule added', run: breakWorkflow('on:\n  workflow_dispatch:', 'on:\n  schedule:\n    - cron: "20 9 * * *"\n  workflow_dispatch:') },
-    { label: 'a copy with a second permission', run: breakWorkflow('  contents: write', '  contents: write\n  actions: read') },
-    { label: 'a copy with an action from someone else', run: breakWorkflow('uses: actions/setup-node@v6', 'uses: someone-else/setup-node@v6') },
-    { label: 'a copy with a step that runs always', run: breakWorkflow('      - name: Save the data files\n', '      - name: Save the data files\n        if: always()\n') },
-    { label: 'a copy that stages a second path', run: breakWorkflow('git add -- public/data', 'git add -- public/data docs') },
-    { label: 'a copy with the key written out', run: breakWorkflow('${{ secrets.QB_USER_TOKEN }}', FAKE_KEY) },
+    breakWorkflow('a copy with no schedule', "  schedule:\n    - cron: '20 9 * * *'\n", '', '  workflow_dispatch:', '  schedule:'),
+    breakWorkflow('a copy with a second time added', "    - cron: '20 9 * * *'\n", "    - cron: '20 9 * * *'\n    - cron: '20 21 * * *'\n", "    - cron: '20 21 * * *'", '  workflow_dispatch:'),
+    breakWorkflow('a copy with a different time', "    - cron: '20 9 * * *'\n", "    - cron: '0 9 * * *'\n", "    - cron: '0 9 * * *'", "    - cron: '20 9 * * *'"),
+    breakWorkflow('a copy with a second permission', '  contents: write\n', '  contents: write\n  actions: read\n', '  actions: read', 'concurrency:'),
+    breakWorkflow('a copy with an action from someone else', 'uses: actions/setup-node@v6', 'uses: someone-else/setup-node@v6', '        uses: someone-else/setup-node@v6', '        uses: actions/setup-node@v6'),
+    breakWorkflow('a copy with a step that runs always', '      - name: Save the data files\n', '      - name: Save the data files\n        if: always()\n', '        if: always()', '        run: |'),
+    breakWorkflow('a copy that stages a second path', 'git add -- public/data', 'git add -- public/data docs', '          git add -- public/data docs', '          git add -- public/data'),
+    breakWorkflow('a copy with the key written out', '${{ secrets.QB_USER_TOKEN }}', FAKE_KEY, `          QB_USER_TOKEN: ${FAKE_KEY}`, '          QB_USER_TOKEN: ${{ secrets.QB_USER_TOKEN }}'),
   ]);
 
 /* ============================================================ the rehearsal's leak scan */

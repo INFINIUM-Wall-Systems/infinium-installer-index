@@ -343,14 +343,17 @@ const BOT_ADDRESS = ['41898282+github-actions', '[bot]@users.noreply.github.com'
 
 /**
  * The one shape .github/workflows/daily-data.yml may have, line by line, comments and blank
- * lines aside: started by hand only, with one box to tick; contents: write and no other
- * permission; ubuntu-latest, never two at once, at most 10 minutes; actions/checkout@v6 and
- * actions/setup-node@v6 on Node 22 and no other action; the tests, then the job, then
- * public/data staged and committed as github-actions[bot] and pushed, with no force.
+ * lines aside: started in two ways, every day at 09:20 UTC and no other time, and by hand with
+ * one box to tick; contents: write and no other permission; ubuntu-latest, never two at once,
+ * at most 10 minutes; actions/checkout@v6 and actions/setup-node@v6 on Node 22 and no other
+ * action; the tests, then the job, then public/data staged and committed as
+ * github-actions[bot] and pushed, with no force.
  */
 export const WORKFLOW_SHAPE = [
   'name: Daily data',
   'on:',
+  '  schedule:',
+  "    - cron: '20 9 * * *'",
   '  workflow_dispatch:',
   '    inputs:',
   '      skip_count_guard:',
@@ -392,16 +395,26 @@ export const WORKFLOW_SHAPE = [
   '          git push origin HEAD:main',
 ];
 
-/** The workflow file has the one shape it is allowed, comments and blank lines aside. */
+/**
+ * The workflow file has the one shape it is allowed, comments and blank lines aside. A failure
+ * names the first line of the file that is not as the shape has it, by its line number in the
+ * file, and what the shape has there. It never repeats a line of the file.
+ */
 export function checkWorkflow(text) {
-  const lines = String(text).replace(/\r/g, '').split('\n').map((l) => l.replace(/\s+$/, ''))
-    .filter((l) => l.trim() && !l.trim().startsWith('#'));
+  const lines = [];
+  String(text).replace(/\r/g, '').split('\n').forEach((l, i) => {
+    const t = l.replace(/\s+$/, '');
+    if (t.trim() && !t.trim().startsWith('#')) lines.push({ text: t, at: i + 1 });
+  });
   const n = Math.max(lines.length, WORKFLOW_SHAPE.length);
   for (let i = 0; i < n; i++) {
-    if (lines[i] !== WORKFLOW_SHAPE[i]) {
-      const where = i >= lines.length ? `line ${i + 1} of the shape is missing` : i >= WORKFLOW_SHAPE.length ? `line ${i + 1} is more than the shape allows` : `line ${i + 1} differs from the shape`;
-      return result('workflow', false, `${where} (comments and blank lines aside)`);
-    }
+    const got = lines[i];
+    const want = WORKFLOW_SHAPE[i];
+    if (got && got.text === want) continue;
+    const where = !got ? `the file ends where the shape goes on with "${want}"`
+      : want === undefined ? `line ${got.at} of the file is more than the shape allows`
+        : `line ${got.at} of the file differs from the shape, which has here: "${want}"`;
+    return result('workflow', false, `${where} (comments and blank lines aside)`);
   }
-  return result('workflow', true, `${lines.length} lines, the one shape allowed: started by hand only, contents: write, two actions, public/data alone staged`);
+  return result('workflow', true, `${lines.length} lines, the one shape allowed: started every day at 09:20 UTC or by hand, contents: write, two actions, public/data alone staged`);
 }

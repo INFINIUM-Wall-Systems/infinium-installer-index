@@ -10,21 +10,28 @@
  *      process with an empty set of environment values and the repository's folder: on the
  *      laptop the key comes from .env.local in the folder above. Each run makes its own
  *      client. Before a run it stops, with a fixed message, if that run could take the calls
- *      past 100 (each client may send 60). Everything the runs print, and everything parts d
- *      and e work out, is held back until the leak scan.
+ *      past 100 (each client may send 60). Everything the runs print, and everything parts d,
+ *      e and f work out, is held back until the leak scan.
  *   d. Works out J1, J2, J8, J10 (running the pair once more if the two runs differ), J11, J12,
  *      J13, J14 and J15 on the real records, with counts and SHA-256 only; how each of the 62
  *      columns asked for came back (text, a number, true or false, a list, nothing); the empty
  *      values in the three files; dates not written like 2026-10-06; office states not in the
  *      county list.
  *   e. Works out counts to set beside what QuickBase held on October 6.
- *   f. The leak scan, on every ending: through everything held back, for every installer id,
+ *   f. Sets the installers.json and territory.json the runs of part d looked at beside the two
+ *      in public\data (compareWithPublished), after the rehearsal's own checks: for each file,
+ *      SAME BYTES or DIFFERENT (by SHA-256), and when different, counts only: entries in one
+ *      file and not the other, and entries in both written differently; whether the published
+ *      file is IN ORDER by this laptop's own rule; and the counts of installers, contacts and
+ *      territory rows, published beside now. A published file that is not in order fails the
+ *      rehearsal. When public\data is not there it says so and goes on.
+ *   g. The leak scan, on every ending: through everything held back, for every installer id,
  *      company, contact name, email and phone read; through every file in the repository
  *      (tracked or not, leaving out .git, public/data, node_modules and .env* files), for every
  *      installer id, email and phone. On a hit it prints the kind of value, where and the line
  *      number, never the value, and nothing held back. With no hit it prints what was held
  *      back.
- *   g. Deletes the folder, looks to see that it is gone, and says so. Counts the other
+ *   h. Deletes the folder, looks to see that it is gone, and says so. Counts the other
  *      installer-index- folders again.
  *
  * It reads the real environment nowhere. It prints no record, no value from one, never the
@@ -39,11 +46,13 @@ import { MAX_CALLS_PER_CLIENT } from './lib/quickbase.mjs';
 import { ASKED, CONTACTS, MASTER, TABLE_ORDER, WATCHED } from './fields.mjs';
 import { CHECK_NAMES } from './checks.mjs';
 import { CONFIRMED, STATUSES } from './shape.mjs';
-import { FULL_ORDER } from './row-contacts.mjs';
+import { FULL_ORDER, orderContacts } from './row-contacts.mjs';
+import { compareText } from './lib/order.mjs';
 import { ROOT, main } from './run.mjs';
 
 const TEMP = tmpdir();
 export const FOLDER = join(TEMP, 'installer-index-rehearsal');
+export const PUBLISHED = join(ROOT, 'public', 'data');
 const MOST_CALLS = 100;
 const sha = (text) => createHash('sha256').update(text, 'utf8').digest('hex');
 const kindOfError = (e) => (e && e.constructor && e.constructor.name) || typeof e;
@@ -76,6 +85,10 @@ const HEADINGS = [
   'one person fills both places contact who cannot be reached fills a place size in bytes calls each run made rows to a page',
   'Role not recorded', 'INFINIUM Installers MASTER Contacts Territory', 'territory rows whose tier is neither Tier 1 nor Tier 2',
   'run 1 run 2 run 3 run 4 the pair is run once more a record may have changed between them',
+  "this laptop beside the files published in public/data SHA-256 and counts only SAME BYTES DIFFERENT installers counties",
+  "only in the published file this laptop's file in both but written differently every entry is written the same so the difference is outside the entries",
+  "the published file is IN ORDER NOT IN ORDER by this laptop's own rule counts published beside now territory rows",
+  'public/data is not there so there is nothing to set beside it the runs did not both write their files',
 ];
 
 /* ------------------------------------------------------------------ the shape of what was read */
@@ -352,6 +365,90 @@ function repositoryFiles() {
   return out;
 }
 
+/* -------------------------------------------------------------- beside the published files */
+
+/** Whether `list`, put in order again by `cmp` with ties left as they are, comes out as it is. */
+function staysInOrder(list, cmp) {
+  const at = list.map((_, i) => i).sort((i, j) => cmp(list[i], list[j]) || i - j);
+  return at.every((v, k) => v === k);
+}
+
+/**
+ * installers.json in the order of section 3.6, by the job's own rule (job\lib\order.mjs): the
+ * installers by company, then installer id; within each, its contacts (orderContacts) and its
+ * territory's states. A tie is left in the order it was published in, which is the order of
+ * QuickBase's record numbers.
+ */
+export function installersInOrder(doc) {
+  if (!staysInOrder(doc.installers, (a, b) => compareText(a.company ?? '', b.company ?? '') || compareText(a.id ?? '', b.id ?? ''))) return false;
+  return doc.installers.every((i) => orderContacts((i.contacts || []).map((contact, rec) => ({ contact, rec }))).every((e, k) => e.rec === k)
+    && staysInOrder((i.territory && i.territory.states) || [], (a, b) => compareText(a.state, b.state)));
+}
+
+/** territory.json in the order of section 3.6: states by code, counties by id, the installer ids of each tier in text order. */
+export function territoryInOrder(doc) {
+  if (!staysInOrder(doc.states, (a, b) => compareText(a.state, b.state))) return false;
+  return doc.states.every((s) => staysInOrder(s.counties, (a, b) => compareText(a.id, b.id))
+    && s.counties.every((c) => staysInOrder(c.tier1Installers || [], compareText) && staysInOrder(c.tier2Installers || [], compareText)));
+}
+
+/** Each installer, by its id, as written. */
+const installerEntries = (doc) => new Map(doc.installers.map((i) => [String(i.id), JSON.stringify(i)]));
+/** Each county, by its state and id, as written. */
+const countyEntries = (doc) => new Map(doc.states.flatMap((s) => s.counties.map((c) => [`${s.state}\u0000${c.id}`, JSON.stringify([s.state, s.country, c])])));
+
+/** Counts only: entries only in the published file, only in this laptop's, and in both but written differently. */
+function entryDifferences(published, now) {
+  const d = { onlyPublished: 0, onlyNow: 0, written: 0 };
+  for (const [k, v] of published) {
+    if (!now.has(k)) d.onlyPublished++;
+    else if (now.get(k) !== v) d.written++;
+  }
+  for (const k of now.keys()) if (!published.has(k)) d.onlyNow++;
+  return d;
+}
+
+/**
+ * Part f. now: the three files a run of the rehearsal wrote, { name: text }. folder: where the
+ * published files are, public\data unless a test gives another. Returns { there, lines,
+ * notInOrder }: the lines to hold back, and the names of the published files that are not in
+ * the order this laptop's own rule gives. The files are compared by SHA-256 and by counts,
+ * never by showing what differs, and nothing returned holds an id or anything else a file
+ * holds.
+ */
+export function compareWithPublished(now, folder = PUBLISHED) {
+  const lines = ['--- this laptop beside the files published in public/data (SHA-256 and counts only)'];
+  const notInOrder = [];
+  const names = ['installers.json', 'territory.json', 'build.json'];
+  if (!names.every((name) => existsSync(join(folder, name)))) {
+    lines.push('  public/data is not there, so there is nothing to set beside it');
+    return { there: false, lines, notInOrder };
+  }
+  const published = Object.fromEntries(names.map((name) => [name, readFileSync(join(folder, name))]));
+  for (const [name, what, entriesOf, inOrder] of [
+    ['installers.json', 'installers', installerEntries, installersInOrder],
+    ['territory.json', 'counties', countyEntries, territoryInOrder],
+  ]) {
+    const doc = JSON.parse(published[name].toString('utf8'));
+    if (sha(published[name]) === sha(now[name])) {
+      lines.push(`  ${name}: SAME BYTES`);
+    } else {
+      const d = entryDifferences(entriesOf(doc), entriesOf(JSON.parse(now[name])));
+      const none = !d.onlyPublished && !d.onlyNow && !d.written;
+      lines.push(`  ${name}: DIFFERENT: ${what} only in the published file ${d.onlyPublished}, only in this laptop's file ${d.onlyNow}, `
+        + `in both but written differently ${d.written}${none ? '; every entry is written the same, so the difference is outside the entries' : ''}`);
+    }
+    const ordered = inOrder(doc);
+    if (!ordered) notInOrder.push(name);
+    lines.push(`  ${name}: the published file is ${ordered ? 'IN ORDER' : 'NOT IN ORDER'} by this laptop's own rule`);
+  }
+  const p = JSON.parse(published['build.json'].toString('utf8')).counts;
+  const n = JSON.parse(now['build.json']).counts;
+  lines.push(`  counts, published beside now: installers ${p.installers} beside ${n.installers}; contacts ${p.contacts} beside ${n.contacts}; `
+    + `territory rows ${p.territoryRows} beside ${n.territoryRows}`);
+  return { there: true, lines, notInOrder };
+}
+
 /* ------------------------------------------------------------------------------- folders */
 
 function otherFolders() {
@@ -538,6 +635,20 @@ export async function rehearse({ io = {} } = {}) {
         hold(`  run ${r.n}: ${r.outcome.calls.length} calls; rows to a page: ${pages ? TABLE_ORDER.map((t) => `${t.name} ${(pages[t.key] || []).join(', ')}`).join('; ') : 'none read'}`);
       }
       hold(`  calls in all, across the rehearsal: ${calls}`);
+
+      step = 'set this laptop beside the published files';
+      try {
+        if (okRuns) {
+          const beside = compareWithPublished(a.files);
+          for (const l of beside.lines) hold(l);
+          if (beside.notInOrder.length) failed.push(`not in this laptop's order: ${beside.notInOrder.join(', ')}`);
+        } else {
+          hold('--- this laptop beside the files published in public/data: the runs did not both write their files, so there is nothing to set beside it');
+        }
+      } catch (e) {
+        hold(`REHEARSAL: an error of kind ${kindOfError(e)} at step "${step}"`);
+        failed.push(`an error at step "${step}"`);
+      }
     } catch (e) {
       hold(`REHEARSAL: an error of kind ${kindOfError(e)} at step "${step}"`);
       failed.push(`an error at step "${step}"`);
