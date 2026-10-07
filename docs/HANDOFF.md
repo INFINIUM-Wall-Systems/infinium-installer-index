@@ -78,14 +78,25 @@ revision 2: build the job and rehearse it on the laptop; nothing published).
   a network error within the same six; an attempt with no answer after 60 seconds is tried
   again.
 
+## Git
+
+- `a38f807` "Daily job: read, shape, check and write; tests with made-up installers; county
+  list; workflow started by hand only", pushed to `origin main` on October 7. In it,
+  `CLAUDE.md` and `docs\SPEC.md` match their SHA-256 values, nothing is under
+  `public/data`, and every text file that is not empty is stored with LF.
+- The workflow file is on GitHub. Nothing runs until Joe starts it.
+- This file's final results are the commit after `a38f807`.
+
 ## The checks
 
-On October 7, with the work staged, before the first commit:
+On October 7, with the work staged, before commit `a38f807`:
 
 - `npm run check`: R1 to R7 and J19 PASS. R6's GitHub half is NOT YET SHOWN.
 - `npm run check:selftest`: PASS, 201 cases: 42 for R1 to R7 and J19, 159 for the job's tests.
 - `npm run check:job`: PASS, 66 sound cases in 62 tests.
 - `npm run check:columns` (R8): PASS, 0 differences.
+- QuickBase calls in the whole run: 30, all reads, no refusal, no retry: R8 twice (6 each)
+  and the rehearsal's two runs (9 each).
 
 ## J1 to J19
 
