@@ -32,6 +32,7 @@ import { TESTS } from './job-tests.mjs';
 import { PUBLISHED_TESTS } from './published-tests.mjs';
 import { PAGE_TESTS } from './page-tests.mjs';
 import { PAGE_PUBLISHED_TESTS } from './page-published-tests.mjs';
+import { MAP_TESTS } from './map-tests.mjs';
 import { removeTemps } from './job-standins.mjs';
 import { removePageTemps } from './page-standins.mjs';
 
@@ -225,7 +226,7 @@ try {
   /* The job's tests, then the tests of check:published and of the rehearsal beside the
      published files, then the page's tests and those of check:page:published: each passing on
      its sound cases and failing on each broken one */
-  for (const [group, tests] of [['job', TESTS], ['published', PUBLISHED_TESTS], ['page', PAGE_TESTS], ['page published', PAGE_PUBLISHED_TESTS]]) {
+  for (const [group, tests] of [['job', TESTS], ['published', PUBLISHED_TESTS], ['page', PAGE_TESTS], ['page', MAP_TESTS], ['page published', PAGE_PUBLISHED_TESTS]]) {
     for (const t of tests) {
       for (const [cs, want] of [[t.sound, true], [t.broken, false]]) {
         for (const c of cs) {

@@ -1,8 +1,9 @@
 /**
- * npm run check:page: the page's tests on made-up installers (scripts\page-tests.mjs), each on
- * its sound cases, one line each. It runs the page's plain functions (public\js) on the three
- * files the job writes from the made-up installers, with the page's own made-up installers
- * added. It needs no browser.
+ * npm run check:page: the page's tests on made-up installers (scripts\page-tests.mjs) and the
+ * tests of the map work (scripts\map-tests.mjs), each on its sound cases, one line each. It runs
+ * the page's plain functions (public\js) on the three files the job writes from the made-up
+ * installers, with the page's own made-up installers added, and on the map and ZIP files of
+ * public\geo. It needs no browser.
  *
  * It never reads the network: fetch is replaced, before anything else, by a stand-in that
  * refuses every call. It never reads public\data, the real key or QuickBase. Its temporary
@@ -13,11 +14,13 @@
 globalThis.fetch = async () => { throw new Error('the page\'s tests never reach the network'); };
 
 const { PAGE_TESTS } = await import('./page-tests.mjs');
+const { MAP_TESTS } = await import('./map-tests.mjs');
 const { removePageTemps } = await import('./page-standins.mjs');
+const TESTS = [...PAGE_TESTS, ...MAP_TESTS];
 
 const lines = [];
 try {
-  for (const t of PAGE_TESTS) {
+  for (const t of TESTS) {
     const results = [];
     for (const c of t.sound) {
       let r;
@@ -33,5 +36,5 @@ try {
 
 for (const l of lines) console.log(`${l.ok ? 'PASS' : 'FAIL'} ${l.t.line}: ${l.why}`);
 const failed = lines.filter((l) => !l.ok);
-console.log(failed.length ? `check:page: ${failed.length} of ${lines.length} failed` : `check:page: PASS, ${lines.length} lines, ${PAGE_TESTS.reduce((n, t) => n + t.sound.length, 0)} cases`);
+console.log(failed.length ? `check:page: ${failed.length} of ${lines.length} failed` : `check:page: PASS, ${lines.length} lines, ${TESTS.reduce((n, t) => n + t.sound.length, 0)} cases`);
 process.exitCode = failed.length ? 1 : 0;
