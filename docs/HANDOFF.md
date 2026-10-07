@@ -290,7 +290,17 @@ Before anything changed in this run, all passed: `npm run check` (R1 to R7 and J
 `npm run check:published` (11 lines), `npm run check:page` (24 lines) and
 `npm run check:page:published` (8 lines).
 
-The results with all the work staged are given under Git, below.
+With all the work staged, before commit `62fda86`, all passed:
+
+- `npm run check`: R1 to R7 and J19 PASS (134 tracked files; R5 scanned 131); R6's GitHub half
+  still printed as NOT YET SHOWN.
+- `npm run check:selftest`: PASS, 421 cases (343 before this run; 78 new: 15 for the built
+  files, 6 for the email repair, 52 for M1 to M13, the addresses, the unloadable files, the four
+  rulings and the words, and 5 for the map lines of `check:page:published`).
+- `npm run check:job`: PASS, 66 cases in 62 tests (unchanged).
+- `npm run check:published`: PASS, 11 lines (unchanged).
+- `npm run check:page`: PASS, 46 lines, 47 cases.
+- `npm run check:page:published`: PASS, 13 lines (above).
 
 No QuickBase call was made in this run.
 
@@ -385,8 +395,10 @@ builtAt 2026-10-07T13:31:41Z. build.json gives installers 73, contacts 221, terr
 - `6bd89ba`: the handoff of the page's first prompt. No commit came after it before this run.
 - `decdda8` "Map shapes and the ZIP list in public/geo, their two scripts and their test".
 - `57cd85d` "Search: an email is matched by its words, not anywhere in it".
-- The map views, and this file, follow; their ids are in the report of this run and in the
-  file as committed after them.
+- `62fda86` "The page: the Home map, the State view, county maps and ZIP lookup".
+- All three pushed to `origin main` on October 7, each with the five checks passing. Nothing
+  under `public/data` in any of them. No "Daily data refresh" came in between.
+- This file's final results are the commit after `62fda86`.
 
 ## Not built
 
