@@ -51,7 +51,17 @@ four reads and three tables replace. The comment at the top of the file has the 
 
 ## The checks
 
-Results: filled in at the end of step 9.
+Results, after the first push (commit `30b9f9a`):
+
+- R1 PASS: origin is the GitHub repository, and the first commit is on GitHub.
+- R2 PASS: 21 tracked files; the folders and files of section 3.4 are there.
+- R3 PASS. R4 PASS.
+- R5 PASS: 21 files scanned. The allowed list is empty.
+- R6 PASS for the repository half: the key was compared in memory and is in no file. The
+  GitHub half is NOT YET SHOWN.
+- R7 PASS.
+- R8 PASS: 0 differences; 338, 15 and 12 columns.
+- `npm run check:selftest`: PASS, 29 cases, each as expected.
 
 How each was shown to fail (`npm run check:selftest`, 29 cases):
 
