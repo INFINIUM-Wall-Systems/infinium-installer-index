@@ -9,6 +9,11 @@
  *   #/search?q=<what was typed>     Search results
  *   #/not-on-the-map                Not on the map
  *   #/about                         About this data
+ *   #/state/<code>                  a state, by its two-letter code; ON for Ontario
+ *   #/state/<code>?county=<id>      that state with one county chosen
+ *   #/zip/<five digits>             the answer for a ZIP code
+ *
+ * #/search?q=<five digits> shows what #/zip/<the same digits> shows.
  *
  * parseHash turns an address into a route; toHash turns a route back into its address, so that
  * every address gives its view and the view gives back the same address. An address that names
@@ -75,6 +80,18 @@ export function parseHash(hash) {
     if (!only('q')) return NOT_FOUND(whole);
     return { view: 'search', q: query && query.has('q') ? query.get('q') : '' };
   }
+  if (path.startsWith('/state/')) {
+    const code = decode(path.slice('/state/'.length));
+    if (!code || !/^[A-Z]{2}$/.test(code) || !only('county')) return NOT_FOUND(whole);
+    const county = query && query.has('county') ? query.get('county') : null;
+    if (county === '') return NOT_FOUND(whole);
+    return { view: 'state', code, county };
+  }
+  if (path.startsWith('/zip/')) {
+    const zip = path.slice('/zip/'.length);
+    if (!/^\d{5}$/.test(zip) || qAt >= 0) return NOT_FOUND(whole);
+    return { view: 'zip', zip };
+  }
   if (path === '/not-on-the-map' && qAt < 0) return { view: 'notOnMap' };
   if (path === '/about' && qAt < 0) return { view: 'about' };
   return NOT_FOUND(whole);
@@ -91,6 +108,8 @@ export function toHash(route) {
     }
     case 'installer': return `#/installer/${encode(route.id)}`;
     case 'search': return `#/search?q=${encode(route.q ?? '')}`;
+    case 'state': return `#/state/${encode(route.code)}${route.county ? `?county=${encode(route.county)}` : ''}`;
+    case 'zip': return `#/zip/${route.zip}`;
     case 'notOnMap': return '#/not-on-the-map';
     case 'about': return '#/about';
     default: return route.hash ?? '#/';
@@ -99,3 +118,14 @@ export function toHash(route) {
 
 /** The address of one installer's view. */
 export const installerHash = (id) => toHash({ view: 'installer', id });
+
+/** The address of a state's view, with a county chosen or not. */
+export const stateHash = (code, county = null) => toHash({ view: 'state', code, county });
+
+/** Five digits typed in the search box, spaces around them aside: a ZIP code. */
+export const isZip = (typed) => /^\s*\d{5}\s*$/.test(String(typed ?? ''));
+
+/** The address the search box gives for what is typed: a ZIP's for five digits, a search's for anything else. */
+export function boxAddress(typed) {
+  return isZip(typed) ? toHash({ view: 'zip', zip: String(typed).trim() }) : toHash({ view: 'search', q: String(typed ?? '') });
+}

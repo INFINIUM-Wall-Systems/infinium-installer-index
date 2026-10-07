@@ -16,6 +16,7 @@
     "job:rehearse": "node job/rehearse.mjs",
     "check:page": "node scripts/check-page.mjs",
     "check:page:published": "node scripts/check-page-published.mjs",
-    "page:pictures": "node scripts/page-pictures.mjs"
+    "page:pictures": "node scripts/page-pictures.mjs",
+    "page:pictures:maps": "node scripts/page-pictures-maps.mjs"
   }
 }

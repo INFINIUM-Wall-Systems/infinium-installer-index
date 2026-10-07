@@ -1,52 +1,89 @@
 # Handoff: state for the next Claude Code chat
 
-**Written:** October 7, 2026, at the end of the page's first prompt (Joe's prompt "The page,
-part 1", revision 1: the frame and the desktop views).
+**Written:** October 7, 2026, at the end of the page's second prompt (Joe's prompt "The page,
+part 2", revision 1: the map, the State view, counties and ZIP codes).
 
 ## Where things stand
 
-- **The page's desktop views are built**, as far as acceptance group V: the frame, Home
-  without its map, All installers, Installer, Search results, Not on the map, About this data,
-  a not-found view, and the view for data that cannot be loaded. Plain files in `public\`,
-  nothing to build.
-- **They were checked three ways, all on made-up installers or by counts only:**
-  `npm run check:page` (24 lines, the page's plain functions on made-up installers),
-  `npm run page:pictures` (Microsoft Edge without a window, against a local server that
-  serves made-up installers only: 30 pictures and 9 measures), and
-  `npm run check:page:published` (the same functions over the real files, counts only).
-- **The page was never loaded, pictured or copied with the real records on the laptop.** The
-  local server cannot serve `public\data\`.
-- **Next:** Joe ties a Netlify site to the GitHub repository, serving the `public` folder with
-  no build step. That is where he sees the page with the real records.
-- **The daily job** runs on GitHub every day at 09:20 UTC. Nothing the job runs or tests
-  changed in this run. The first scheduled runs are on the mornings of October 8 and 9 (J17).
+- **The map views are built**, as far as acceptance group M, on a desktop screen: the map on
+  Home of the states and Ontario, with its legend and a list of every state; the State view,
+  with its county map, its county box and its list; and ZIP lookup. Also the shape files and the
+  ZIP list in `public\geo\`, and one repair to search (an email is matched by its words).
+- **The desktop views of the first prompt** stand as they were, with the changes this prompt
+  names: links to a state's view (ruling 8), the line under a search that names a state
+  (ruling 7), ZIP codes named in the search box's hint, Home's line and the list of what can be
+  searched, and the credits on About this data (ruling 5). Joe looked at them on the Netlify
+  test copy with the real records and said to go on.
+- **Checked four ways, on made-up installers or by counts only:** `npm run check:page` (46
+  lines), `npm run page:pictures` and the new `npm run page:pictures:maps` (Microsoft Edge
+  without a window, against a local server that serves made-up installers only), and
+  `npm run check:page:published` (13 lines over the real files, counts only).
+- **The page was never loaded, pictured or copied with the real records on the laptop.**
+- **Next:** Joe goes through the layout of the whole page on the Netlify test copy, then the
+  phone layout.
+- **The daily job** runs on GitHub every day at 09:20 UTC. Nothing it runs or tests changed.
 
 ## What the repository holds
 
 - `CLAUDE.md`, `docs\SPEC.md` (eighth revision) and `docs\ACCEPTANCE.md`: Joe's text,
-  unchanged in this run.
-- `README.md`, for Kuna: now also how the page is laid out, that it is plain files served from
-  `public\`, that the addresses after the `#` need no settings on a host, that the page reads
-  four files and never calls QuickBase, the page's three commands, and where the fonts and the
-  logo came from.
-- `public\index.html`; `public\css\fonts.css` and `site.css`; `public\js\app.js` (the only part
-  that touches the browser), `data.js`, `routes.js`, `search.js`, `contacts.js`, `views.js`,
-  `format.js`, `html.js`; `public\img\` (logo and icons); `public\vendor\fonts\` (four font
-  files). The `.gitkeep` files of `public\js`, `public\css` and `public\vendor` are gone.
-- `public\geo\counties.json` and `public\data\`: unchanged by this run.
-- `job\` and `.github\workflows\daily-data.yml`: unchanged.
+  unchanged.
+- `README.md`, for Kuna: now also how the maps are drawn and that nothing comes from another
+  site; the files of `public\geo\`, what made each, how to make them again and where their
+  sources lie; the credits; and `npm run page:pictures:maps`.
+- `public\`: `index.html`; `css\fonts.css`, `css\site.css`; `js\app.js` (the only part that
+  touches the browser), `data.js`, `routes.js`, `search.js`, `contacts.js`, `views.js`,
+  `maps.js` (new: the maps), `format.js`, `html.js`; `img\`; `vendor\fonts\` (the fonts alone);
+  `geo\counties.json` (unchanged), `geo\states-map.json`, `geo\counties\` (52 files) and
+  `geo\zips\` (10 files), all new; `data\` (only the job writes it).
+- `job\`: `build-shapes.mjs` and `build-zips.mjs` are new, run by hand, never by the daily job.
+  Nothing the daily job loads changed.
 - `scripts\`:
-  - new: `check-page.mjs` (`npm run check:page`), `page-tests.mjs` (its tests),
-    `check-page-published.mjs` (`npm run check:page:published`), `page-published-tests.mjs`
-    (its self-test cases), `page-standins.mjs` (made-up data, tree helpers, section 4.4 written
-    out), `serve-made-up.mjs` (the local server), `page-pictures.mjs` (`npm run page:pictures`),
-    `fixtures\page-installers.json` (6 made-up installers, 11 contacts, 7 territory rows, for
-    cases the job's fixtures lack).
-  - changed: `check-selftest.mjs` (runs the page's tests and cleans their temporary folders),
-    `package.json` (three scripts added).
+  - new: `map-tests.mjs` (the tests of the map work, in `check:page`), `page-browser.mjs` (what
+    both picture commands share), `page-pictures-maps.mjs` (`npm run page:pictures:maps`).
+  - changed: `check-page.mjs` (runs the map tests too), `page-tests.mjs` (V9 and V11 brought to
+    the new rules; the email test), `check-page-published.mjs` (5 map lines),
+    `page-published-tests.mjs` (their self-test cases), `page-pictures.mjs` (on the shared
+    harness; its views wait for their maps), `check-selftest.mjs` (runs the map tests),
+    `package.json` (`page:pictures:maps` added).
   - unchanged: `checks.mjs`, `check.mjs`, `job-tests.mjs`, `job-standins.mjs`, `check-job.mjs`,
-    `published-tests.mjs`, `check-published.mjs`, `fixtures\installers.json`,
-    `fixtures\fingerprints.json`, `r5-allowed.json` (still empty).
+    `published-tests.mjs`, `check-published.mjs`, `serve-made-up.mjs`, `page-standins.mjs`, the
+    two job fixtures, `fixtures\page-installers.json`, `r5-allowed.json` (still empty).
+
+## The map and ZIP files (public\geo)
+
+Built by hand, by `node job/build-shapes.mjs` and `node job/build-zips.mjs`. The same sources
+give the same bytes (built twice, same SHA-256).
+
+| What | Files | Bytes |
+|---|---|---|
+| `states-map.json`, the Home map | 1 | 88,825 |
+| `counties\<code>.json`, one county map for each of the 52 | 52 | 494,809 in all; the largest `ON.json`, 63,148; the smallest `DC.json`, 165 |
+| `zips\0.json` to `zips\9.json`, the ZIP list by first digit | 10 | 1,387,970 in all; the largest `4.json`, 160,619 |
+| In all | 63 | 1,971,604 |
+
+- **Outlines:** `public/data/counties.topo.json` of `installer-application` at `a6fc6db`
+  (990,334 bytes; 10,141 arcs; 3,193 county outlines and 52 state outlines, the states already
+  joined; quantized TopoJSON in longitude and latitude), read with `git show` and held in
+  memory. Its county ids are those of `counties.json`: each of the 3,193 has one shape, in its
+  own state's file.
+- **What was done to them:** each arc projected, put into its frame, rounded to whole units, and
+  a point that repeats the one before dropped. No further thinning (the source is already
+  simplified): the Home map keeps 14,887 of 15,414 points, the county maps 49,568 of 49,883.
+  Paths are written `M x,y l dx,dy,... z`, whole numbers, a comma between every two, so that
+  R5 reads no phone number in them.
+- **Projections:** the Home map, 9,600 by 7,377 units: the 48 adjoining states, the District of
+  Columbia and Ontario in one Albers equal-area conic (parallels 29.5 and 45.5 degrees north,
+  centred on 96 west); Alaska (its own conic, parallels 55 and 65, at 0.35 of the main scale)
+  and Hawaii (parallels 8 and 18, at 0.8) in the lower left, each below every state above it.
+  Codes fit on 44 states; not on CT, DC, DE, HI, MA, MD, NJ and RI, which the list under the
+  map covers. Each state's map: an Albers conic centred on the state, parallels at one sixth
+  and five sixths of its span of latitude, north up, fitted into 6,400 by 5,600 units with a
+  margin of 60, centred. For Alaska, 360 is taken from a longitude above zero (the source holds
+  none: it was clipped at 180 west).
+- **ZIP list:** `coverage-map\data\geo\zip-to-county.csv`, read where it lies: 2,437,863 bytes;
+  46,969 rows; 33,791 ZIP codes; 3,233 county codes, 3,144 of them in the county list. Outside
+  the map, by first digit: 0: 138 (PR 132, VI 6); 9: 11 (GU 7, MP 3, AS 1); every other digit
+  0; none beginning 06. No ZIP has some counties in the list and some not.
 
 ## The logo and the fonts
 
@@ -91,8 +128,43 @@ Copied byte for byte from `installer-application` at commit `a6fc6db`, by node r
 - Eastern time is worked out from the United States daylight-time rule, not the machine's
   settings. It agrees with node's own time-zone data at every 90 minutes of 2026 and 2027
   (11,680 times, in `check:page`).
+- The map work adds `#/state/<code>`, `#/state/<code>?county=<id>` and `#/zip/<five digits>`;
+  `#/search?q=<five digits>` shows what the ZIP's own address shows. A code or a county id not
+  in the county list, a county of another state, and a ZIP that is not five digits give the
+  not-found view. The search box gives a ZIP's address for five digits, spaces around them
+  aside, and a search's for anything else (`boxAddress` in `routes.js`); typing a ZIP adds one
+  step to Back.
+- Which files an address needs beyond the four is `filesFor` in `views.js`: Home the Home map;
+  a State view its own shape file; a ZIP its ZIP file, then, for a ZIP in one county, that
+  state's shape file. `app.js` fetches each once and keeps it. The list shows at once; when a
+  map's file comes, only the map's part (`[data-map-slot]`) is filled in, and marked
+  `data-map="drawn"`, or `"failed"` with one line saying the map could not be drawn.
+- `maps.js` draws the maps as plain SVG markup (svg, g, a, path, text, title): each state or
+  county a link to its address, shaded on the five steps (1; 2 to 3; 4 to 6; 7 to 10; 11 up)
+  in the old page's greens, white with a line-coloured border for none. The border and green
+  ring of the shape under the pointer or the focus are drawn by `app.js` on two empty paths at
+  the end of the map, so no neighbour hides them. The chosen county's heavy outline is drawn
+  again over the map last, not a link.
 
-## The rulings, as built
+## The rulings of the second prompt, as built
+
+1. The county maps are drawn as plain SVG from the application form's county outlines, not
+   with its map library. `public\vendor\` holds only the fonts.
+2. The Home map is drawn from the same outlines. Ontario is a shape in its true place, above the
+   Great Lakes.
+3. Under the Home map, "Every state and Ontario": all 52 by name with their code, each with its
+   number of installers ("3 installers", "1 installer", "no installer") and a link to its view.
+4. The ZIP list is ten files by first digit; only the one needed is loaded.
+5. About this data has a part "Where the maps come from" with the three lines of step 4f.
+6. An email is matched from the start of any word before the @ (a period, hyphen, underscore
+   or plus sign parts the words), from the start of the part after the @, or anywhere when
+   what is typed holds an @ or a period.
+7. A search that names a state shows, above its results, "Open the map of <state>".
+8. In States covered the codes are links; in the Installer view, the first line inside each
+   state is "Open the map of <state>", and the line that opens it holds no link; a search
+   result found by territory links the state's name to its view.
+
+## The rulings of the first prompt, as built
 
 1. Search by state finds an installer whose office is in that state and one whose territory
    includes it. A result found by territory shows "Territory includes <state>: Tier 1 in N
@@ -137,6 +209,27 @@ Copied byte for byte from `installer-application` at commit `a6fc6db`, by node r
 | V15 | Shown by measure in a browser on made-up installers: no script error in any view. Waits for Joe's eye on the Netlify test copy with the real records |
 | V16 | Shown by test (a file missing, not JSON, schema not 1: 7 cases) and in a browser picture with `installers.json` missing |
 
+## M1 to M13
+
+Each waits as well for Joe's eye on the Netlify test copy with the real records, which is how
+group M's milestone is met.
+
+| Check | Where it stands |
+|---|---|
+| M1 | Shown by test: all 52 shaded at the step for the installers territory.json gives them; the steps at their edges; the five colours; a code on every step at least 4.5 to 1. On the real files: 52 at their step (`home map`). In a browser: every code at least 13px and 9.8 to 1 as drawn |
+| M2 | Shown by test: every state and Ontario links to its view, on the map and in the list. In a browser: a click on Ohio opens it; Enter on five states of the map |
+| M3 | Shown by test: each of the 52 State views asks for its own shape file alone. In a browser: Ohio, Texas, Ontario and the District of Columbia each fetched their own file alone |
+| M4 | Shown by test for all 3,193 counties. On the real files: 3,193 at their step (`county maps`) |
+| M5 | Shown by test for all 3,193 counties chosen in turn, 01001 and the Ontario divisions among them; 3,178 of them served by none of the made-up installers. On the real files: each county, chosen, lists as many installers as territory.json gives it |
+| M6 | Shown by test for all 3,193 names: the box gives the same address as the county's link; matched from the start of a word, capitals aside; "Show all of Ohio" gives Ohio's address |
+| M7 | Shown by test on a model changed by hand, so that the file's order and the tiers' differ; the file's order is alphabetical by company |
+| M8 | Shown by test: the number from the data (25, then 1 with its own wording); a number written in fails. On the real files: 21, build.json's number (`foot line`) |
+| M9 | Shown by test: Adams County, Ohio; El Paso County, Texas; the District of Columbia. On the real files no county is unserved today |
+| M10 | Shown by test: 50 ZIP codes by a fixed rule, 12 crossing a county line and 5 beginning with a zero |
+| M11 | Shown by test on a model changed by hand: ZIP 44203, three counties, each installer once at its best tier |
+| M12 | Shown by test, in section 4.9's words; pictured in a browser (49999, 00601) |
+| M13 | Shown by test (11 addresses ask for no ZIP file; a ZIP for the one file of its first digit), and by measure in a browser |
+
 ## npm run check:page:published, on the real files (October 7)
 
 | Line | Result |
@@ -149,34 +242,55 @@ Copied byte for byte from `installer-application` at commit `a6fc6db`, by node r
 | not on the map | PASS: lists 21; build.json counts 21 without territory |
 | about | PASS: the 15 counts and gap counts build.json holds, and its 7 checks |
 | rows | PASS: rows showing a stand-in 30, beside 30 from the file; nobody in a place 16, beside 16; one person in both places 12, beside 12 |
+| home map | PASS: 52 states, each at the step for its number of installers |
+| state views | PASS: 3,245 State views drawn, 52 with no county chosen and 3,193 with one |
+| county maps | PASS: 3,193 counties, each at the step for its number of installers, and each listing as many when chosen |
+| foot line | PASS: the foot line carries 21; build.json counts 21 without territory |
+| steps | PASS: counties none 0, step 1 0, step 2 96, step 3 2,499, step 4 551, step 5 47; states none 0, step 1 0, step 2 2, step 3 13, step 4 30, step 5 7; the same from the file |
 
-## In a browser (npm run page:pictures)
+## In a browser
 
 Microsoft Edge 154.0.4258.62, without a window, with a throwaway profile, against
-`http://127.0.0.1` only, and told it could resolve no other host. Every measure passed: V1,
-V3, V4, V15, no request left 127.0.0.1 (976 requests), text size and contrast (3,516 pieces
-of text: smallest 12px, lowest 4.98 to 1), Tab and Escape (179 links, buttons and fields in 6
-views reached in the page's order with a green focus ring; Escape closes "Show all contacts"
-and an open state). V3 and V4 were shown failing on a copy of the page with a broken style.
+`http://127.0.0.1` only, and told it could resolve no other host. Both commands share
+`scripts\page-browser.mjs`; each waits, for a view with a map, until the map's part is marked.
 
-Pictures, each at 1440 and 1280, in `review-screens\` (not committed): `home`,
-`all-installers-contact-info`, `all-installers-rates`, `all-installers-one-status`,
+**npm run page:pictures** (22 seconds; October 7, after the last change to the page). Every
+measure passed: V1, V3, V4, V15, no request left 127.0.0.1 (1,037 requests), text size and
+contrast (4,158 pieces of text: smallest 12px, lowest 4.98 to 1), Tab and Escape (297 links,
+buttons and fields in 6 views, the 52 states of the Home map among them, reached in order with
+a ring). V3 and V4 shown failing on a copy with a broken style. Pictures, each at 1440 and 1280:
+`home`, `all-installers-contact-info`, `all-installers-rates`, `all-installers-one-status`,
 `installer-everything-filled`, `installer-state-open`, `installer-least-filled`,
 `show-all-contacts-open`, `search-contact-not-on-row`, `search-no-match`, `search-state`,
 `not-on-the-map`, `about-this-data`, `out-of-date-line`, `data-not-loaded`.
 
+**npm run page:pictures:maps** (96 seconds). Every measure passed, and each was shown failing on
+a copy of the page broken for it:
+
+| Measure | Result | Shown failing on |
+|---|---|---|
+| addresses | 10 new addresses opened fresh, each its view; a mouse click on Ohio and on Summit County, Back twice and Forward; typing a ZIP gives its address, one Back returns to Home | a copy whose router sends a state's address to not-found |
+| requests | a State view fetched its own shape file alone (Ohio, Texas, Ontario, the District of Columbia); no ZIP file before a ZIP; a ZIP the one file of its first digit; 2,589 requests, all to 127.0.0.1 | a copy that fetches a ZIP file on Home |
+| width | 19 views at both widths, every map drawn: no map wider than its panel, no sideways scroll | a copy whose map is 2,600px wide |
+| errors | no script error in any view | a copy whose map stops with an error |
+| text | every piece of text at least 12px and 4.5 to 1; 176 codes on maps measured as drawn, smallest 13px, lowest 9.80 to 1 against their own state | a copy whose codes are 6px and pale (44 codes caught) |
+| keyboard | all 52 states, and every county of Ohio, Texas, the District of Columbia and Ontario, reached with Tab in order, the green ring drawn on the shape; Enter on the first, the last and three between; the skip links move the focus past the map and leave the address alone | a copy whose states cannot be reached with Tab |
+
+Pictures, each at 1440 and 1280: `home-map`, `home-state-by-tab`, `state-OH`, `state-TX`,
+`state-AK`, `state-HI`, `state-MI`, `state-VA`, `state-LA`, `state-DC`, `state-ON`,
+`state-county-chosen` (Summit County, Ohio), `state-county-nobody-serves` (Adams County, Ohio),
+`zip-one-county` (44056), `zip-several-counties` (44203), `zip-not-in-list` (49999),
+`zip-outside-map` (00601), `about-this-data-maps`, `search-names-state`; and at 1440 each map's
+panel alone (`map-panel-*`, 13 pictures). All in `review-screens\`, not committed.
+
 ## The checks
 
-On October 7, with the work staged, before commit `93a3dc7`:
+Before anything changed in this run, all passed: `npm run check` (R1 to R7 and J19),
+`npm run check:selftest` (343 cases), `npm run check:job` (66 cases in 62 tests),
+`npm run check:published` (11 lines), `npm run check:page` (24 lines) and
+`npm run check:page:published` (8 lines).
 
-- `npm run check`: R1 to R7 and J19 PASS (65 tracked files; R5 scanned 62); R6's GitHub half is
-  still printed as NOT YET SHOWN.
-- `npm run check:selftest`: PASS, 343 cases (259 before this run): 73 cases of the page's
-  tests (25 sound, 48 broken) and 11 of `check:page:published` (1 sound, 10 broken) are new.
-- `npm run check:job`: PASS, 66 cases in 62 tests (unchanged).
-- `npm run check:published`: PASS, 11 lines (unchanged).
-- `npm run check:page`: PASS, 24 lines, 25 cases.
-- `npm run check:page:published`: PASS, 8 lines (above).
+The results with all the work staged are given under Git, below.
 
 No QuickBase call was made in this run.
 
@@ -268,25 +382,21 @@ builtAt 2026-10-07T13:31:41Z. build.json gives installers 73, contacts 221, terr
 
 ## Git
 
-- `22eeaba`: the handoff of the job's second prompt. No commit came after it before this run.
-- `93a3dc7` "The page: frame, All installers, Installer, Search, Not on the map, About this
-  data", pushed to `origin main` on October 7. GitHub answered the first two pushes with
-  "Internal Server Error" and took the third, three minutes later; its main had not moved in
-  between. Nothing under `public/data` in it.
-- This file's final results are the commit after `93a3dc7`.
+- `6bd89ba`: the handoff of the page's first prompt. No commit came after it before this run.
+- `decdda8` "Map shapes and the ZIP list in public/geo, their two scripts and their test".
+- `57cd85d` "Search: an email is matched by its words, not anywhere in it".
+- The map views, and this file, follow; their ids are in the report of this run and in the
+  file as committed after them.
 
 ## Not built
 
-The map on Home; the State view; the county map; ZIP lookup (five digits in the search box say
-"ZIP code lookup comes with the map views."); the phone layout; address search; the county
-shapes, the state map and the ZIP list of `public\geo\`; the Netlify test copy.
+The phone layout (group P); address search (group A); the server copy (group T).
 
 ## What comes next
 
-1. Joe ties a Netlify site to the GitHub repository, serving the `public` folder with no build
-   step, and looks at the page with the real records (V4, V15 and V1 there, and the look).
-2. The first two scheduled runs of the job, on the mornings of October 8 and 9 (J17, J18).
-3. Then the map, the State view, the county map and ZIP lookup (group M).
+1. Joe goes through the layout of the whole page on the Netlify test copy, the map views with
+   the real records among it (group M's look, and V1, V4 and V15 with the real records).
+2. Then the phone layout (group P).
 
 ## Worth knowing
 
@@ -295,8 +405,15 @@ shapes, the state map and the ZIP list of `public\geo\`; the Netlify test copy.
   made-up data in temporary folders and its server has no way to serve `public\data\`;
   `npm run check:page:published` reads the real files with node and prints counts only.
 - The page's tests and pictures make their temporary folders as `installer-index-page-*`,
-  `installer-index-browser-*` and `installer-index-broken-style-*`, and delete each by its own
-  path.
+  `installer-index-browser-*`, `installer-index-broken-style-*` and
+  `installer-index-broken-<measure>-*`, and delete each by its own path.
+- `npm run page:pictures` and `npm run page:pictures:maps` each run within Claude Code's ten
+  minutes (22 and 96 seconds); run them one after the other, never in the background.
+- Chrome and Edge keep at most 50 steps of history, so a measure counts a step to Back by going
+  Back, not by the length of the history.
+- The made-up installers cover 15 counties; 3,178 counties and most states have none of them,
+  which is what the tests of a county nobody serves use. On the real files every county is
+  served today.
 - A broken case in `scripts\page-tests.mjs` hands the test a broken stand-in for one of the
   page's functions, or a changed copy of what a view gave back, and carries `mustSay`.
 - An email is matched from the start of any word of the part before the @ (a period, a hyphen,

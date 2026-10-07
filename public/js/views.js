@@ -3,15 +3,21 @@
  * and gives back { view, title, node }, where node is a tree of elements (html.js). They touch
  * no browser object, so node can load them and test them; app.js puts the result on the page.
  *
- * Sections 4.1 and 4.3 to 4.8 of docs\SPEC.md say what each view shows, with the rulings of the
- * page's first prompt. A field with no value is left out, never shown as a dash.
+ * Sections 4.1 to 4.9 of docs\SPEC.md say what each view shows, with the rulings of the page's
+ * first and second prompts. A field with no value is left out, never shown as a dash.
+ *
+ * A view with a map, or a ZIP code to look up, needs a file that is fetched only then: filesFor
+ * says which, and renderView and mapPart are handed what has come so far, as
+ * files = { path: { state: 'loading' | 'ok' | 'failed', doc } }. The list shows at once and the
+ * map when its file has come; the map's part is marked pending, drawn or failed.
  */
 import { h } from './html.js';
 import * as F from './format.js';
-import { countiesIn, notOnTheMap, stateName } from './data.js';
+import { countiesIn, countyCount, countyMapPath, HOME_MAP, notOnTheMap, placeName, stateName, zipPath } from './data.js';
 import { search } from './search.js';
 import { contactsOf, NO_ROLE, rolesOf, rowOf } from './contacts.js';
-import { installerHash, toHash } from './routes.js';
+import { installerHash, isZip, stateHash, toHash } from './routes.js';
+import { countyMap, countyMapUsable, homeMap, homeMapUsable, installersWord, legend } from './maps.js';
 
 export const SITE = 'Installer Index';
 export const CONFIRMED = 'CONFIRMED BY PARTNER';
@@ -161,20 +167,117 @@ const heading = (text, sub) => h('div', { class: 'view-head' },
 
 /* ============================================================ the views */
 
+/* ============================================================ maps in views */
+
+/** A link, shown on focus, that skips past a map: app.js moves the focus, and the address does not change. */
+const skipLink = (target, text) => h('a', { class: 'skip-map', href: `#${target}`, 'data-skip-to': target }, text);
+
+/** The map's part of a view: { key, state: 'pending' | 'drawn' | 'failed', node }. */
+function homeMapPart(model, files) {
+  const f = files[HOME_MAP];
+  if (!f || f.state === 'loading') return { key: 'home', state: 'pending', node: h('p', { class: 'map-note' }, 'Drawing the map…') };
+  if (f.state !== 'ok' || !homeMapUsable(f.doc)) {
+    return { key: 'home', state: 'failed', node: h('p', { class: 'map-note', 'data-map-failed': 'true' }, 'The map could not be drawn. Every state is in the list below.') };
+  }
+  return { key: 'home', state: 'drawn', node: [homeMap(model, f.doc), legend('Installers with territory in the state or province')] };
+}
+
+function countyMapPart(model, code, chosen, files) {
+  const f = files[countyMapPath(code)];
+  if (!f || f.state === 'loading') return { key: 'county', state: 'pending', node: h('p', { class: 'map-note' }, 'Drawing the map…') };
+  if (f.state !== 'ok' || !countyMapUsable(f.doc, code)) {
+    return { key: 'county', state: 'failed', node: h('p', { class: 'map-note', 'data-map-failed': 'true' }, 'The map could not be drawn. The list below still shows every installer.') };
+  }
+  return { key: 'county', state: 'drawn', node: [countyMap(model, code, f.doc, chosen), legend('Installers serving the county')] };
+}
+
+const mapSlot = (part) => h('div', { class: 'map-slot', 'data-map-slot': part.key, 'data-map': part.state }, part.node);
+
+/** A state's code or a county's id that the county list holds, in that state. */
+const knownState = (model, code) => model.stateNames.has(code);
+const knownCounty = (model, code, county) => {
+  const c = model.countyById.get(county);
+  return Boolean(c) && c.state === code;
+};
+
+/** What the ZIP file says of a ZIP: { state: 'pending' | 'failed' | 'ok', entry }; entry null when it is not in the list. */
+function zipLookup(files, zip) {
+  const f = files[zipPath(zip)];
+  if (!f || f.state === 'loading') return { state: 'pending', entry: null };
+  if (f.state !== 'ok' || !Array.isArray(f.doc.zips)) return { state: 'failed', entry: null };
+  return { state: 'ok', entry: f.doc.zips.find((z) => isGroup(z) && z.zip === zip) || null };
+}
+
+/** The ZIP a route asks for: a ZIP's own address, or a search for five digits. */
+const zipOf = (route) => (route.view === 'zip' ? route.zip : route.view === 'search' && isZip(route.q) ? String(route.q).trim() : null);
+
+/** The one listed county of a ZIP that is in exactly one county, or null. */
+function soleCounty(model, entry) {
+  if (!entry || !Array.isArray(entry.counties) || entry.counties.length !== 1) return null;
+  return model.countyById.get(entry.counties[0]) || null;
+}
+
+/**
+ * The files an address needs, beyond the four the page loads at the start: [{ path, part }].
+ * part is 'map' for a file that only draws the map, 'content' for one the view's list waits on.
+ */
+export function filesFor(route, model, files = {}) {
+  if (route.view === 'home') return [{ path: HOME_MAP, part: 'map' }];
+  if (route.view === 'state') {
+    if (!knownState(model, route.code) || (route.county && !knownCounty(model, route.code, route.county))) return [];
+    return [{ path: countyMapPath(route.code), part: 'map' }];
+  }
+  const zip = zipOf(route);
+  if (!zip) return [];
+  const out = [{ path: zipPath(zip), part: 'content' }];
+  const z = zipLookup(files, zip);
+  const sole = z.state === 'ok' ? soleCounty(model, z.entry) : null;
+  if (sole) out.push({ path: countyMapPath(sole.state), part: 'map' });
+  return out;
+}
+
+/** The map's part of the view for a route, as files stand: null for a view with no map. */
+export function mapPart(route, model, files = {}) {
+  if (route.view === 'home') return homeMapPart(model, files);
+  if (route.view === 'state') {
+    if (!knownState(model, route.code) || (route.county && !knownCounty(model, route.code, route.county))) return null;
+    return countyMapPart(model, route.code, route.county, files);
+  }
+  const zip = zipOf(route);
+  if (!zip) return null;
+  const z = zipLookup(files, zip);
+  const sole = z.state === 'ok' ? soleCounty(model, z.entry) : null;
+  return sole ? countyMapPart(model, sole.state, sole.id, files) : null;
+}
+
+/* ============================================================ the views */
+
 function home(ctx) {
   const { model } = ctx;
   const all = model.installers.length;
   const off = notOnTheMap(model).length;
   const button = (href, label, n) => h('a', { class: 'btn btn-big', href, 'data-count': n },
     h('span', {}, label), h('span', { class: 'count' }, F.count(n)));
+  const states = [...model.stateList].sort((a, b) => F.compareText(String(a.name), String(b.name)));
   return {
     view: 'home',
     title: SITE,
     node: h('section', { class: 'home' },
-      heading('Find an installer', 'Search above by company, contact, email, phone, office city or state, or open a list.'),
-      h('div', { class: 'home-buttons' },
+      heading('Find an installer', 'Search above by company, contact, email, phone, office city, state or ZIP code, or open a state on the map or a list.'),
+      h('div', { class: 'panel map-panel map-panel-home' },
+        skipLink('home-after-map', 'Skip the map'),
+        mapSlot(homeMapPart(model, ctx.files))),
+      h('div', { class: 'home-buttons', id: 'home-after-map', tabindex: '-1' },
         button(toHash({ view: 'installers', set: 'contact', status: null }), 'All installers', all),
-        button(toHash({ view: 'notOnMap' }), 'Not on the map', off))),
+        button(toHash({ view: 'notOnMap' }), 'Not on the map', off)),
+      h('section', { class: 'panel part state-index', 'data-part': 'states' },
+        h('h3', { class: 'part-title' }, 'Every state and Ontario'),
+        h('ul', { class: 'state-index-list' }, states.map((s) => {
+          const n = model.stateCounts.get(s.code) ?? 0;
+          return h('li', {}, h('a', { href: stateHash(s.code), 'data-state-link': s.code },
+            h('span', { class: 'state-index-name' }, `${s.name} (${s.code})`)),
+          h('span', { class: 'state-index-count', 'data-count': n }, installersWord(n)));
+        })))),
   };
 }
 
@@ -208,7 +311,8 @@ function rateCell(installer, key) {
 function statesCovered(ctx, installer) {
   if (!isGroup(installer.territory) || !Array.isArray(installer.territory.states)) return h('span', { class: 'off-map' }, 'Not on the map');
   const codes = installer.territory.states.filter(isGroup).map((s) => String(s.state));
-  return h('span', { class: 'codes' }, codes.map((code, i) => [i ? ', ' : '', h('abbr', { title: stateName(ctx.model, code) }, code)]));
+  return h('span', { class: 'codes' }, codes.map((code, i) => [i ? ', ' : '',
+    h('a', { href: stateHash(code), title: stateName(ctx.model, code), 'aria-label': stateName(ctx.model, code) }, code)]));
 }
 
 function directoryCell(ctx, installer, key) {
@@ -352,7 +456,9 @@ function installerView(ctx, route) {
           h('summary', {}, h('span', { class: 'chev', 'aria-hidden': 'true' }),
             h('span', { class: 'state-name' }, `${stateName(model, s.state)} (${s.state})`),
             h('span', { class: 'state-counts' }, `Tier 1 in ${F.plural(t1, 'county', 'counties')}, Tier 2 in ${F.plural(t2c, 'county', 'counties')}`)),
-          h('div', { class: 'counties' }, tierList(1, 'Tier 1', names.tier1), tierList(2, 'Tier 2', names.tier2)));
+          h('div', { class: 'counties' },
+            h('p', { class: 'state-map-link' }, h('a', { href: stateHash(s.state), 'data-state-link': s.state }, `Open the map of ${stateName(model, s.state)}`)),
+            tierList(1, 'Tier 1', names.tier1), tierList(2, 'Tier 2', names.tier2)));
       })),
       filled(i.coverageNote) ? fields(field('coverageNote', 'Coverage note', String(i.coverageNote), { long: true })) : null);
   } else if (filled(i.coverageNote)) {
@@ -394,12 +500,37 @@ export const SEARCHABLE = [
   'Phone number, by its digits',
   'Office city, from the start of any word',
   'State, by its full name or its two-letter code: an office in that state, or territory there',
+  'ZIP code, by its five digits: the counties it falls in, and the installers who serve them',
 ];
 
 const MATCH_NAMES = {
   company: 'company name', city: 'office city', officeState: 'office state', territory: 'territory',
   name: 'contact name', email: 'email', email2: 'second email', phone: 'phone',
 };
+
+/**
+ * One entry of a list laid out as a search result is: three columns, the installer, contacts by
+ * role, rates and mobilization. lines go under the company (a State view's tier and counties
+ * covered); after goes under the status (a search's matches).
+ */
+function entryRow(ctx, installer, { matches = [], lines = [], after = [], attrs = {} } = {}) {
+  const rates = isGroup(installer.rates) ? installer.rates : {};
+  const rateLines = [['nonUnionST', 'Non-union ST'], ['nonUnionOT', 'Non-union OT'], ['unionST', 'Union ST'], ['unionOT', 'Union OT']]
+    .filter(([k]) => typeof rates[k] === 'number')
+    .map(([k, label]) => h('div', { class: 'mini', 'data-field': `rates.${k}` }, h('dt', {}, label), h('dd', {}, F.money(rates[k]))));
+  return h('tr', { 'data-installer': installer.id, ...attrs },
+    h('td', { 'data-column': 'installer' },
+      h('p', { class: 'result-company' }, companyLink(installer, matches)),
+      lines,
+      h('p', { class: 'result-office' }, officeLine(installer, matches)),
+      h('p', { class: 'result-status' }, statusTag(installer.status), ratesExpired(installer, ctx.today) ? [' ', expiredTag()] : null),
+      after),
+    h('td', { 'data-column': 'contacts' }, rowContacts(ctx, installer, { marks: matches })),
+    h('td', { 'data-column': 'rates' },
+      rateLines.length ? h('dl', { class: 'mini-rates' }, rateLines) : null,
+      filled(installer.mobilization) ? h('dl', { class: 'mini-rates mobil' }, h('div', { class: 'mini wide', 'data-field': 'mobilization' },
+        h('dt', {}, 'Mobilization'), h('dd', {}, String(installer.mobilization)))) : null));
+}
 
 function resultRow(ctx, result) {
   const { installer, matches } = result;
@@ -408,44 +539,33 @@ function resultRow(ctx, result) {
     const s = installer.territory.states.find((x) => isGroup(x) && x.state === m.state) || {};
     const t1 = Number.isInteger(s.tier1Counties) ? s.tier1Counties : 0;
     const t2 = Number.isInteger(s.tier2Counties) ? s.tier2Counties : 0;
-    return h('p', { class: 'territory-match', 'data-match': 'territory' }, 'Territory includes ', h('mark', {}, stateName(model, m.state)),
+    return h('p', { class: 'territory-match', 'data-match': 'territory' }, 'Territory includes ',
+      h('a', { href: stateHash(m.state), 'data-state-link': m.state }, h('mark', {}, stateName(model, m.state))),
       `: Tier 1 in ${F.plural(t1, 'county', 'counties')}, Tier 2 in ${F.plural(t2, 'county', 'counties')}`);
   });
   const on = [...new Set(matches.map((m) => MATCH_NAMES[m.field]))];
-  const rates = isGroup(installer.rates) ? installer.rates : {};
-  const rateLines = [['nonUnionST', 'Non-union ST'], ['nonUnionOT', 'Non-union OT'], ['unionST', 'Union ST'], ['unionOT', 'Union OT']]
-    .filter(([k]) => typeof rates[k] === 'number')
-    .map(([k, label]) => h('div', { class: 'mini', 'data-field': `rates.${k}` }, h('dt', {}, label), h('dd', {}, F.money(rates[k]))));
-  return h('tr', { 'data-installer': installer.id, 'data-matched-on': matches.map((m) => m.field).join(' ') },
-    h('td', { 'data-column': 'installer' },
-      h('p', { class: 'result-company' }, companyLink(installer, matches)),
-      h('p', { class: 'result-office' }, officeLine(installer, matches)),
-      h('p', { class: 'result-status' }, statusTag(installer.status), ratesExpired(installer, ctx.today) ? [' ', expiredTag()] : null),
-      territoryLines,
-      h('p', { class: 'matched-on' }, `Matched on ${on.join(', ')}`)),
-    h('td', { 'data-column': 'contacts' }, rowContacts(ctx, installer, { marks: matches })),
-    h('td', { 'data-column': 'rates' },
-      rateLines.length ? h('dl', { class: 'mini-rates' }, rateLines) : null,
-      filled(installer.mobilization) ? h('dl', { class: 'mini-rates mobil' }, h('div', { class: 'mini wide', 'data-field': 'mobilization' },
-        h('dt', {}, 'Mobilization'), h('dd', {}, String(installer.mobilization)))) : null));
+  return entryRow(ctx, installer, { matches, attrs: { 'data-matched-on': matches.map((m) => m.field).join(' ') },
+    after: [territoryLines, h('p', { class: 'matched-on' }, `Matched on ${on.join(', ')}`)] });
 }
 
 export const SEARCH_COLUMNS = [['installer', 'Installer'], ['contacts', 'Contacts by role'], ['rates', 'Rates and mobilization']];
 
 function searchView(ctx, route) {
+  if (isZip(route.q)) return zipView(ctx, { view: 'zip', zip: String(route.q).trim() }, { search: true });
   const r = search(ctx.model, route.q);
   const q = r.q;
   const canSearch = () => h('div', { class: 'panel can-search' }, h('p', {}, 'You can search by:'),
     h('ul', {}, SEARCHABLE.map((s) => h('li', {}, s))));
+  // Ruling 7: a search that names a state shows a link to that state's view.
+  const stateLink = r.state ? h('p', { class: 'panel note state-link', 'data-state-link': r.state },
+    h('a', { href: stateHash(r.state) }, `Open the map of ${stateName(ctx.model, r.state)}`)) : null;
   let body;
   if (r.kind === 'short') {
     body = [heading('Search', 'Type two or more characters to search.'), canSearch()];
-  } else if (r.kind === 'zip') {
-    body = [heading('Search results', null), h('p', { class: 'panel note', 'data-zip': 'true' }, 'ZIP code lookup comes with the map views.')];
   } else if (r.kind === 'none') {
-    body = [heading('Search results', null), h('p', { class: 'panel note', 'data-no-match': 'true' }, `No installer matches “${q}”.`), canSearch()];
+    body = [heading('Search results', null), stateLink, h('p', { class: 'panel note', 'data-no-match': 'true' }, `No installer matches “${q}”.`), canSearch()];
   } else {
-    body = [heading('Search results', `${F.plural(r.results.length, 'installer matches', 'installers match')} “${q}”.`),
+    body = [heading('Search results', `${F.plural(r.results.length, 'installer matches', 'installers match')} “${q}”.`), stateLink,
       table('results', SEARCH_COLUMNS, r.results.map((x) => resultRow(ctx, x)))];
   }
   return {
@@ -453,6 +573,164 @@ function searchView(ctx, route) {
     title: titled(q ? `Search: ${q}` : 'Search'),
     node: h('section', { class: 'search', 'data-kind': r.kind }, body),
   };
+}
+
+/* ============================================================ the State view and ZIP lookup */
+
+/** The line at the foot of every list: the installers with no territory, from the data, linking to Not on the map. */
+export function footLine(model) {
+  const n = notOnTheMap(model).length;
+  const text = n === 1 ? '1 installer has no mapped territory and may also serve this area.'
+    : `${F.count(n)} installers have no mapped territory and may also serve this area.`;
+  return h('p', { class: 'foot-line', 'data-foot': n }, h('a', { href: toHash({ view: 'notOnMap' }) }, text));
+}
+
+/**
+ * Who serves a state, or one county of it, in the order step 4c gives: [{ installer, tier, t1, t2 }].
+ * With a county: its Tier 1 installers, then its Tier 2, each in the order of the file. With
+ * none: those with any Tier 1 county in the state, then the rest, each in the order of the file.
+ */
+export function servingState(model, code, county = null) {
+  const list = [];
+  const coverageOf = (i) => (model.coverage.get(i.id) || new Map()).get(code) || { tier1: [], tier2: [] };
+  if (county) {
+    const s = model.countyServers.get(county) || { tier1: [], tier2: [] };
+    const t1 = new Set(s.tier1);
+    const t2 = new Set(s.tier2);
+    for (const tier of [1, 2]) {
+      for (const i of model.installers) {
+        if (tier === 1 ? t1.has(i.id) : !t1.has(i.id) && t2.has(i.id)) {
+          const c = coverageOf(i);
+          list.push({ installer: i, tier, t1: c.tier1.length, t2: c.tier2.length });
+        }
+      }
+    }
+    return list;
+  }
+  for (const first of [true, false]) {
+    for (const i of model.installers) {
+      const c = coverageOf(i);
+      if (c.tier1.length + c.tier2.length === 0 || (c.tier1.length > 0) !== first) continue;
+      list.push({ installer: i, tier: null, t1: c.tier1.length, t2: c.tier2.length });
+    }
+  }
+  return list;
+}
+
+const tierWords = (e) => (e.tier ? `Tier ${e.tier}` : `Tier 1 in ${F.plural(e.t1, 'county', 'counties')}, Tier 2 in ${F.count(e.t2)}`);
+
+/** The State view's list, or a plain line when nobody serves the place; then the foot line. */
+function servingList(ctx, code, county, id) {
+  const { model } = ctx;
+  const entries = servingState(model, code, county);
+  const place = county ? (model.countyById.get(county) || {}).name || county : stateName(model, code);
+  const where = stateName(model, code);
+  const body = entries.length
+    ? table('results', SEARCH_COLUMNS, entries.map((e) => entryRow(ctx, e.installer, {
+      attrs: { 'data-tier': e.tier ?? 'both' },
+      lines: [h('p', { class: 'tier-line' }, tierWords(e)),
+        h('p', { class: 'counties-line' }, `${F.plural(e.t1 + e.t2, 'county', 'counties')} covered in ${where}`)],
+    })))
+    : h('p', { class: 'panel note', 'data-nobody': 'true' }, `No installer serves ${place}.`);
+  return h('section', { class: 'serving', id, tabindex: '-1', 'data-count': entries.length }, body, footLine(model));
+}
+
+/** The State view, or a ZIP in one county, which shows the State view for that county under its own heading. */
+function stateView(ctx, route, { zip = null } = {}) {
+  const { model } = ctx;
+  const { code, county } = route;
+  if (!knownState(model, code) || (county && !knownCounty(model, code, county))) return notFound(ctx, route);
+  const n = servingState(model, code, county).length;
+  const place = placeName(model, code, county);
+  const title = zip ? `Installers serving ZIP ${zip} — ${place}` : `Installers in ${place}`;
+  const sub = n ? `${F.plural(n, 'installer serves', 'installers serve')} ${place}.` : null;
+  return {
+    view: zip ? 'zip' : 'state',
+    title: titled(zip ? `ZIP ${zip}` : place),
+    node: h('section', { class: 'state-view', 'data-state': code, 'data-county': county || null, 'data-zip': zip },
+      heading(title, sub),
+      h('div', { class: 'panel map-panel map-panel-state' },
+        h('div', { class: 'map-column' },
+          skipLink('state-after-map', 'Skip the map'),
+          mapSlot(countyMapPart(model, code, county, ctx.files))),
+        h('div', { class: 'map-side' },
+          h('label', { class: 'box-label', for: 'county-box' }, `Find a county in ${stateName(model, code)}`),
+          h('input', { id: 'county-box', class: 'county-box', type: 'text', autocomplete: 'off', spellcheck: 'false', 'data-county-box': code,
+            'aria-controls': 'county-suggestions', placeholder: 'Type a county\'s name' }),
+          h('div', { id: 'county-suggestions', class: 'suggestions', 'aria-live': 'polite' }),
+          county ? h('p', { class: 'chosen-line' }, h('span', { class: 'inline-label' }, 'Chosen'), (model.countyById.get(county) || {}).name || county) : null,
+          county ? h('p', { class: 'show-all' }, h('a', { class: 'btn', href: stateHash(code), 'data-show-all': code }, `Show all of ${stateName(model, code)}`)) : null)),
+      servingList(ctx, code, county, 'state-after-map')),
+  };
+}
+
+/** The words section 4.9 gives for what the ZIP list leaves out. */
+export const ZIP_LEAVES_OUT = 'ZIP codes that are only post office boxes, ZIP codes belonging to a single organization, military ZIP codes, and Canadian postal codes';
+
+/** ZIP lookup, section 4.9. */
+function zipView(ctx, route, { search: viaSearch = false } = {}) {
+  const { model } = ctx;
+  const zip = route.zip;
+  const z = zipLookup(ctx.files, zip);
+  const page = (body, kind) => ({
+    view: 'zip',
+    title: titled(`ZIP ${zip}`),
+    node: h('section', { class: 'zip-view', 'data-zip': zip, 'data-kind': kind, 'data-via-search': viaSearch ? 'true' : null }, body),
+  });
+  if (z.state === 'pending') {
+    return page([heading(`ZIP code ${zip}`, null), h('div', { class: 'map-slot', 'data-map-slot': 'zip', 'data-map': 'pending' },
+      h('p', { class: 'panel note' }, `Looking up ZIP code ${zip}…`))], 'pending');
+  }
+  if (z.state === 'failed') {
+    return page([heading(`ZIP code ${zip}`, null), h('div', { class: 'map-slot', 'data-map-slot': 'zip', 'data-map': 'failed' },
+      h('p', { class: 'panel note', 'data-zip-failed': 'true' }, `ZIP code ${zip} could not be looked up. Please try again shortly.`))], 'failed');
+  }
+  if (!z.entry) {
+    return page([heading(`ZIP code ${zip}`, null),
+      h('div', { class: 'panel note', 'data-zip-missing': 'true' },
+        h('p', {}, `ZIP code ${zip} is not in the list of ZIP codes.`),
+        h('p', {}, `The list leaves out ${ZIP_LEAVES_OUT}.`))], 'missing');
+  }
+  if (z.entry.outside === true || !Array.isArray(z.entry.counties) || !z.entry.counties.length) {
+    return page([heading(`ZIP code ${zip}`, null),
+      h('p', { class: 'panel note', 'data-zip-outside': 'true' }, `ZIP code ${zip} is outside the mapped area.`)], 'outside');
+  }
+  const counties = z.entry.counties.map((id) => model.countyById.get(id)).filter(Boolean);
+  if (counties.length === 1) {
+    const out = stateView(ctx, { view: 'state', code: counties[0].state, county: counties[0].id }, { zip });
+    return { ...out, node: { ...out.node, attrs: { ...out.node.attrs, 'data-kind': 'one', 'data-via-search': viaSearch ? 'true' : null } } };
+  }
+  // Several counties: every county, largest share first; then each installer once, at its best tier among them.
+  const best = new Map();
+  for (const c of counties) {
+    const s = model.countyServers.get(c.id) || { tier1: [], tier2: [] };
+    for (const [tier, ids] of [[1, s.tier1], [2, s.tier2]]) {
+      for (const id of ids) {
+        if (!best.has(id)) best.set(id, { tier, counties: [] });
+        const b = best.get(id);
+        b.tier = Math.min(b.tier, tier);
+        if (!b.counties.includes(c)) b.counties.push(c);
+      }
+    }
+  }
+  const entries = [1, 2].flatMap((tier) => model.installers.filter((i) => best.has(i.id) && best.get(i.id).tier === tier)
+    .map((i) => ({ installer: i, ...best.get(i.id) })));
+  const names = (list) => {
+    const n = list.map((c) => c.name);
+    return n.length <= 1 ? n.join('') : `${n.slice(0, -1).join(', ')} and ${n[n.length - 1]}`;
+  };
+  const body = entries.length
+    ? table('results', SEARCH_COLUMNS, entries.map((e) => entryRow(ctx, e.installer, {
+      attrs: { 'data-tier': e.tier },
+      lines: [h('p', { class: 'tier-line' }, `Tier ${e.tier}`), h('p', { class: 'counties-line' }, `Serves ${names(e.counties)}`)],
+    })))
+    : h('p', { class: 'panel note', 'data-nobody': 'true' }, `No installer serves the counties of ZIP code ${zip}.`);
+  return page([
+    heading(`Installers serving ZIP ${zip}`, `ZIP code ${zip} falls in ${F.plural(counties.length, 'county', 'counties')}, largest share first.`),
+    h('ul', { class: 'panel zip-counties' }, counties.map((c) => h('li', { 'data-county': c.id },
+      h('a', { href: stateHash(c.state, c.id) }, placeName(model, c.state, c.id))))),
+    h('section', { class: 'serving', 'data-count': entries.length }, body, footLine(model)),
+  ], 'several');
 }
 
 function notOnMapView(ctx) {
@@ -518,12 +796,23 @@ function aboutView(ctx) {
         h('table', { class: 'stats checks' },
           h('thead', {}, h('tr', {}, h('th', { scope: 'col' }, 'Check'), h('th', { scope: 'col' }, 'Name'), h('th', { scope: 'col' }, 'Result'))),
           h('tbody', {}, checks.map((c) => h('tr', { 'data-check': c.check }, h('td', {}, num(c.check)), h('td', {}, String(c.name ?? '')),
-            h('td', { 'data-result': c.skipped === true ? 'skipped' : c.passed === true ? 'passed' : 'failed' }, result(c)))))))),
+            h('td', { 'data-result': c.skipped === true ? 'skipped' : c.passed === true ? 'passed' : 'failed' }, result(c))))))),
+      h('section', { class: 'panel part', 'data-part': 'maps' },
+        h('h3', { class: 'part-title' }, 'Where the maps come from'),
+        MAP_CREDITS.map((line) => h('p', { class: 'credit' }, line)))),
   };
 }
 
+/** The makers of the map and ZIP files, credited on About this data (ruling 5). */
+export const MAP_CREDITS = [
+  'County and state outlines: U.S. Census Bureau, 2025 cartographic boundary files.',
+  'Ontario census divisions: adapted from Statistics Canada, 2021 Census boundary files. This does not constitute an endorsement by Statistics Canada of this product.',
+  'ZIP codes: U.S. Census Bureau, 2020 ZIP Code Tabulation Area to county relationship file. A Census ZIP area is close to, but not exactly, the area the Postal Service delivers to.',
+];
+
 function notFound(ctx, route) {
-  const what = route.view === 'installer' ? 'No installer with this address is in the data.' : 'There is no view at this address.';
+  const what = route.view === 'installer' ? 'No installer with this address is in the data.'
+    : route.view === 'state' ? 'No state or county with this address is on the map.' : 'There is no view at this address.';
   return {
     view: 'notFound',
     title: titled('Not found'),
@@ -546,10 +835,11 @@ export function dataErrorView() {
 
 /**
  * The view for a route: { view, title, node }. now is the time in milliseconds, handed in, so
- * that "today" (ruling 7) and the out-of-date line (ruling 8) can be tested.
+ * that "today" (ruling 7) and the out-of-date line (ruling 8) can be tested. files holds what
+ * has come of the files filesFor names.
  */
-export function renderView(route, model, { now = Date.now() } = {}) {
-  const ctx = { model, now, today: F.easternDate(now), ids: 0, view: route.view };
+export function renderView(route, model, { now = Date.now(), files = {} } = {}) {
+  const ctx = { model, now, today: F.easternDate(now), ids: 0, view: route.view, files };
   switch (route.view) {
     case 'home': return home(ctx);
     case 'installers': return installersView(ctx, route);
@@ -557,6 +847,8 @@ export function renderView(route, model, { now = Date.now() } = {}) {
     case 'search': return searchView(ctx, route);
     case 'notOnMap': return notOnMapView(ctx);
     case 'about': return aboutView(ctx);
+    case 'state': return stateView(ctx, route);
+    case 'zip': return zipView(ctx, route);
     default: return notFound(ctx, route);
   }
 }

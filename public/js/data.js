@@ -66,12 +66,15 @@ export function makeModel(build, installers, territoryStates, counties) {
   const byId = new Map();
   for (const i of installers) if (typeof i.id === 'string' && !byId.has(i.id)) byId.set(i.id, i);
 
-  // Which counties each installer covers in each state, at each tier, from territory.json.
+  // Which counties each installer covers in each state, at each tier, and who serves each
+  // county at each tier, from territory.json.
   const coverage = new Map();
+  const countyServers = new Map();
   for (const state of territoryStates) {
     if (!isGroup(state)) continue;
     for (const county of list(state.counties)) {
       if (!isGroup(county)) continue;
+      countyServers.set(county.id, { tier1: list(county.tier1Installers).slice(), tier2: list(county.tier2Installers).slice() });
       for (const [tier, ids] of [['tier1', county.tier1Installers], ['tier2', county.tier2Installers]]) {
         for (const id of list(ids)) {
           if (!coverage.has(id)) coverage.set(id, new Map());
@@ -82,7 +85,35 @@ export function makeModel(build, installers, territoryStates, counties) {
       }
     }
   }
-  return { build, installers, territoryStates, stateList, stateNames, countyById, byId, coverage };
+  // Each state's counties, in the order of the county list; and how many installers have
+  // territory in each state.
+  const countiesByState = new Map(stateList.map((s) => [s.code, []]));
+  for (const c of countyById.values()) if (countiesByState.has(c.state)) countiesByState.get(c.state).push(c);
+  const stateCounts = new Map(stateList.map((s) => [s.code, 0]));
+  for (const i of installers) {
+    if (!isGroup(i.territory)) continue;
+    for (const code of new Set(list(i.territory.states).filter(isGroup).map((s) => s.state))) {
+      if (stateCounts.has(code)) stateCounts.set(code, stateCounts.get(code) + 1);
+    }
+  }
+  const position = new Map(installers.map((i, k) => [i.id, k]));
+  return { build, installers, territoryStates, stateList, stateNames, countyById, byId, coverage, countyServers, countiesByState,
+    stateCounts, position };
+}
+
+/** How many installers serve a county, at either tier. */
+export function countyCount(model, countyId) {
+  const s = model.countyServers.get(countyId);
+  return s ? new Set([...s.tier1, ...s.tier2]).size : 0;
+}
+
+/** A place's name as a heading says it: "Summit County, Ohio"; a county named as its state is said once. */
+export function placeName(model, code, countyId = null) {
+  const state = stateName(model, code);
+  if (!countyId) return state;
+  const c = model.countyById.get(countyId);
+  const county = c && typeof c.name === 'string' ? c.name : String(countyId);
+  return county === state ? state : `${county}, ${state}`;
 }
 
 /** A state's name from the county list, or the code itself when the list does not hold it. */
@@ -103,6 +134,23 @@ export function countiesIn(model, installerId, state) {
     return c && typeof c.name === 'string' ? c.name : String(id);
   }).sort(compareText);
   return { tier1: names(ids.tier1), tier2: names(ids.tier2) };
+}
+
+/* ---------------------------------------------------------------- files a view asks for when it needs them */
+
+/** The Home map, a state's county map, and the ZIP file for a ZIP code's first digit. */
+export const HOME_MAP = 'geo/states-map.json';
+export const countyMapPath = (code) => `geo/counties/${code}.json`;
+export const zipPath = (zip) => `geo/zips/${String(zip)[0]}.json`;
+
+/** Fetches one of those files: { state: 'ok', doc }, or { state: 'failed' } when it is missing, not JSON, or not schema 1. */
+export async function loadExtra(fetchText, path) {
+  try {
+    const doc = JSON.parse(await fetchText(path));
+    return isGroup(doc) && doc.schema === 1 ? { state: 'ok', doc } : { state: 'failed' };
+  } catch {
+    return { state: 'failed' };
+  }
 }
 
 /** The installers with no territory, in the order of the file. */

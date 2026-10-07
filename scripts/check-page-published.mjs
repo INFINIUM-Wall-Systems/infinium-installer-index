@@ -17,6 +17,17 @@
  *   about           About this data shows the counts build.json holds
  *   rows            how many rows show a stand-in, nobody in a place, and one person in both
  *                   places, beside the same counts made from the file
+ *   home map        for each of the 52, the Home map's step is the one for the number of
+ *                   installers territory.json gives it
+ *   state views     every State view draws without an error, with and without a county chosen
+ *   county maps     for each of the 3,193 counties, the county map's step is the one for the
+ *                   number of installers territory.json gives it, and the list with that county
+ *                   chosen holds as many installers
+ *   foot line       the foot line's number is build.json's number without territory
+ *   steps           how many counties and states fall on each of the five steps and on none, on
+ *                   the maps, beside the same counts made from territory.json
+ * The map lines read the map files of publicgeo. A failing map line names at most a state's
+ * code or a county's id, never an installer.
  *
  * It prints counts, file names, the names of values and their kinds, and PASS or FAIL. Never a
  * company, a person, an email, a phone, an address, a rate or an installer id, and never what a
@@ -33,11 +44,13 @@ import { search } from '../public/js/search.js';
 import { renderView } from '../public/js/views.js';
 import { bannedIn, installerViewProblems, rowsOf } from './page-tests.mjs';
 import { byAttr, find, findAll, kindOf, squash } from './page-standins.mjs';
+import { geoFiles, servedFrom, stepOf } from './map-tests.mjs';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const PUBLISHED = join(ROOT, 'public', 'data');
 export const COUNTIES = join(ROOT, 'public', 'geo', 'counties.json');
-export const LINES = ['views', 'fields', 'words', 'counties', 'last confirmed', 'not on the map', 'about', 'rows'];
+export const LINES = ['views', 'fields', 'words', 'counties', 'last confirmed', 'not on the map', 'about', 'rows', 'home map', 'state views',
+  'county maps', 'foot line', 'steps'];
 const CONFIRMED = 'CONFIRMED BY PARTNER';
 const FILES = { build: 'build.json', installers: 'installers.json', territory: 'territory.json' };
 
@@ -230,6 +243,94 @@ export function checkPagePublished(folder = PUBLISHED, I = REAL, { now = Date.no
     }
     const same = JSON.stringify(fromView) === JSON.stringify(fromFile);
     return [same, `rows showing a stand-in ${fromView.standIn}, beside ${fromFile.standIn} from the file; nobody in a place ${fromView.nobody}, beside ${fromFile.nobody}; one person in both places ${fromView.both}, beside ${fromFile.both}`];
+  });
+
+  // The maps: what territory.json gives each state and county, worked out apart from the page.
+  const served = servedFrom(territoryText);
+  const files = geoFiles();
+  const mapOpts = { now, files };
+  const shapes = (out) => findAll(out.node, (n) => n.tag === 'a' && n.attrs['data-shape'] !== undefined);
+  const stateViews = new Map();
+  const countyViews = new Map();
+
+  line('home map', () => {
+    const out = I.render({ view: 'home' }, model, mapOpts);
+    const drawn = shapes(out);
+    let bad = 0;
+    let first = null;
+    for (const s of model.stateList) {
+      const a = drawn.find((x) => x.attrs['data-shape'] === s.code);
+      const want = stepOf((served.byState.get(s.code) || new Set()).size);
+      if (!a || a.attrs['data-step'] !== want) { bad++; first ||= s.code; }
+    }
+    return [bad === 0, bad ? `${bad} of ${model.stateList.length} states at the wrong step or not drawn; first ${first}`
+      : `${model.stateList.length} states, each at the step for its number of installers`];
+  });
+
+  line('state views', () => {
+    let errors = 0;
+    let errorKind = null;
+    let first = null;
+    let drawn = 0;
+    for (const s of model.stateList) {
+      const counties = [null, ...(model.countiesByState.get(s.code) || []).map((c) => c.id)];
+      for (const county of counties) {
+        try {
+          const out = I.render({ view: 'state', code: s.code, county }, model, mapOpts);
+          toHtml(out.node);
+          if (out.view !== 'state') throw new TypeError('not the State view');
+          if (county) countyViews.set(county, out); else stateViews.set(s.code, out);
+          drawn++;
+        } catch (e) {
+          errors++;
+          errorKind ||= kindOfError(e);
+          first ||= county || s.code;
+        }
+      }
+    }
+    return [errors === 0, errors ? `${errors} State view(s) did not draw; first ${first}, an error of kind ${errorKind}` : `${drawn} State views drawn, ${model.stateList.length} with no county chosen and ${drawn - model.stateList.length} with one`];
+  });
+
+  line('county maps', () => {
+    let bad = 0;
+    let first = null;
+    let checked = 0;
+    for (const s of model.stateList) {
+      const out = stateViews.get(s.code);
+      if (!out) { bad++; first ||= s.code; continue; }
+      const drawn = shapes(out);
+      for (const c of model.countiesByState.get(s.code) || []) {
+        const n = served.byCounty.has(c.id) ? served.byCounty.get(c.id).ids.size : 0;
+        const a = drawn.find((x) => x.attrs['data-shape'] === c.id);
+        const chosen = countyViews.get(c.id);
+        if (!a || a.attrs['data-step'] !== stepOf(n) || !chosen || rowsOf(chosen.node).length !== n) { bad++; first ||= c.id; }
+        checked++;
+      }
+    }
+    return [bad === 0, bad ? `${bad} of ${checked} counties at the wrong step, or listing another number of installers; first ${first}`
+      : `${checked} counties, each at the step for its number of installers, and each listing as many when chosen`];
+  });
+
+  line('foot line', () => {
+    const out = stateViews.get('OH') || I.render({ view: 'state', code: model.stateList[0].code, county: null }, model, mapOpts);
+    const foot = find(out.node, (n) => typeof n.attrs.class === 'string' && n.attrs.class.split(' ').includes('foot-line'));
+    const shown = foot ? foot.attrs['data-foot'] : null;
+    const want = model.build.counts.installersWithoutTerritory;
+    const text = foot ? squash(textOf(foot)) : '';
+    const okText = text.startsWith(`${commas(want)} installer`);
+    return [shown === want && okText, `the foot line carries ${shown ?? 'no number'}; build.json counts ${want} without territory`];
+  });
+
+  line('steps', () => {
+    const fromMaps = { counties: [0, 0, 0, 0, 0, 0], states: [0, 0, 0, 0, 0, 0] };
+    const fromFile = { counties: [0, 0, 0, 0, 0, 0], states: [0, 0, 0, 0, 0, 0] };
+    for (const a of shapes(I.render({ view: 'home' }, model, mapOpts))) fromMaps.states[a.attrs['data-step']]++;
+    for (const out of stateViews.values()) for (const a of shapes(out)) fromMaps.counties[a.attrs['data-step']]++;
+    for (const s of model.stateList) fromFile.states[stepOf((served.byState.get(s.code) || new Set()).size)]++;
+    for (const c of model.countyById.values()) fromFile.counties[stepOf(served.byCounty.has(c.id) ? served.byCounty.get(c.id).ids.size : 0)]++;
+    const words = (k) => k.map((n, step) => `${step ? `step ${step}` : 'none'} ${n}`).join(', ');
+    const same = JSON.stringify(fromMaps) === JSON.stringify(fromFile);
+    return [same, `counties on the maps: ${words(fromMaps.counties)}; from the file: ${words(fromFile.counties)}. States: ${words(fromMaps.states)}; from the file: ${words(fromFile.states)}`];
   });
 
   return { results, facts };

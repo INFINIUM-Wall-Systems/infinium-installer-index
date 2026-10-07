@@ -533,10 +533,10 @@ async function v11(I) {
   const text = squash(textOf(out.node));
   if (!text.includes('No installer matches “zzqx”.')) return no('a search with no match does not say so');
   if (rowsOf(out.node).length) return no('a search with no match lists installers');
-  for (const what of ['Company name', 'Contact name', 'Email address', 'Phone number', 'Office city', 'State']) {
+  for (const what of ['Company name', 'Contact name', 'Email address', 'Phone number', 'Office city', 'State', 'ZIP code']) {
     if (!text.includes(what)) return no(`a search with no match does not list what can be searched: ${what}`);
   }
-  return ok('"zzqx" says no installer matches, and lists the six things that can be searched');
+  return ok('"zzqx" says no installer matches, and lists the seven things that can be searched');
 }
 test('V11', 'a search with no match says so and lists what can be searched',
   [sound('the page as built', () => v11(impl()))],
