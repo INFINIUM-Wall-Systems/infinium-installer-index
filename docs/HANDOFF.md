@@ -299,7 +299,9 @@ shapes, the state map and the ZIP list of `public\geo\`; the Netlify test copy.
   path.
 - A broken case in `scripts\page-tests.mjs` hands the test a broken stand-in for one of the
   page's functions, or a changed copy of what a view gave back, and carries `mustSay`.
-- An email is matched anywhere in it, as section 4.5 says, so two letters such as "co" match
-  every address ending ".com".
+- An email is matched from the start of any word of the part before the @ (a period, a hyphen,
+  an underscore or a plus sign parts the words), from the start of the part after the @, or
+  anywhere once what is typed holds an @ or a period (the page's second prompt, step 3). Two
+  letters such as "co" no longer find every address ending ".com".
 - Title and Procedure are empty on all 221 real contacts, so those lines will not show on the
   test copy until QuickBase holds them.

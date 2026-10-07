@@ -398,7 +398,7 @@ async function v9(I) {
     ['brook', 'FAKE-001', false, 'a company is matched inside a word ("brook" in Alderbrook)'],
     ['ann ost', 'FAKE-001', true, 'a contact\'s name is not matched as a phrase ("ann ost")'],
     ['ost ann', 'FAKE-001', false, 'words matched out of their order ("ost ann")'],
-    ['strander', 'FAKE-001', true, 'an email is not matched anywhere in it ("strander")'],
+    ['strander', 'FAKE-001', false, 'an email is matched inside a word of its address ("strander")'],
     ['akr', 'FAKE-106', true, 'an office city is not matched from the start of a word ("akr")'],
     ['kron', 'FAKE-106', false, 'an office city is matched inside a word ("kron")'],
     ['555-0111', 'FAKE-024', true, 'a phone is not matched on its digits ("555-0111")'],
@@ -408,7 +408,7 @@ async function v9(I) {
     ['renee', 'FAKE-025', true, 'a contact with an accent is not found without it ("renee")'],
   ];
   for (const [q, id, want, why] of expect) if (found(I, model, q).includes(id) !== want) return no(why);
-  return ok(`${expect.length} searches: from the start of a word, as a phrase, emails anywhere, phones on their digits`);
+  return ok(`${expect.length} searches: from the start of a word, as a phrase, not inside a word of an email, phones on their digits`);
 }
 const substringNames = (model, q) => {
   const r = search(model, q);
@@ -417,11 +417,65 @@ const substringNames = (model, q) => {
     && [i.company, i.office && i.office.city, ...(i.contacts || []).map((c) => c.name)].some((v) => typeof v === 'string' && v.toLowerCase().includes(needle)));
   return { ...r, results: [...r.results, ...more.map((installer) => ({ installer, matches: [{ field: 'company', range: [0, 1] }] }))] };
 };
-test('V9', 'a company, contact or city is matched from the start of a word; "in" finds no installer whose only match is inside a longer word; an email anywhere; a phone on its digits',
+test('V9', 'a company, contact or city is matched from the start of a word; "in" finds no installer whose only match is inside a longer word; an email by its words (step 3); a phone on its digits',
   [sound('the page as built', () => v9(impl()))],
   [
     broken('a search that matches inside words', 'Augustin', () => v9(impl({ search: substringNames }))),
     broken('a search that leaves phones out', 'phone is not matched', () => v9(impl({ search: (m, q) => { const r = search(m, q); return { ...r, results: r.results.filter((x) => x.matches.some((y) => y.field !== 'phone')) }; } }))),
+  ]);
+
+/* ================================================================== the repair to search */
+
+/** A search whose email matches follow another rule: rule(email, q) gives [start, end] or null. */
+const searchWithEmail = (rule) => (model, q) => {
+  const r = search(model, q);
+  if (r.kind === 'short' || r.kind === 'zip') return r;
+  const results = [];
+  for (const installer of model.installers) {
+    const kept = ((r.results.find((x) => x.installer === installer) || {}).matches || []).filter((m) => m.field !== 'email' && m.field !== 'email2');
+    (installer.contacts || []).forEach((c, contact) => {
+      for (const key of ['email', 'email2']) {
+        const range = typeof c[key] === 'string' ? rule(c[key].toLowerCase(), q.trim().toLowerCase()) : null;
+        if (range) kept.push({ field: key, contact, range });
+      }
+    });
+    if (kept.length) results.push({ installer, matches: kept });
+  }
+  return { ...r, kind: results.length ? 'results' : 'none', results };
+};
+const at = (k, q) => (k < 0 ? null : [k, k + q.length]);
+const OLD_RULE = (e, q) => at(e.indexOf(q), q);
+const LOCAL_ONLY = (e, q) => { const local = e.split('@')[0]; for (let k = 0; k < local.length; k++) if ((k === 0 || '.-_+'.includes(local[k - 1])) && local.startsWith(q, k)) return at(k, q); return null; };
+const ADDRESS_START_ONLY = (e, q) => (e.startsWith(q) ? at(0, q) : null);
+
+async function emailRepair(I) {
+  const model = await madeUpModel();
+  const emailMatchOf = (q, id) => {
+    const res = I.search(model, q).results.find((x) => x.installer.id === id);
+    return res ? res.matches.filter((m) => m.field === 'email' || m.field === 'email2') : [];
+  };
+  // FAKE-104's only "co" is the .com of its contacts' addresses.
+  if (found(I, model, 'co').includes('FAKE-104')) return no('"co" finds FAKE-104 by the ".com" of an address alone');
+  if (!emailMatchOf('exam', 'FAKE-104').length) return no('"exam", the start of the part after the @, does not find an address');
+  if (!emailMatchOf('quin', 'FAKE-104').length) return no('"quin", the first letters of a surname in an address written first.last@, does not find it');
+  if (!emailMatchOf('lan@exa', 'FAKE-104').length) return no('"lan@exa", a piece holding an @, does not find the address it is part of');
+  if (!emailMatchOf('t.quin', 'FAKE-104').length) return no('"t.quin", a piece holding a period, does not find the address it is part of');
+  if (found(I, model, 'strander').includes('FAKE-001')) return no('"strander" finds FAKE-001 by the inside of a word of its address');
+  const out = I.render({ view: 'search', q: 'exam' }, model, { now: NOW });
+  const row = rowsOf(out.node).find((r) => r.attrs['data-installer'] === 'FAKE-104');
+  const face = row ? squash(faceText(row)) : '';
+  const marks = row ? findAll(row, (n) => n.tag === 'mark').map((n) => squash(textOf(n))) : [];
+  if (!face.includes('pat.quinlan@example.com') || !marks.includes('exam')) return no('a result found by an address does not show the address that matched, marked');
+  return ok('"co" does not find an address by its ".com"; "exam", "quin", "lan@exa" and "t.quin" do; "strander" does not; the result shows the address, marked');
+}
+test('email', 'the repair to search: an email is matched from the start of a word before the @, from the start of the part after it, or anywhere when what is typed holds an @ or a period',
+  [sound('the page as built', () => emailRepair(impl()))],
+  [
+    broken('the old rule: anywhere in the address', 'by the ".com" of an address alone', () => emailRepair(impl({ search: searchWithEmail(OLD_RULE) }))),
+    broken('a rule that leaves out the part after the @', '"exam"', () => emailRepair(impl({ search: searchWithEmail(LOCAL_ONLY) }))),
+    broken('a rule that matches only the start of the address', '"quin"', () => emailRepair(impl({ search: searchWithEmail((e, q) => ADDRESS_START_ONLY(e, q) || (e.includes('@') && e.split('@')[1].startsWith(q) ? at(e.indexOf('@') + 1, q) : null)) }))),
+    broken('a rule that never looks across the @', '"lan@exa"', () => emailRepair(impl({ search: searchWithEmail((e, q) => (q.includes('@') ? null : LOCAL_ONLY(e, q) || (e.split('@')[1].startsWith(q) ? at(e.indexOf('@') + 1, q) : null))) }))),
+    broken('a result whose address is not marked', 'does not show the address that matched', () => emailRepair(impl({ render: transformed(renderView, (n) => (n.tag === 'mark' ? { tag: 'span', attrs: {}, children: n.children } : n)) }))),
   ]);
 
 /* ================================================================== V10 */

@@ -8,8 +8,12 @@
  *     does not find "Martin". Capitals, accents and apostrophes are not minded.
  *   - A state is matched by its whole name or its whole two-letter code only. It finds an
  *     installer whose office is in that state, and one whose territory includes it.
- *   - An email address (and a second email) is matched anywhere in it. A phone is matched on
- *     its digits, when what is typed is a phone number of three or more digits.
+ *   - An email address (and a second email) is matched from the start of any word of the part
+ *     before the @, where a period, a hyphen, an underscore or a plus sign parts the words; or
+ *     from the start of the part after the @; or anywhere in it when what is typed holds an @
+ *     or a period. So "co" does not find every address that ends ".com".
+ *   - A phone is matched on its digits, when what is typed is a phone number of three or more
+ *     digits.
  *   - A contact marked departed is searched too, and shown as departed.
  *   - Nothing else is searched: only what a view shows.
  *
@@ -26,7 +30,7 @@ export const MIN_PHONE_DIGITS = 3;
 
 /** Capitals lowered, accents and apostrophes taken off. */
 export function fold(s) {
-  return String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/['’]/g, '').toLowerCase();
+  return String(s).normalize('NFD').replace(/\p{M}/gu, '').replace(/['’]/g, '').toLowerCase();
 }
 
 /** The words of a text, each with where it starts and ends in the text as written. */
@@ -93,15 +97,32 @@ export function phoneMatch(phone, d) {
   return k < 0 ? null : [at[k], at[k + d.length - 1] + 1];
 }
 
-/** Where an email holds the typed text, anywhere: [start, end], or null. */
+/** The characters that part the words of an email address before its @. */
+const EMAIL_WORD_BREAKS = '.-_+';
+
+/**
+ * Where an email holds the typed text: [start, end], or null. What is typed matches from the
+ * start of any word of the part before the @ (a period, a hyphen, an underscore or a plus sign
+ * parts the words), or from the start of the part after the @, or anywhere in the address when
+ * what is typed holds an @ or a period.
+ */
 export function emailMatch(email, q) {
   if (typeof email !== 'string') return null;
   const needle = String(q).trim().toLowerCase();
   if (!needle) return null;
   const lower = email.toLowerCase();
-  const k = lower.indexOf(needle);
-  if (k < 0) return null;
-  return lower.length === email.length ? [k, k + needle.length] : [0, email.length];
+  const span = (k) => (lower.length === email.length ? [k, k + needle.length] : [0, email.length]);
+  if (needle.includes('@') || needle.includes('.')) {
+    const k = lower.indexOf(needle);
+    return k < 0 ? null : span(k);
+  }
+  const at = lower.indexOf('@');
+  const local = at < 0 ? lower : lower.slice(0, at);
+  for (let k = 0; k < local.length; k++) {
+    if ((k === 0 || EMAIL_WORD_BREAKS.includes(local[k - 1])) && local.startsWith(needle, k)) return span(k);
+  }
+  if (at >= 0 && lower.startsWith(needle, at + 1)) return span(at + 1);
+  return null;
 }
 
 /**

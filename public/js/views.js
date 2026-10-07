@@ -390,7 +390,7 @@ function installerView(ctx, route) {
 export const SEARCHABLE = [
   'Company name, from the start of any word',
   'Contact name, from the start of any word, including people who have left',
-  'Email address, any part of it',
+  'Email address, from the start of any word of it, or any part once what you type holds an @ or a period',
   'Phone number, by its digits',
   'Office city, from the start of any word',
   'State, by its full name or its two-letter code: an office in that state, or territory there',
