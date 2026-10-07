@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "builtAt": "2026-10-07T13:31:41Z",
+  "counts": {
+    "installers": 73,
+    "contacts": 221,
+    "territoryRows": 17745,
+    "duplicateTerritoryRows": 0,
+    "installersWithTerritory": 52,
+    "installersWithoutTerritory": 21,
+    "countiesCovered": 3193,
+    "byStatus": [
+      {
+        "status": "CONFIRMED BY PARTNER",
+        "installers": 54
+      },
+      {
+        "status": "DORMANT - NO RESPONSE",
+        "installers": 14
+      },
+      {
+        "status": "INACTIVE",
+        "installers": 2
+      },
+      {
+        "status": "PENDING - UPDATE EXPECTED",
+        "installers": 2
+      },
+      {
+        "status": "HELD - BUSINESS DECISION",
+        "installers": 1
+      }
+    ]
+  },
+  "gaps": {
+    "noQuoting": 25,
+    "noScheduling": 29,
+    "neither": 23
+  },
+  "checks": [
+    {
+      "check": 1,
+      "name": "Counts have not fallen",
+      "passed": true
+    },
+    {
+      "check": 2,
+      "name": "Every contact and territory row has its installer",
+      "passed": true
+    },
+    {
+      "check": 3,
+      "name": "Every county is in the county list",
+      "passed": true
+    },
+    {
+      "check": 4,
+      "name": "No installer id twice",
+      "passed": true
+    },
+    {
+      "check": 5,
+      "name": "Every installer has a company and a known status",
+      "passed": true
+    },
+    {
+      "check": 6,
+      "name": "The same data gives the same files",
+      "passed": true
+    },
+    {
+      "check": 7,
+      "name": "Columns keep their label and type",
+      "passed": true
+    }
+  ],
+  "files": {
+    "installers.json": "1c80e08944d28d838504ace3ed6bd0e91935c2c8969f88c1cb2f7a23702dc7cc",
+    "territory.json": "e78af877ceba9539498ec6619a44fc368a10c27e410c7481358dbbec41077e36"
+  }
+}
