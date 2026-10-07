@@ -13,6 +13,9 @@
     "check:job": "node scripts/check-job.mjs",
     "check:published": "node scripts/check-published.mjs",
     "quickbase:columns": "node job/quickbase-columns.mjs",
-    "job:rehearse": "node job/rehearse.mjs"
+    "job:rehearse": "node job/rehearse.mjs",
+    "check:page": "node scripts/check-page.mjs",
+    "check:page:published": "node scripts/check-page-published.mjs",
+    "page:pictures": "node scripts/page-pictures.mjs"
   }
 }

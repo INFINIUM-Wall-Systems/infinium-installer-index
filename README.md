@@ -6,8 +6,10 @@ and how current each record is. It replaces the INFINIUM Partner Finder page at
 
 **Status, October 7, 2026:** the daily job is built. Its first run, started by hand on GitHub,
 passed and published the three data files into `public\data\`, and they were checked on the
-laptop. The daily schedule is on from October 8. The page is not built yet. This file fills
-in as the build goes.
+laptop. The daily schedule is on from October 8. The page's desktop views are built: Home
+(without its map), All installers, Installer, Search results, Not on the map and About this
+data. The map, the State view, the county map, ZIP lookup and the phone layout come later.
+This file fills in as the build goes.
 
 ## How it works
 
@@ -91,6 +93,88 @@ no row holds a departed contact; nothing is written empty; every date reads like
 2026-10-06. Then the build time, the main counts and the files' sizes. It prints counts and
 names only, never installer data, and calls nothing on the network.
 
+## The page
+
+The page is plain files in `public\`: markup, styling, scripts the browser loads as they are,
+pictures and fonts. There is no framework, nothing to install and nothing to build. A host
+serves the `public\` folder as it is.
+
+```
+public\
+  index.html         the frame: header, pinned search bar, the line saying how current the data is, footer
+  css\fonts.css      the Montserrat and Roboto font rules
+  css\site.css       the look
+  js\app.js          the one part that touches the browser: fetches the files, draws each view,
+                     keeps the address in step, listens for clicks and keys
+  js\data.js         reads the four files and checks each one's schema
+  js\routes.js       the addresses of the views
+  js\search.js       search
+  js\contacts.js     a row's contacts, as the job chose them
+  js\views.js        the words and layout of every view
+  js\format.js       dates in Eastern time, money, counts, phone and email links
+  js\html.js         builds the markup and makes everything taken from the data safe
+  img\               the INFINIUM logo and the small icons
+  vendor\fonts\      the Montserrat and Roboto font files
+  geo\counties.json  the county list
+  data\              the three files the job writes
+```
+
+- **The page reads four files and never calls QuickBase:** `data/build.json`,
+  `data/installers.json`, `data/territory.json` and `geo/counties.json`, by addresses
+  relative to the page. If one is missing, is not JSON, or does not carry `"schema": 1`, the
+  page says the installer data could not be loaded and to try again shortly. It never shows an
+  empty directory.
+- **It asks the network for its own files and nothing else:** no font service, no script
+  library, no map tiles, no counter.
+- **Every view has its own address, written after a `#`**, such as `#/installers`,
+  `#/installers?set=rates`, `#/installer/<installer id>`, `#/search?q=akron`,
+  `#/not-on-the-map` and `#/about`. Everything after the `#` stays in the browser, so a host
+  needs no settings or redirect rules for them: it serves `index.html` and the page does the
+  rest. Pasting an address into a new tab shows the same view, and Back and Forward work.
+- **The work is kept apart from the browser.** Everything in `js\` except `app.js` is plain
+  functions that take data and give back text or markup, so node can load and test them.
+- **The fonts and the logo** were copied, byte for byte, from the installer application's
+  repository beside this one (`installer-application`, commit `a6fc6db`): the logo
+  `infinium-logo-tagline.svg`, the icons `favicon.svg`, `favicon-32.png` and
+  `apple-touch-icon.png`, and the four font files. The fonts are Montserrat and Roboto, two
+  free fonts, as variable fonts carrying every weight from 100 to 900. Their sizes and SHA-256
+  values are in `docs\HANDOFF.md`.
+
+### Checking the page
+
+```
+npm run check:page
+```
+
+Runs the page's own functions on made-up installers and prints one line per check, PASS or
+FAIL: every address gives its view; All installers in the file's order with both column sets
+and the status filter; the Installer view shows every filled field and no empty one; a row's
+contacts; "Last confirmed"; search by state, by the start of a word, email and phone; the
+matched value on each result; a search with no match; "Rates expired"; Not on the map; the
+date line and About this data; the page when the data cannot be loaded; text made safe; no
+address of another site in `public\`; and the rulings. It needs no browser and never reads
+`public\data\`.
+
+```
+npm run check:page:published
+```
+
+Runs the same functions over the real files in `public\data\` and prints counts and PASS or
+FAIL only, never a record.
+
+```
+npm run page:pictures
+```
+
+Starts a small web server on this computer (127.0.0.1 only) that serves the page with
+made-up installers and cannot serve `public\data\`, starts Microsoft Edge or Google Chrome
+without a window, saves pictures of every view at 1440 and 1280 pixels wide into
+`review-screens\` (which git ignores), and measures: each address shows its view, the column
+titles stay in view below the search bar, nothing is wider than its panel or cut off, no
+script error, no request leaves the computer, no text under 12 pixels or under 4.5 to 1
+contrast, and every link and button can be reached with Tab. It needs no package. Add
+`-- --first-screens` to also save what the window shows first.
+
 ## What a host needs to do
 
 Serve the `public\` folder as it is, and republish when this repository changes. There is
@@ -120,7 +204,8 @@ docs\              the specification, the acceptance checks, and the QuickBase c
 job\               the job: read QuickBase, check, write the data files
 public\            the page, and in public\data\ the files the job writes
 public\geo\        counties.json, the county list; map shapes and the ZIP list come later
-scripts\           checks, and the job's tests on made-up installers
+scripts\           checks, the job's and the page's tests on made-up installers, and the
+                   pictures of the page
 ```
 
 ## Where to read more
