@@ -1,6 +1,6 @@
 /**
- * npm run check: checks R1 to R7 of group R (docs\ACCEPTANCE.md), all seven every time. It
- * never calls QuickBase. R8 reads QuickBase and is npm run check:columns.
+ * npm run check: checks R1 to R7 of group R (docs\ACCEPTANCE.md), and J19 of group J, all eight
+ * every time. It never calls QuickBase. R8 reads QuickBase and is npm run check:columns.
  *
  * Each check prints its id and PASS or FAIL. When one fails, the run still does the rest, then
  * ends with an error.
@@ -10,7 +10,7 @@
  */
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { ROOT, checkR1, checkR2, checkR3, checkR4, checkR5, checkR6, checkR7, trackedPaths, trackedFiles,
+import { ROOT, checkR1, checkR2, checkR3, checkR4, checkR5, checkR6, checkR7, checkJ19, trackedPaths, trackedFiles,
   isIgnored, loadAllowed } from './checks.mjs';
 import { makeClient, readEnv, makeRedactor } from '../job/lib/quickbase.mjs';
 
@@ -45,11 +45,12 @@ const results = [
   { id: 'R5', ...(allowed === null ? { ok: false, why: 'scripts/r5-allowed.json could not be read' } : await fromListing(() => checkR5(files, allowed))) },
   { id: 'R6', ...(await fromListing(() => checkR6({ paths, files, ignored: (n) => isIgnored(ROOT, n), key }))) },
   await checkR7(makeClient),
+  await checkJ19(ROOT),
 ];
 for (const r of results) {
   say(`${r.id} ${r.ok ? 'PASS' : 'FAIL'}${r.id === 'R6' && r.ok ? ' (repository half)' : ''}: ${r.why}`);
-  if (r.id === 'R6') say('R6 NOT YET SHOWN (GitHub half): the key read from the repository\'s secrets can be shown only once the job exists');
+  if (r.id === 'R6') say('R6 NOT YET SHOWN (GitHub half): the key read from the repository\'s secrets is shown only by a run of the job on GitHub');
 }
 const failed = results.filter((r) => !r.ok).map((r) => r.id);
-say(failed.length ? `check: ${failed.length} failed (${failed.join(', ')})` : 'check: R1 to R7 PASS');
+say(failed.length ? `check: ${failed.length} failed (${failed.join(', ')})` : 'check: R1 to R7 and J19 PASS');
 process.exitCode = failed.length ? 1 : 0;

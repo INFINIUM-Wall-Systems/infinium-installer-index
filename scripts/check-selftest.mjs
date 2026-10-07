@@ -1,22 +1,32 @@
 /**
- * npm run check:selftest: shows each of checks R1 to R7 (scripts\checks.mjs) passing on sound
- * input and failing on broken input, so that a check that always passes, or always fails, is
- * caught. Where a check has more than one clause, each clause has its own broken case, and the
- * case also asks that the failure names that clause.
+ * npm run check:selftest: shows each of checks R1 to R7 and J19 (scripts\checks.mjs) passing on
+ * sound input and failing on broken input, so that a check that always passes, or always fails,
+ * is caught. Where a check has more than one clause, each clause has its own broken case, and
+ * the case also asks that the failure names that clause.
  *
- * It works on temporary git repositories in the system temp folder, deleted at the end, and on
- * values held in memory. It never changes this repository, never loads the real QuickBase key
- * and never reaches QuickBase. Strings git must not track, such as a real-looking installer id,
- * are put together when it runs.
+ * It then runs every test of the job (scripts\job-tests.mjs): each passing on its sound cases
+ * and failing on each broken input or broken stand-in. npm run check:job runs the sound cases
+ * alone.
+ *
+ * It works on temporary git repositories and folders in the system temp folder, deleted at the
+ * end, and on values held in memory. It never changes this repository, never loads the real
+ * QuickBase key and never reaches QuickBase: fetch is replaced by a stand-in that refuses every
+ * call. Strings git must not track, such as a real-looking installer id, are put together when
+ * it runs.
  *
  * R8 reads QuickBase, so its failing case is shown by hand: npm run check:columns given a copy
  * of docs\quickbase\columns.json with one label changed.
  */
-import { mkdtempSync, readFileSync, rmSync, writeFileSync, existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import * as C from './checks.mjs';
 import { makeClient } from '../job/lib/quickbase.mjs';
+import { TESTS } from './job-tests.mjs';
+import { removeTemps } from './job-standins.mjs';
+
+globalThis.fetch = async () => { throw new Error('the self-test never reaches the network'); };
 
 const temps = [];
 function tempDir(tag) {
@@ -48,10 +58,11 @@ function expect(id, label, wantPass, r, mustSay = null) {
 }
 
 /* The listing section 3.4 of docs\SPEC.md draws, as a repository would track it. */
-const CANON = ['.gitattributes', '.gitignore', 'CLAUDE.md', 'README.md', 'package.json', '.github/workflows/.gitkeep',
+const CANON = ['.gitattributes', '.gitignore', 'CLAUDE.md', 'README.md', 'package.json', '.github/workflows/daily-data.yml',
   'docs/SPEC.md', 'docs/ACCEPTANCE.md', 'docs/HANDOFF.md', 'docs/quickbase/columns.json', 'job/quickbase-columns.mjs',
-  'job/lib/quickbase.mjs', 'public/js/.gitkeep', 'public/css/.gitkeep', 'public/vendor/.gitkeep', 'public/geo/.gitkeep',
-  'scripts/checks.mjs'];
+  'job/run.mjs', 'job/lib/quickbase.mjs', 'public/js/.gitkeep', 'public/css/.gitkeep', 'public/vendor/.gitkeep',
+  'public/geo/counties.json', 'scripts/checks.mjs', 'scripts/fixtures/installers.json'];
+const DATA = ['public/data/installers.json', 'public/data/territory.json', 'public/data/build.json'];
 
 try {
   /* R1 */
@@ -94,8 +105,11 @@ try {
 
   /* R2 */
   expect('R2', 'sound: the listing section 3.4 draws', true, await C.checkR2(CANON));
+  expect('R2', 'sound: the same, with public/data as the job writes it', true, await C.checkR2([...CANON, ...DATA]));
   expect('R2', 'a required file missing (docs/HANDOFF.md)', false, await C.checkR2(CANON.filter((p) => p !== 'docs/HANDOFF.md')), 'docs/HANDOFF.md is missing');
-  expect('R2', 'a required folder with nothing tracked (public/geo)', false, await C.checkR2(CANON.filter((p) => p !== 'public/geo/.gitkeep')), 'public/geo/');
+  expect('R2', 'a required folder with nothing tracked (public/geo)', false, await C.checkR2(CANON.filter((p) => p !== 'public/geo/counties.json')), 'public/geo/');
+  expect('R2', 'a required folder with nothing tracked (.github/workflows), public/data there', false,
+    await C.checkR2([...CANON, ...DATA].filter((p) => p !== '.github/workflows/daily-data.yml')), '.github/workflows/');
   expect('R2', 'an unexpected file at the top level', false, await C.checkR2([...CANON, 'notes.txt']), 'unexpected at the top level');
   expect('R2', 'a tracked file under review-screens', false, await C.checkR2([...CANON, 'review-screens/home.png']), 'review-screens/ is tracked');
 
@@ -108,6 +122,10 @@ try {
     await C.checkR3(claude.split('`docs\\SPEC.md`').join('`docs\\OTHER.md`')), 'docs\\SPEC.md');
   expect('R3', 'a copy with a data rule removed', false,
     await C.checkR3(claude.split('\n').filter((l) => !l.includes('`FAKE-`')).join('\n')), 'data rule');
+  expect('R3', 'a copy without the rule that the laptop never writes public\\data', false,
+    await C.checkR3(claude.split('\n').filter((l) => !l.startsWith('- On the laptop the job never writes')).join('\n')), 'data rule 2');
+  expect('R3', 'a copy without the rule that a temporary folder of real records is deleted', false,
+    await C.checkR3(claude.split('\n').filter((l) => !l.startsWith('- A temporary folder that holds real installer records')).join('\n')), 'data rule 3');
 
   /* R4 */
   const gitignore = readFileSync(resolve(C.ROOT, '.gitignore'), 'utf8');
@@ -156,12 +174,62 @@ try {
     getFields: (id) => opts.fetch(`https://api.quickbase.com/v1/fields?tableId=${id}`, { method: 'GET' }),
   });
   expect('R7', 'a stand-in client that passes every call through', false, await C.checkR7(passThrough), 'reached the stand-in');
+
+  /* J19, in a temporary repository with made-up data files */
+  {
+    const d = tempRepo('j19', { origin: null, commits: 0, gitignore });
+    writeFileSync(join(d, '.gitattributes'), '* text=auto eol=lf\n');
+    g(d, 'add', '--', '.gitignore', '.gitattributes');
+    commit(d, 'selftest: the rules');
+    expect('J19', 'sound: public/data is not there', true, await C.checkJ19(d));
+    const sha = (t) => createHash('sha256').update(t).digest('hex');
+    const installers = '{"schema":1,"installers":[\n{"id":"FAKE-001","company":"Made-up Walls","contacts":[],"row":{"gap":"both"}}\n]}\n';
+    const territory = '{"schema":1,"states":[\n]}\n';
+    const build = `${JSON.stringify({ schema: 1, files: { 'installers.json': sha(installers), 'territory.json': sha(territory) } }, null, 2)}\n`;
+    const data = join(d, 'public', 'data');
+    const put = (name, text) => writeFileSync(join(data, name), text);
+    mkdirSync(data, { recursive: true });
+    put('installers.json', installers);
+    put('territory.json', territory);
+    put('build.json', build);
+    g(d, 'add', '--', 'public/data');
+    commit(d, 'selftest: the job wrote public/data');
+    expect('J19', 'sound: public/data as the job wrote and committed it', true, await C.checkJ19(d));
+    put('installers.json', installers.replace('Made-up Walls', 'Made-up Walls Inc'));
+    expect('J19', 'a hand edit to installers.json, not staged: the fingerprint', false, await C.checkJ19(d), 'installers.json does not match its fingerprint');
+    expect('J19', 'a hand edit to installers.json, not staged: git', false, await C.checkJ19(d), 'git shows 1 changed');
+    g(d, 'add', '--', 'public/data');
+    expect('J19', 'the same hand edit, staged', false, await C.checkJ19(d), 'git shows 1 changed, staged');
+    commit(d, 'selftest: a hand edit committed');
+    expect('J19', 'the same hand edit, committed, so git is clean: the fingerprint alone', false, await C.checkJ19(d), 'installers.json does not match its fingerprint');
+    put('installers.json', installers);
+    g(d, 'add', '--', 'public/data');
+    commit(d, 'selftest: put back');
+    expect('J19', 'sound: put back as the job wrote it', true, await C.checkJ19(d));
+    put('notes.txt', 'made up\n');
+    expect('J19', 'an untracked file under public/data', false, await C.checkJ19(d), 'git shows 1 changed, staged or untracked');
+    rmSync(join(data, 'notes.txt'));
+    put('territory.json', territory.replace('[\n]', '[\n{"state":"OH","country":"US","counties":[]}\n]'));
+    expect('J19', 'a hand edit to territory.json', false, await C.checkJ19(d), 'territory.json does not match its fingerprint');
+  }
+
+  /* The job's tests: each passing on its sound cases and failing on each broken one */
+  for (const t of TESTS) {
+    for (const [cs, want] of [[t.sound, true], [t.broken, false]]) {
+      for (const c of cs) {
+        let r;
+        try { r = await c.run(); } catch (e) { r = { ok: false, why: `stopped: ${e && e.constructor ? e.constructor.name : 'error'}: ${e && e.message}` }; }
+        expect(`job ${t.line}`, `${t.label}: ${want ? 'sound' : 'broken'}: ${c.label}`, want, r);
+      }
+    }
+  }
 } catch (e) {
   cases.push({ id: 'selftest', label: 'the self-test itself', wantPass: true, got: false, right: false, why: `stopped: ${e.message}` });
 } finally {
   for (const d of temps) {
     try { rmSync(d, { recursive: true, force: true, maxRetries: 3 }); } catch { /* reported below */ }
   }
+  for (const d of removeTemps()) temps.push(d);
 }
 
 for (const c of cases) {

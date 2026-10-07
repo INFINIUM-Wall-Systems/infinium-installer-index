@@ -1,6 +1,8 @@
 /**
  * The checks of group R in docs\ACCEPTANCE.md, R1 to R7. R8 reads QuickBase and is in
- * scripts\check-columns.mjs.
+ * scripts\check-columns.mjs. Also J19 of group J (a hand edit to public\data is caught), and
+ * checkWorkflow, the one shape .github\workflows\daily-data.yml may have, which
+ * npm run check:job runs.
  *
  * Each check returns { id, ok, why } and never throws: when it cannot tell, it returns ok
  * false and says why. Each takes what it checks as an argument (a folder, a list of paths, a
@@ -10,7 +12,8 @@
  * Nothing a check returns holds a value it found: a hit is named by file and line only.
  */
 import { spawnSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, readFileSync } from 'node:fs';
 import { basename, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Refused, TABLES, REALM, APP_ID, DAVE_TABLE } from '../job/lib/quickbase.mjs';
@@ -117,6 +120,8 @@ export const STOP_LIST = [
 ];
 export const DATA_RULES = [
   '`public\\data\\` holds real installer records.',
+  'On the laptop the job never writes `public\\data\\`. A run there puts its files in a temporary folder, checks them, and deletes them. Only a run on GitHub\'s scheduler writes `public\\data\\` and commits it.',
+  'A temporary folder that holds real installer records is deleted before the work ends, and the report says so.',
   'Everything else in the repository uses made-up installers',
   'A made-up installer id starts with `FAKE-`.',
   'A made-up email address ends in `@example.com`.',
@@ -290,4 +295,113 @@ export function checkR7(makeClientFn) {
     }
     return result('R7', true, "a write, Dave's table and another table were each refused, and no request was sent");
   });
+}
+
+/* ==================================================================== J19 */
+
+/**
+ * J19: only the job changes public/data. It passes when public/data is not there and git
+ * tracks nothing under it. Otherwise it fails when git shows a changed, staged or untracked
+ * file under public/data, or when installers.json or territory.json no longer matches its
+ * fingerprint in build.json. It names files, never what they hold.
+ */
+export function checkJ19(dir = ROOT) {
+  return guarded('J19', () => {
+    const status = git(dir, ['status', '--porcelain=v1', '--untracked-files=all', '--', 'public/data']);
+    if (status.code !== 0) throw new Error(`git status ended with exit code ${status.code}`);
+    const changed = status.out.split('\n').filter(Boolean).length;
+    const data = resolve(dir, 'public', 'data');
+    if (!existsSync(data)) {
+      return changed ? result('J19', false, `public/data is not there, and git shows ${changed} change(s) under it`)
+        : result('J19', true, 'public/data is not there yet: nothing to compare');
+    }
+    const problems = [];
+    if (changed) problems.push(`git shows ${changed} changed, staged or untracked file(s) under public/data`);
+    let files = null;
+    try {
+      files = JSON.parse(readFileSync(resolve(data, 'build.json'), 'utf8')).files;
+    } catch {
+      problems.push('public/data/build.json is missing or cannot be read');
+    }
+    if (files) {
+      for (const name of ['installers.json', 'territory.json']) {
+        const path = resolve(data, name);
+        if (!existsSync(path)) { problems.push(`public/data/${name} is missing`); continue; }
+        const sha = createHash('sha256').update(readFileSync(path)).digest('hex');
+        if (sha !== files[name]) problems.push(`public/data/${name} does not match its fingerprint in build.json`);
+      }
+    }
+    return problems.length ? result('J19', false, problems.join('; '))
+      : result('J19', true, 'public/data matches the fingerprints in build.json, and git shows no change under it');
+  });
+}
+
+/* ========================================================= the workflow file */
+
+/** The bot's address, put together when the check runs, so that the workflow file is the only file holding it. */
+const BOT_ADDRESS = ['41898282+github-actions', '[bot]@users.noreply.github.com'].join('');
+
+/**
+ * The one shape .github/workflows/daily-data.yml may have, line by line, comments and blank
+ * lines aside: started by hand only, with one box to tick; contents: write and no other
+ * permission; ubuntu-latest, never two at once, at most 10 minutes; actions/checkout@v6 and
+ * actions/setup-node@v6 on Node 22 and no other action; the tests, then the job, then
+ * public/data staged and committed as github-actions[bot] and pushed, with no force.
+ */
+export const WORKFLOW_SHAPE = [
+  'name: Daily data',
+  'on:',
+  '  workflow_dispatch:',
+  '    inputs:',
+  '      skip_count_guard:',
+  '        description: Skip the count guard for this one run, when a count has really fallen',
+  '        type: boolean',
+  '        default: false',
+  'permissions:',
+  '  contents: write',
+  'concurrency:',
+  '  group: daily-data',
+  '  cancel-in-progress: false',
+  'jobs:',
+  '  refresh:',
+  '    runs-on: ubuntu-latest',
+  '    timeout-minutes: 10',
+  '    steps:',
+  '      - name: Check the repository out',
+  '        uses: actions/checkout@v6',
+  '      - name: Set up Node 22',
+  '        uses: actions/setup-node@v6',
+  '        with:',
+  '          node-version: 22',
+  '      - name: Tests with made-up installers',
+  '        run: npm run check:job',
+  '      - name: Run the job',
+  "        run: node job/run.mjs --publish ${{ inputs.skip_count_guard && '--skip-count-guard' || '' }}",
+  '        env:',
+  '          QB_USER_TOKEN: ${{ secrets.QB_USER_TOKEN }}',
+  '          QB_REALM_HOSTNAME: infiniumwalls.quickbase.com',
+  '          QB_APP_ID: bpkqi6uif',
+  '      - name: Save the data files',
+  '        run: |',
+  '          git add -- public/data',
+  '          if git diff --cached --quiet; then',
+  '            echo "Nothing changed in public/data, so there is nothing to commit."',
+  '            exit 0',
+  '          fi',
+  `          git -c user.name="github-actions[bot]" -c user.email="${BOT_ADDRESS}" commit -q -m "Daily data refresh"`,
+  '          git push origin HEAD:main',
+];
+
+/** The workflow file has the one shape it is allowed, comments and blank lines aside. */
+export function checkWorkflow(text) {
+  const lines = String(text).replace(/\r/g, '').split('\n').map((l) => l.replace(/\s+$/, ''))
+    .filter((l) => l.trim() && !l.trim().startsWith('#'));
+  const n = Math.max(lines.length, WORKFLOW_SHAPE.length);
+  for (let i = 0; i < n; i++) {
+    if (lines[i] !== WORKFLOW_SHAPE[i]) {
+      const where = i >= lines.length ? `line ${i + 1} of the shape is missing` : i >= WORKFLOW_SHAPE.length ? `line ${i + 1} is more than the shape allows` : `line ${i + 1} differs from the shape`;
+      return result('workflow', false, `${where} (comments and blank lines aside)`);
+    }
+  }
+  return result('workflow', true, `${lines.length} lines, the one shape allowed: started by hand only, contents: write, two actions, public/data alone staged`);
 }

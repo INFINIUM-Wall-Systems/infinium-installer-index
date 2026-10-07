@@ -10,6 +10,8 @@
     "check": "node scripts/check.mjs",
     "check:selftest": "node scripts/check-selftest.mjs",
     "check:columns": "node scripts/check-columns.mjs",
-    "quickbase:columns": "node job/quickbase-columns.mjs"
+    "check:job": "node scripts/check-job.mjs",
+    "quickbase:columns": "node job/quickbase-columns.mjs",
+    "job:rehearse": "node job/rehearse.mjs"
   }
 }

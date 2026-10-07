@@ -24,9 +24,9 @@
  *   - Every refusal happens before any network call is made.
  *   - REST only. The XML interface is left out.
  *   - The client keeps a list of every request it sends, by method and address (the key is
- *     never in it), and no more than MAX_CALLS_PER_RUN requests leave one run of a script.
- *   - fetch, sleep and now default to the real ones. A test passes its own fetch and a
- *     made-up key, so it never loads the real key and never reaches QuickBase.
+ *     never in it), and no more than MAX_CALLS_PER_CLIENT requests leave one client.
+ *   - fetch, sleep, now and timeoutSignal default to the real ones. A test passes its own, and
+ *     a made-up key, so it never loads the real key, never reaches QuickBase and never waits.
  *   - The realm and app id the client is made with must be the installer app's.
  *   - The client also answers query(id, body), the name readAll calls, as the backfill's
  *     wrapper (loaderApi) did.
@@ -43,6 +43,27 @@
  * Unchanged: at least 150 ms between calls, the retry after a 429 (and after a 5xx or a lost
  * answer, these all being reads), and the 60-second timeout.
  *
+ * What changed on 2026-10-07, for the daily job:
+ *   - The limit of MAX_CALLS_PER_CLIENT (60) requests, retries included, counts for one client.
+ *     It was one count for the whole process, across clients. Each run of the job makes its
+ *     own client, and the tests make many clients in one process.
+ *   - readAll asks for PAGE_SIZE (5,000) rows to a page, where it asked for 1,000, and hands
+ *     back { rows, total }: every row once, in the order of QuickBase's record numbers, and
+ *     QuickBase's own total. It stops when it has that total, not when a page comes back
+ *     short. If QuickBase reports no total, or a total that changes from one page to the
+ *     next, it stops with an error.
+ *   - The body of an answer is read inside the retry, under the same 60-second timer: a stall
+ *     while the body is read is given up and tried again like a lost answer.
+ *   - The timer is timeoutSignal, which a test can stand in for, beside fetch, sleep and now.
+ *     The wait a Retry-After date asks for is worked out from now.
+ *   - The client keeps sentAt, the time each request left, beside calls.
+ *   - ApiError carries the status number of QuickBase's answer as status, so that the job can
+ *     report the number and never the text.
+ *   - keyFrom says where the key comes from. On GitHub, told from the environment value
+ *     GITHUB_ACTIONS being "true": the environment values QB_USER_TOKEN, QB_REALM_HOSTNAME and
+ *     QB_APP_ID, and nowhere else. On the laptop: the .env.local file it is given, through
+ *     readEnv; environment values are not looked at.
+ *
  * Loading this module sends nothing, reads no file and writes nothing.
  */
 import { readFileSync, existsSync } from 'node:fs';
@@ -54,7 +75,7 @@ export const TABLES = Object.freeze({ MASTER: 'bwegbya6s', CONTACTS: 'bwegb3582'
 const TABLE_IDS = new Set(Object.values(TABLES));
 export const REALM = 'infiniumwalls.quickbase.com';
 export const APP_ID = 'bpkqi6uif';
-export const MAX_CALLS_PER_RUN = 60;
+export const MAX_CALLS_PER_CLIENT = 60;
 /** .env.local in the folder above this repository: job\lib\ -> job\ -> the repository -> its parent. */
 export const DEFAULT_ENV_PATH = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '.env.local');
 
@@ -62,7 +83,8 @@ export const DAVE_TABLE = 'bwcd37y2s';
 const API = 'https://api.quickbase.com/v1';
 const USER_AGENT = 'INFINIUM-installer-index/read-only';
 const RECORD_ID = 3;
-const PAGE = 1000;
+/** Rows asked for in one page of a records query. Territory comes in four. */
+export const PAGE_SIZE = 5000;
 
 // Rate limits: REST allows 100 requests per 10 seconds per user token. A 429 carries
 // retry-after. As in the original: at least MIN_GAP_MS between calls, at most MAX_TRIES
@@ -77,7 +99,13 @@ const TOKEN_KEYS = ['QB_USER_TOKEN', 'QUICKBASE_USER_TOKEN', 'QB_TOKEN', 'QUICKB
 const APP_KEYS = ['QB_APP_ID', 'QUICKBASE_APP_ID', 'QB_APP', 'QUICKBASE_APP'];
 
 export class Refused extends Error {}
-export class ApiError extends Error {}
+/** A call that QuickBase answered with an error, or that got no answer. status is the answer's number, when there was one. */
+export class ApiError extends Error {
+  constructor(message, status) {
+    super(message);
+    this.status = status;
+  }
+}
 
 /* ======================================================= encoding and secrets */
 
@@ -150,6 +178,31 @@ export function readEnv(path = DEFAULT_ENV_PATH, appKey) {
   return { realm, appId, appKey: key, token: env[tokenKey] };
 }
 
+/** The three environment values the key, the realm and the app id come from on GitHub. */
+export const GITHUB_KEYS = ['QB_USER_TOKEN', 'QB_REALM_HOSTNAME', 'QB_APP_ID'];
+
+/**
+ * Where the key comes from. `env` is the set of environment values the caller hands over;
+ * `path` is the .env.local file to read on the laptop.
+ *   On GitHub (env.GITHUB_ACTIONS is "true"): QB_USER_TOKEN, QB_REALM_HOSTNAME and QB_APP_ID,
+ *   and nothing else. One that is missing or empty is named, never shown.
+ *   Anywhere else: the file at `path`, through readEnv. Environment values are not looked at,
+ *   so a stray one cannot take the file's place.
+ * Returns { realm, appId, token, source } with source "environment" or "file", or { problem }.
+ * Names of values may be printed; values never are.
+ */
+export function keyFrom(env, path) {
+  if (!env || typeof env !== 'object') return { problem: 'No environment values were handed over, so nothing was sent to QuickBase.' };
+  if (env.GITHUB_ACTIONS === 'true') {
+    const missing = GITHUB_KEYS.filter((k) => typeof env[k] !== 'string' || !env[k].trim());
+    if (missing.length) return { problem: `On GitHub, missing or empty: ${missing.join(', ')}. Nothing was sent to QuickBase.` };
+    return { realm: env.QB_REALM_HOSTNAME.trim(), appId: env.QB_APP_ID.trim(), token: env.QB_USER_TOKEN.trim(), source: 'environment' };
+  }
+  if (!path) return { problem: 'No .env.local file was named, so nothing was sent to QuickBase.' };
+  const r = readEnv(path);
+  return r.problem ? { problem: r.problem } : { realm: r.realm, appId: r.appId, token: r.token, source: 'file' };
+}
+
 /* ====================================================================== client */
 
 // The only four requests this client can send. Each names one of the three tables.
@@ -170,12 +223,12 @@ function routeOf(method, u, appId) {
 
 const backoff = (attempt) => Math.min(60_000, 1000 * 2 ** attempt);
 
-function retryAfter(res) {
+function retryAfter(res, now) {
   const v = res.headers.get('retry-after');
   if (!v) return null;
   if (/^\d+(\.\d+)?$/.test(v.trim())) return Math.min(120_000, Number(v) * 1000);
   const at = Date.parse(v);
-  return Number.isNaN(at) ? null : Math.min(120_000, Math.max(0, at - Date.now()));
+  return Number.isNaN(at) ? null : Math.min(120_000, Math.max(0, at - now()));
 }
 
 function parseJson(text) {
@@ -188,17 +241,19 @@ function errorText(res, out, xml) {
   return `${res.status} ${res.statusText || ''}${why ? ` — ${why}` : ''}`.slice(0, 600);
 }
 
-// Every request sent by this process, across clients: one run of a script.
-let sentThisRun = 0;
-
 export function makeClient({ realm, appId, token, fetch = globalThis.fetch,
-  sleep = (ms) => new Promise((r) => setTimeout(r, ms)), now = () => Date.now() }) {
+  sleep = (ms) => new Promise((r) => setTimeout(r, ms)), now = () => Date.now(),
+  timeoutSignal = (ms) => AbortSignal.timeout(ms) }) {
   if (realm !== REALM || appId !== APP_ID) {
     throw new Refused(`refused: this client reads only realm ${REALM}, app ${APP_ID}.`);
   }
   const stats = { calls: 0, attempts: 0, rateLimited: 0, retries: 0, refused: 0 };
   // Every request sent, as "METHOD address". The key is in a header, never in an address.
   const calls = [];
+  // The time, by now(), each of those requests left.
+  const sentAt = [];
+  // Requests sent by this client, retries included.
+  let sent = 0;
   let last = -Infinity;
   const rest = { 'QB-Realm-Hostname': realm, Authorization: `QB-USER-TOKEN ${token}`, 'User-Agent': USER_AGENT,
     'Content-Type': 'application/json; charset=utf-8' };
@@ -227,33 +282,36 @@ export function makeClient({ realm, appId, token, fetch = globalThis.fetch,
     stats.calls++;
     for (let attempt = 1; ; attempt++) {
       // GUARD:call-limit
-      if (sentThisRun >= MAX_CALLS_PER_RUN) refuse(`${where}: ${MAX_CALLS_PER_RUN} requests were sent in this run, the most one run may send.`);
+      if (sent >= MAX_CALLS_PER_CLIENT) refuse(`${where}: ${MAX_CALLS_PER_CLIENT} requests have left this client, the most one client may send.`);
       // /GUARD:call-limit
       const gap = last + MIN_GAP_MS - now();
       if (gap > 0) await sleep(gap);
       last = now();
       stats.attempts++;
-      sentThisRun++;
+      sent++;
+      sentAt.push(last);
       calls.push(`${method} https://${u.host}${u.pathname}${u.search}`);
       let res;
+      let text;
       try {
-        res = await fetch(url, { method, headers: rest, body, signal: AbortSignal.timeout(TIMEOUT_MS) });
+        res = await fetch(url, { method, headers: rest, body, signal: timeoutSignal(TIMEOUT_MS) });
+        // The body is read under the same timer, so a stall here is a lost answer as well.
+        text = new TextDecoder('utf-8').decode(Buffer.from(await res.arrayBuffer()));
       } catch (e) {
         if (attempt < MAX_TRIES) { stats.retries++; await sleep(backoff(attempt)); continue; }
-        throw new ApiError(`${where}: no answer (${e.name}).`);
+        throw new ApiError(`${where}: no answer (${(e && e.name) || 'Error'}).`);
       }
       if (res.status === 429 && attempt < MAX_TRIES) {
         stats.rateLimited++;
-        await sleep(retryAfter(res) ?? backoff(attempt));
+        await sleep(retryAfter(res, now) ?? backoff(attempt));
         continue;
       }
       if (res.status >= 500 && attempt < MAX_TRIES) { stats.retries++; await sleep(backoff(attempt)); continue; }
-      const text = new TextDecoder('utf-8').decode(Buffer.from(await res.arrayBuffer()));
       const out = parseJson(text);
       // GUARD:stop-on-error
       if (!res.ok) {
         const ray = res.headers.get('qb-api-ray');
-        throw new ApiError(`${where}: ${errorText(res, out, false)}${ray ? ` [qb-api-ray ${ray}]` : ''}`);
+        throw new ApiError(`${where}: ${errorText(res, out, false)}${ray ? ` [qb-api-ray ${ray}]` : ''}`, res.status);
       }
       // /GUARD:stop-on-error
       return out;
@@ -264,7 +322,7 @@ export function makeClient({ realm, appId, token, fetch = globalThis.fetch,
   // runQuery: POST /records/query, body {from, select, where, sortBy, options: {skip, top}}.
   const queryRecords = (id, body) => send('POST', `${API}/records/query`, { json: { from: id, ...body } });
   return {
-    stats, calls, send,
+    stats, calls, sentAt, send,
     // getTable: GET /tables/{tableId}?appId. Gives the name, keyFieldId and the record names.
     getTable: (id) => send('GET', `${API}/tables/${id}?${q({ appId })}`),
     // getFields: GET /fields?tableId. Every field with fieldType, mode, required, unique,
@@ -289,18 +347,27 @@ export function partsOf(fields, addressId) {
 
 /* ============================================================== reading records */
 
-/** Every record matching `where` (all of them without one), page by page. */
+/**
+ * Every record matching `where` (all of them without one), page by page, in the order of
+ * QuickBase's record numbers. Returns { rows, total }: total is QuickBase's own count. It stops
+ * when it has that many rows, not when a page comes back short; an empty page also ends it, so
+ * that the caller can compare rows.length with total.
+ */
 export async function readAll(api, id, select, where) {
-  const out = [];
+  const rows = [];
+  let total = null;
   for (let skip = 0; ;) {
-    const res = await api.query(id, { select, ...(where ? { where } : {}), sortBy: [{ fieldId: RECORD_ID, order: 'ASC' }], options: { skip, top: PAGE } });
-    const data = res.data || [];
-    out.push(...data);
+    const res = await api.query(id, { select, ...(where ? { where } : {}), sortBy: [{ fieldId: RECORD_ID, order: 'ASC' }], options: { skip, top: PAGE_SIZE } });
+    const data = Array.isArray(res.data) ? res.data : [];
+    const reported = (res.metadata || {}).totalRecords;
+    if (typeof reported !== 'number') throw new ApiError(`table ${id}: QuickBase reported no total.`);
+    if (total !== null && reported !== total) throw new ApiError(`table ${id}: QuickBase's total changed while the table was read.`);
+    total = reported;
+    for (const row of data) rows.push(row);
     skip += data.length;
-    const total = (res.metadata || {}).totalRecords;
-    if (!data.length || (typeof total === 'number' && skip >= total)) break;
+    if (skip >= total || !data.length) break;
   }
-  return out;
+  return { rows, total };
 }
 
 const toSecond = (v) => { const ms = Date.parse(v); return new Date(ms - (((ms % 1000) + 1000) % 1000)).toISOString(); };

@@ -1,104 +1,237 @@
 # Handoff: state for the next Claude Code chat
 
-**Written:** October 6, 2026, at the end of the repository kickoff (Joe's prompt revision 1).
+**Written:** October 7, 2026, at the end of the daily job's first prompt (Joe's prompt
+revision 2: build the job and rehearse it on the laptop; nothing published).
 
 ## What the repository holds
 
-- `CLAUDE.md`, `README.md`, `docs\SPEC.md`, `docs\ACCEPTANCE.md`: Joe's text, carried in the
-  kickoff prompt and checked by SHA-256 before and after they were written. Edit none of them
-  unless a prompt from Joe carries the new text in full.
-- `docs\HANDOFF.md`: this file.
-- `docs\quickbase\columns.json`: every column of the three installer tables, read from
-  QuickBase: field id, label, type, choices, and for an address part the field id of its
-  Address column. No record and no date of reading.
-- `job\lib\quickbase.mjs`: the read-only QuickBase client.
-- `job\quickbase-columns.mjs`: rewrites `columns.json` (`npm run quickbase:columns`).
-- `scripts\checks.mjs`: checks R1 to R7. `scripts\check.mjs` runs them (`npm run check`).
-  `scripts\check-selftest.mjs` shows each passing and failing (`npm run check:selftest`).
-  `scripts\check-columns.mjs` is R8 (`npm run check:columns`). `scripts\r5-allowed.json` is
-  R5's allowed list; it is empty.
-- `package.json` (no dependencies), `.gitignore`, `.gitattributes` (LF line endings), and
-  `.gitkeep` in `.github\workflows`, `public\js`, `public\css`, `public\vendor`, `public\geo`.
-- `review-screens\` exists on the laptop and is ignored by git.
+- `CLAUDE.md` and `docs\SPEC.md` (eighth revision): Joe's text, carried in the prompt and
+  checked by SHA-256 in a temporary folder, in place, and as committed. `docs\ACCEPTANCE.md`
+  is unchanged; its header still says it goes with the seventh revision, which is known.
+- `README.md`: filled in by this run, as the prompt asked: the secret's name, how to start
+  the job by hand, and that the schedule is not on yet.
+- `docs\quickbase\columns.json`: unchanged. R8 found 0 differences on October 7.
+- `job\`, the job:
+  - `run.mjs`: the job from start to finish (read, shape, check, write), and its command line.
+  - `fields.mjs`: the one place that lists the field ids: the 69 watched, the 62 asked for.
+  - `read.mjs`: reads the three tables' fields, then their records, through the client.
+  - `shape.mjs`: turns what was read into installers.json and territory.json, and the counts
+    and gap counts; no network and no files.
+  - `row-contacts.mjs`: the people for a row (section 4.8).
+  - `checks.mjs`: the seven checks of section 3.5.
+  - `write.mjs`: writes the three files, all or nothing.
+  - `rehearse.mjs`: the rehearsal on the laptop (`npm run job:rehearse`).
+  - `build-counties.mjs`: builds `public\geo\counties.json` from installer-application's
+    county list.
+  - `lib\quickbase.mjs`: the read-only client. `lib\order.mjs`: the one way text is put in
+    order, by character codes, never by the machine's language settings.
+  - `quickbase-columns.mjs`: rewrites `columns.json` (unchanged).
+- `public\geo\counties.json`: 3,193 counties (3,144 in the United States, 49 in Ontario), 52
+  states, 318 ids that begin with a zero, every id text. Built from
+  installer-application's `public/data/counties.meta.json` at commit `a6fc6db`, read with
+  `git show`. The source writes states as two-letter codes, ON for Ontario; 3,020 of the
+  3,193 names carry the word County.
+- `.github\workflows\daily-data.yml`: runs the job on GitHub. Started by hand only; no
+  schedule.
+- `scripts\`: `checks.mjs` (R1 to R7, J19, and the workflow file's shape), `check.mjs`
+  (`npm run check`), `check-selftest.mjs` (`npm run check:selftest`), `check-columns.mjs`
+  (R8, `npm run check:columns`), `check-job.mjs` (`npm run check:job`), `job-tests.mjs` (the
+  job's tests), `job-standins.mjs` (stand-ins for QuickBase, the clock and the key),
+  `fixtures\installers.json` (27 made-up installers, 62 contacts, 14 territory rows) and
+  `fixtures\fingerprints.json`, `r5-allowed.json` (still empty).
+- `.gitkeep` is left only in `public\js`, `public\css` and `public\vendor`.
+- `review-screens\` exists on the laptop and is ignored by git. `public\data\` does not exist.
 
-## The QuickBase client
+## The job
 
-Copied from `installer-application`, commit `a6fc6db`: `makeClient`, `readEnv`,
-`makeRedactor` and `partsOf` from `scripts\quickbase-create-tables.mjs`; `readAll` and `canon`
-from `scripts\quickbase-backfill.mjs`. `makeRedactor`, `partsOf`, `readAll` and `canon` are
-unchanged. `readEnv` changed in one line: its path defaults to `.env.local` in the folder
-above this repository. `makeClient` changed: it sends only four reads (a table, its fields,
-its relationships, a records query), only for the three installer tables, refuses anything
-else before any network call, keeps a list of the requests it sends, and stops at 60 requests
-in one run. Left out: the XML interface, every function that writes, and the guards the fixed
-four reads and three tables replace. The comment at the top of the file has the full list.
+- `node job/run.mjs --out <folder>`: writes into an existing, empty folder inside the system
+  temp directory whose name, or that of a folder it sits in, begins `installer-index-`. On
+  the laptop the key comes from `.env.local` in the folder above the repository.
+- `node job/run.mjs --publish`: writes `public\data`; refused unless `GITHUB_ACTIONS` is
+  "true". On GitHub the key, the realm and the app id come from `QB_USER_TOKEN`,
+  `QB_REALM_HOSTNAME` and `QB_APP_ID`, and nowhere else.
+- `--skip-count-guard`: leaves the count guard out for one run; at least one installer is
+  still asked for; build.json writes `skipped` for the first check.
+- Order of work: the three tables' fields (3 calls), check 7, the records (6 calls with 5,000
+  rows to a page), the rows read compared with QuickBase's totals, shaping twice (check 6),
+  checks 1 to 6, and only then the write. A failed check writes nothing and names the check,
+  its number, its name and counts.
+- It prints the time, where the key came from, the rows read and the rows to a page, the
+  counts, each check, and each call by method and address with how many times. An error is
+  printed by its kind and step and, for a QuickBase refusal, the status number; never its
+  text.
+- Only the command-line start of `job\run.mjs` reads the real environment. `main` is handed
+  its environment values and the repository's folder, with no default for either.
 
-## What QuickBase showed on October 6
+## The client, changed in this run
 
-- Columns: MASTER 338, Contacts 15, Territory 12. No choice list was withheld.
-- Section 3.2 of the specification: all 69 field ids are in `columns.json`; the 53 labels it
-  writes out all match. The 16 it describes (address parts of the two shipping addresses and
-  four "Not applicable" boxes) carry QuickBase's own labels.
-- Tier 2 charge columns, installers with each filled: Tier 2 basis 27, charge unit 6, charge
-  unit - other 3, charge amount 4, charge relation 6. At least one: 27. None: 46.
-- Installer Agreement on File?: 64 filled (Yes 36, No 28). Valid COI on File?: 45 filled
-  (Yes 26, No 19). COI Valid Through: 0 filled.
-- Role marks, all 221 contacts: Leadership / Ownership 69; Quoting / Estimating 66;
-  Scheduling / Coordination 63; Field / Installation 44; Receiving / Warehouse 39; Office /
-  Billing / Compliance / Accounts payable 39; Primary contact, After-hours, Emergency dispatch
-  0; no role 47. Leaving out the 11 departed: the same, except Field / Installation 43 and no
-  role 37. Receiving / Warehouse is 39 either way, not 40.
+- The limit of 60 requests counts for one client (it was one count for the whole process).
+- `readAll` asks for 5,000 rows to a page and returns `{ rows, total }`. It stops at
+  QuickBase's total, not at a short page, and stops with an error if the total is missing or
+  changes between pages.
+- The reading of an answer's body is inside the retry, under the same 60-second timer.
+- `timeoutSignal` is a timer a test can stand in for; the Retry-After date is worked out from
+  `now`. The client keeps `sentAt`. `ApiError` carries `status`.
+- `keyFrom(env, path)`: where the key comes from, as above.
+- Shown by tests, each working as written: at least 150 ms between calls; after a 429 it
+  waits as Retry-After says, or backs off, up to six attempts; it tries again after a 5xx or
+  a network error within the same six; an attempt with no answer after 60 seconds is tried
+  again.
 
 ## The checks
 
-Results, after the first push (commit `30b9f9a`):
+On October 7, with the work staged, before the first commit:
 
-- R1 PASS: origin is the GitHub repository, and the first commit is on GitHub.
-- R2 PASS: 21 tracked files; the folders and files of section 3.4 are there.
-- R3 PASS. R4 PASS.
-- R5 PASS: 21 files scanned. The allowed list is empty.
-- R6 PASS for the repository half: the key was compared in memory and is in no file. The
-  GitHub half is NOT YET SHOWN.
-- R7 PASS.
-- R8 PASS: 0 differences; 338, 15 and 12 columns.
-- `npm run check:selftest`: PASS, 29 cases, each as expected.
+- `npm run check`: R1 to R7 and J19 PASS. R6's GitHub half is NOT YET SHOWN.
+- `npm run check:selftest`: PASS, 201 cases: 42 for R1 to R7 and J19, 159 for the job's tests.
+- `npm run check:job`: PASS, 66 sound cases in 62 tests.
+- `npm run check:columns` (R8): PASS, 0 differences.
 
-How each was shown to fail (`npm run check:selftest`, 29 cases):
+## J1 to J19
 
-- R1: a different origin, no commit, a GitHub answer that does not hold the first commit,
-  GitHub's main not in the local repository, and no main on GitHub.
-- R2: a required file missing, a required folder with nothing tracked, an unexpected file at
-  the top level, and a tracked file under `review-screens`.
-- R3: a stop-list item removed, `docs\SPEC.md` not named, and a data rule removed.
-- R4: a `.gitignore` without the `review-screens` line.
-- R5: a planted installer id, email address and phone number, each named by file and line.
-- R6: a planted token-shaped string, a made-up key planted in a file, a tracked `.env.local`,
-  and a `.gitignore` without the `.env*` line. The GitHub half of R6, the key read from the
-  repository's secrets, is NOT YET SHOWN: it can be shown only once the job exists.
-- R7: a stand-in client that passes calls through.
-- R8, shown by hand: `npm run check:columns` given a copy of `columns.json` with one label
-  changed reported 1 difference and ended with an error.
+| Check | Where it stands |
+|---|---|
+| J1 | Shown with made-up installers and on the real records: every call listed by method and address |
+| J2 | Shown with made-up installers (a stand-in total that differs stops the job) and on the real records (73, 221, 17,745) |
+| J3 | Shown with made-up installers: falls in each count, an unreadable build.json, the first run, `--skip-count-guard`. On GitHub the first run has no last good run |
+| J4 to J7 | Shown with made-up installers (planted orphans, an unknown county, a second id, a blank company, a sixth status); passed on the real records |
+| J8 | Shown with made-up installers (a changed label, a changed type) and on the real records |
+| J9 | Shown with made-up installers in a made-up repository. Waits for GitHub for "nothing is saved into the repository" and "the run shows as failed" |
+| J10 | Shown with made-up installers and on the real records (two runs, same SHA-256). Waits for GitHub for Linux and Node 22 writing the same bytes: the fingerprints test runs there first |
+| J11 | Shown with made-up installers and on the real records: 3,193 ids, all text, 318 begin with a zero |
+| J12 | Shown with made-up installers and on the real records: 25, 29, 23, equal to the second count |
+| J13 | Shown with made-up installers and on the real records |
+| J14 | Shown with made-up installers and on the real records |
+| J15 | Shown with a stand-in clock and on the real records (at most 18 calls in any 10 seconds) |
+| J16 | Shown with made-up installers: a clean run, each check failing in turn, an error thrown on purpose and a refusal whose text holds made-up values. The rehearsal's leak scan found nothing on the real records |
+| J17 | Waits for GitHub: the schedule is not on yet |
+| J18 | Waits for GitHub: Joe's first run by hand |
+| J19 | Shown in a temporary repository; in `npm run check`, passes with `public\data` not there |
 
-## Exceptions of the rules used
+## What the rehearsal counted (October 7)
 
-Temporary folders in the Windows temp folder, each deleted: one for the four files, one for
-the two source files read through `git show`, one for the R8 copy, and the self-test's
-repositories. git's safe.directory list was not changed.
+One rehearsal: two runs, 9 calls each, 18 in all. Every check passed in both runs, and both
+runs wrote the same installers.json and territory.json. The leak scan looked for 702 values,
+skipped 5, and found nothing. The folder `installer-index-rehearsal` was deleted.
+
+Every count equals what QuickBase held on October 6: installers 73; contacts 221; territory
+rows 17,745; counted twice 0; with territory 52, without 21; counties covered 3,193; states
+covered 52; CONFIRMED BY PARTNER 54, DORMANT - NO RESPONSE 14, INACTIVE 2, PENDING - UPDATE
+EXPECTED 2, HELD - BUSINESS DECISION 1; no quoting contact 25, no scheduling contact 29,
+neither 23; rates written Non-Union ST 45, Non-Union OT 46, Union ST 52, Union OT 51, all four
+34, none 9; mobilization 65; rates valid through 58.
+
+Counted for the first time:
+
+- Quoting place: a quoting contact 48, a stand-in 25, nobody 0.
+- Scheduling place: a scheduling contact 44, a stand-in 13, nobody 16.
+- One person fills both places on 12 rows. A contact who cannot be reached fills a place on
+  0 rows.
+- Sizes: installers.json 119,198 bytes; territory.json 358,681; build.json 1,745.
+- Rows to a page: MASTER 73; Contacts 221; Territory 5,000, 5,000, 5,000, 2,745.
+- In the files: no null, empty text, empty list or empty group; 0 installers with no
+  contact; 0 contacts with nothing filled. 112 dates, all written like 2026-10-06. 73 office
+  states, all among the county list's two-letter codes.
+
+How QuickBase hands over a blank: as an empty text for text, long text, choice, date, email
+and phone; as nothing (null) for currency and number; as false for a box; as an empty list
+for several choices. No column came back with a value left out of a record or of another
+kind.
+
+How each of the 62 columns asked for came back (run 1):
+
+| Table | Field | Label | Type | Came back as |
+|---|---|---|---|---|
+| MASTER | 6 | Installer ID | text | text 73 |
+| MASTER | 25 | Company | text | text 73 |
+| MASTER | 13 | Record status | choice | text 73 |
+| MASTER | 14 | Last confirmed | date | text 61, empty text 12 |
+| MASTER | 28 | Street 1 | text | text 72, empty text 1 |
+| MASTER | 29 | Street 2 | text | text 7, empty text 66 |
+| MASTER | 30 | City | text | text 73 |
+| MASTER | 31 | State/Region | choice | text 73 |
+| MASTER | 32 | Postal Code | text | text 72, empty text 1 |
+| MASTER | 33 | Country | text | text 2, empty text 71 |
+| MASTER | 35 | Street 1 | text | text 47, empty text 26 |
+| MASTER | 36 | Street 2 | text | text 5, empty text 68 |
+| MASTER | 37 | City | text | text 44, empty text 29 |
+| MASTER | 38 | State/Region | choice | text 43, empty text 30 |
+| MASTER | 39 | Postal Code | text | text 44, empty text 29 |
+| MASTER | 40 | Country | text | text 1, empty text 72 |
+| MASTER | 60 | Shipping Address - Not applicable | box | true 15, false 58 |
+| MASTER | 47 | Street 1 | text | text 4, empty text 69 |
+| MASTER | 48 | Street 2 | text | text 3, empty text 70 |
+| MASTER | 49 | City | text | text 4, empty text 69 |
+| MASTER | 50 | State/Region | choice | text 4, empty text 69 |
+| MASTER | 51 | Postal Code | text | text 3, empty text 70 |
+| MASTER | 52 | Country | text | empty text 73 |
+| MASTER | 61 | Second Shipping Address - Not applicable | box | true 46, false 27 |
+| MASTER | 41 | Non-Union ST | currency | number 45, null 28 |
+| MASTER | 42 | Non-Union OT | currency | number 46, null 27 |
+| MASTER | 43 | Union ST | currency | number 52, null 21 |
+| MASTER | 44 | Union OT | currency | number 51, null 22 |
+| MASTER | 21 | Mobilization / demobilization - Rate / basis | text | text 65, empty text 8 |
+| MASTER | 20 | Rates valid through | date | text 58, empty text 15 |
+| MASTER | 19 | Shop / labor status | choice | text 64, empty text 9 |
+| MASTER | 63 | Outreach pricing notes | long text | text 6, empty text 67 |
+| MASTER | 54 | Tier 2 basis | choice | text 27, empty text 46 |
+| MASTER | 55 | Tier 2 charge unit | choice | text 6, empty text 67 |
+| MASTER | 56 | Tier 2 charge unit - other | text | text 3, empty text 70 |
+| MASTER | 57 | Tier 2 charge amount | number | number 4, null 69 |
+| MASTER | 58 | Tier 2 charge relation | choice | text 6, empty text 67 |
+| MASTER | 26 | Coverage Area | long text | text 16, empty text 57 |
+| MASTER | 53 | Travel note | long text | text 14, empty text 59 |
+| MASTER | 62 | Travel note - Not applicable | box | true 13, false 60 |
+| MASTER | 45 | Warehousing Available | choice | text 56, empty text 17 |
+| MASTER | 59 | Warehousing at our addresses | several choices | list 46, empty list 27 |
+| MASTER | 22 | Current EMR | text | text 35, empty text 38 |
+| MASTER | 23 | Current EMR - Not applicable | box | true 10, false 63 |
+| MASTER | 9 | Valid COI on File? | choice | text 45, empty text 28 |
+| MASTER | 10 | COI Valid Through | date | empty text 73 |
+| MASTER | 11 | Installer Agreement on File? | choice | text 64, empty text 9 |
+| MASTER | 12 | Notes / Comments | long text | text 50, empty text 23 |
+| MASTER | 24 | Anything else | long text | text 8, empty text 65 |
+| Contacts | 6 | Parent reference | text | text 221 |
+| Contacts | 7 | Name | text | text 214, empty text 7 |
+| Contacts | 8 | Title | text | empty text 221 |
+| Contacts | 9 | Email | email | text 207, empty text 14 |
+| Contacts | 10 | Second email | email | text 20, empty text 201 |
+| Contacts | 11 | Phone | phone | text 188, empty text 33 |
+| Contacts | 12 | Roles | several choices | list 174, empty list 47 |
+| Contacts | 13 | Procedure | text | empty text 221 |
+| Contacts | 14 | Departed | box | true 11, false 210 |
+| Contacts | 15 | Confirmed the record | box | true 54, false 167 |
+| Territory | 6 | Parent reference | text | text 17,745 |
+| Territory | 7 | County id | text | text 17,745 |
+| Territory | 11 | Tier | choice | text 17,745 |
 
 ## Not built
 
-The daily job and its schedule, the page, `public\data\`, and the reference files of
-`public\geo\`.
+The page; the daily schedule; `public\data\`, which the first run on GitHub writes; the
+county shapes, the state map and the ZIP list of `public\geo\`; the Netlify test copy.
 
 ## What comes next
 
-The daily job, from a prompt Joe will bring.
+1. Joe types the QuickBase key into the repository's settings on GitHub as the repository
+   secret `QB_USER_TOKEN`, if he has not already.
+2. Joe starts the job by hand from the repository's Actions page (`README.md` says where).
+   That run is the first to write `public\data\` and save installer records into the
+   repository.
+3. A prompt that checks the files that run published (J2 and J10 to J14) and adds the daily
+   schedule.
 
 ## Worth knowing
 
-- The client's 60-request limit counts every request one script sends, retries included.
-- Field 325 "Send people to training" holds the word "people", and a first version of the
-  choice-withholding rule in `job\quickbase-columns.mjs` withheld its choices. The rule now
-  looks at whole labels; its choices are written.
-- The 7 contacts with no name, the 6 with neither a phone nor an email, and the 7 installers
-  outside CONFIRMED BY PARTNER with a "Last confirmed" date were not re-read in this run.
+- `scripts\fixtures\fingerprints.json` holds the SHA-256 of the three files the made-up
+  installers give with builtAt held fixed. If the files' shape is changed on purpose, by a
+  new revision of the specification, it is written again; otherwise a change there means the
+  job no longer writes the same bytes.
+- The workflow runs `npm run check:job` before the job, so a machine that writes different
+  bytes stops before it reads QuickBase.
+- The office state (MASTER 31) holds two-letter codes on all 73 installers, though the choice
+  list `columns.json` records for State/Region holds full state names.
+- Title and Procedure are empty on all 221 contacts.
+- 7 installers that are not CONFIRMED BY PARTNER carry a "Last confirmed" date; the job
+  leaves it out of their entries, as ruled.
+- The rehearsal reads the real records only through `npm run job:rehearse`, holds back all
+  it prints until its leak scan has found nothing, and deletes its folder whatever happens.

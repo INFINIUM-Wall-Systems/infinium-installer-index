@@ -1,0 +1,52 @@
+# Runs the Installer Index job on GitHub and saves its three data files into public/data.
+# It starts only when someone starts it by hand, from the repository's Actions page. The
+# daily schedule is added by a later prompt, after the first run by hand has been checked.
+# checkWorkflow in scripts/checks.mjs holds the one shape this file may have, and
+# npm run check:job compares the two, comments and blank lines aside.
+name: Daily data
+
+on:
+  workflow_dispatch:
+    inputs:
+      skip_count_guard:
+        description: Skip the count guard for this one run, when a count has really fallen
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-data
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check the repository out
+        uses: actions/checkout@v6
+      - name: Set up Node 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      # A machine that would write different bytes from the laptop stops here.
+      - name: Tests with made-up installers
+        run: npm run check:job
+      - name: Run the job
+        run: node job/run.mjs --publish ${{ inputs.skip_count_guard && '--skip-count-guard' || '' }}
+        env:
+          QB_USER_TOKEN: ${{ secrets.QB_USER_TOKEN }}
+          QB_REALM_HOSTNAME: infiniumwalls.quickbase.com
+          QB_APP_ID: bpkqi6uif
+      # Stages public/data and nothing else, and asks git only whether anything is staged.
+      - name: Save the data files
+        run: |
+          git add -- public/data
+          if git diff --cached --quiet; then
+            echo "Nothing changed in public/data, so there is nothing to commit."
+            exit 0
+          fi
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -q -m "Daily data refresh"
+          git push origin HEAD:main

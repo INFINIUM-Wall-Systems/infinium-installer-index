@@ -2,7 +2,10 @@
 
 **Date:** Tuesday, October 6, 2026
 **Owner:** Joe Lull
-**Status:** agreed, seventh revision. Joe gave GO on October 6, 2026, with no changes.
+**Status:** eighth revision, October 6, 2026. Joe agreed the seventh revision the same day
+with no changes. The eighth adds what the run that created the repository found (the
+kickoff run) and what the daily job needs written down. Joe agrees the eighth revision by
+giving the daily job's prompt to Claude Code.
 **Name:** INFINIUM Installer Index. Joe renamed it on October 6, 2026; it was INFINIUM
 Installer Intel from September 9. The page it replaces is INFINIUM Partner Finder.
 **FinishLine:** `infinium-installer-index`
@@ -19,8 +22,8 @@ and `claude/INSTALLER-INTEL-DECISIONS-2026-09-09.md`. Section 9 says what carrie
 
 **Notes at agreement (October 6, 2026)**
 
-Joe's GO came after Cowork named three points. None changes a ruling, and the text below
-is as Joe agreed it.
+Joe's GO on the seventh revision came after Cowork named three points. None changes a
+ruling. What the eighth revision adds is listed after them.
 
 - **Empty folders.** Git keeps no empty folder. A folder of section 3.4 that has nothing in
   it yet holds a placeholder file named `.gitkeep`. `public\data\` holds none: only the job
@@ -32,6 +35,33 @@ is as Joe agreed it.
   the phone layout. It is made earlier, as soon as there is a page to show, so that the
   desktop views, the map views and the phone layout are each shown to Joe on it.
 - **Cowork's calls.** Every call marked "for Joe to overrule" stands as written.
+
+**What changed in the eighth revision**
+
+No ruling changes. No view is added or removed.
+
+- **Counts from the kickoff run** of October 6 are added to section 3.3: the Tier 2 charge
+  columns, the agreement column and the two certificate columns. Section 4.4 no longer
+  says they have not been counted.
+- **Two sentences corrected.** Section 3.1: MASTER's key column is required and unique.
+  Section 3.2: which of the columns it names are watched but not asked for.
+- **Receiving / Warehouse** is settled at 39 for the Index. Why the load report said 40
+  stays with the outreach import (section 8).
+- **What the daily job needs written down:** the shape of the data files (section 3.6);
+  the hour, the name of the key on GitHub, the two steps by which the schedule is switched
+  on, and what happens when a count has really fallen (section 3.7); where a run on the
+  laptop writes (sections 3.4 and 3.7); and how the contact rules combine (section 4.8).
+  Each is Cowork's call, for Joe to overrule.
+- **Four of those calls settle what a row shows where the seventh revision was silent:**
+  the job, not the page, chooses the people for a row; the two places show two different
+  people whenever the contacts allow it; a contact who cannot be reached fills a place
+  only when nobody who can be reached holds that role; and an entry whose only role is
+  Emergency dispatch is set aside.
+- **Whole records are read on the laptop.** A rehearsal of the job there reads every
+  installer record under Joe's key and writes it to a temporary folder outside the
+  repository, which is then deleted (section 3.4). Joe's agreeing this revision covers it.
+- **Smaller additions:** four items for later and two closed items in section 8, a note
+  under the step table in section 7, and three lines in section 10.
 
 **What changed in the seventh revision**
 
@@ -101,6 +131,8 @@ QuickBase installer tables  -->  the daily job  -->  data files  -->  the page
    Territory)                     writes files         beside the page) never calls QuickBase
 ```
 
+The daily job and the nightly job, both named below, are the same thing.
+
 - **The daily job** reads the three tables, checks what it read, and writes a small set
   of data files. It is the only thing that talks to QuickBase. GitHub runs it once a day
   (section 3.7).
@@ -130,7 +162,8 @@ Realm `infiniumwalls.quickbase.com`, app `bpkqi6uif` ("Project Manager - Infiniu
 
 Contacts and Territory are each tied to MASTER by a real QuickBase relationship: field 6,
 "Parent reference", holds the installer id. They are not tied to each other. No table has a
-lookup, summary or required column.
+lookup or summary column. One column is required: MASTER's key, Installer ID, which is
+also unique. (Read in the inventory run of October 6; not read again since.)
 
 The 73 existing installers fill only the 40 outreach columns of MASTER, field ids 6 to 63.
 Field ids 64 to 334 are the 271 application-form columns and are blank on every existing
@@ -162,7 +195,11 @@ installer. They will fill only for installers approved through the application f
 | 9, 10, 11 | Valid COI on File?; COI Valid Through; Installer Agreement on File? | choice, date, choice | Installer view, when filled |
 | 12, 24 | Notes / Comments; Anything else | long text | Installer view |
 
-Read but not shown: none. Not read: Region (7), Last Updated (8), Record source (15),
+Watched but not asked for: the three address columns 27, 34 and 46, whose parts are asked
+for instead; and Territory's County name, State or province, Country and Boundary version
+(8, 9, 10 and 12), because a county's name, state and country come from the county list
+(section 3.6). The job still checks that all of them keep their label and type. Not read:
+Region (7), Last Updated (8), Record source (15),
 Application status (16), Received at (17), Source (18), every application-form column (64
 to 334) and the four columns QuickBase made for the relationships (335 to 338).
 
@@ -203,9 +240,10 @@ application form's county map uses: 3,193 of 3,193 match.
 
 ### 3.3 What QuickBase held on October 6, 2026
 
-Read by Claude Code in one read-only run and reported as numbers only. Cowork did not see
-QuickBase. These figures describe that day; the nightly job counts them again on every run
-and the page shows the job's numbers, never these.
+Read by Claude Code in one read-only run and reported as numbers only. The last four rows
+were read the same evening, in the kickoff run. Cowork did not see QuickBase. These
+figures describe that day; the nightly job counts them again on every run and the page
+shows the job's numbers, never these.
 
 | What | Count |
 |---|---|
@@ -228,6 +266,10 @@ and the page shows the job's numbers, never these.
 | Mobilization filled | 65 |
 | Rates valid through | 58 filled; 10 of those dates were before October 6, 2026 |
 | Office city and state | 73 of 73 |
+| Tier 2 charge columns filled | Basis 27; charge unit 6; charge unit - other 3; charge amount 4; charge relation 6. At least one of the five 27. None 46 |
+| Installer Agreement on File? | Yes 36; No 28; blank 9 (the blank count worked out by Cowork) |
+| Valid COI on File? | Yes 26; No 19; blank 28 (the blank count worked out by Cowork) |
+| COI Valid Through | 0 filled |
 
 Contact counts by installer leave out departed contacts.
 
@@ -257,6 +299,11 @@ infinium-installer-index\
 
 - **Only the job writes `public\data\`.** No person and no Claude Code chat edits those
   files by hand.
+- **On the laptop the job never writes `public\data\`.** A run there reads whole installer
+  records under Joe's key, puts its files in a temporary folder outside the repository,
+  checks them, and deletes them. Joe's agreeing the eighth revision covers that read of
+  whole records. Only a run on GitHub's scheduler writes `public\data\` and saves it into
+  the repository. (Cowork's call, for Joe to overrule.)
 - **Everything else in the repository uses made-up installers:** code, documents, tests,
   reports and commit messages. The real data changes every day; a test built on it would
   pass one day and fail the next.
@@ -305,6 +352,119 @@ drive and rebuilt only when boundaries change:
 The county shapes are split by state because the whole-country file is 990,334 bytes, too
 heavy to send to a phone to draw one state. (Cowork's call, for Joe to overrule.)
 
+**The shape of the files.** (Cowork's call, for Joe to overrule.) The page is built on this
+shape, so it changes only by a new revision of this specification. A file is a set of
+named values. "Name" below means the name of a value inside a file.
+
+Rules for the three files the job writes:
+
+- **Plain text that keeps accented letters** (UTF-8). Every line ends the way GitHub's
+  computers end a line (LF), and the file ends with one such ending.
+- **A value that is empty in QuickBase is left out.** It is never written as a blank, as
+  the word null, or as a dash. A box that is not ticked is left out. A group with nothing
+  in it and a list with nothing in it are left out too. Four things are always written:
+  an installer's `contacts`, every contact in it even when nothing in the contact is
+  filled, the installer's `row`, and every line of `byStatus`.
+- **A value is written as QuickBase returns it,** with spaces at either end dropped. A
+  value of nothing but spaces is empty. A choice is written as QuickBase's own text, such
+  as Yes or No.
+- **Text is written inside quotation marks and numbers without.** Installer ids, county
+  ids and dates are text; a date reads `2026-10-06`. The four rates and the Tier 2 charge
+  amount are numbers. A rate of 0 is written. A blank rate is left out.
+- **The same data always gives the same bytes.** Names are written in the order shown
+  here. Wherever things are put in order, text is compared with capitals lowered, one
+  character at a time, in the fixed order computers give characters: digits, then
+  letters, then accented letters. Where that ties, the text as written decides; and where
+  that still ties, the order of QuickBase's own record numbers, which is the order the
+  job asks QuickBase for.
+- **One installer to a line** in `installers.json`, and one county to a line in
+  `territory.json`, so a change shows as a changed line.
+- Each file starts with `"schema": 1`. The number rises when the shape changes. A page
+  that meets a number it does not know says the data could not be loaded.
+
+`installers.json` holds `"schema"` and `"installers"`, a list in order of company name and
+then installer id. Each installer has:
+
+| Name | Holds | From |
+|---|---|---|
+| `id` | The installer id | MASTER 6 |
+| `company` | The company name | 25 |
+| `status` | One of the five record statuses | 13 |
+| `lastConfirmed` | The date. Written only when the status is CONFIRMED BY PARTNER | 14 |
+| `office` | `street1`, `street2`, `city`, `state`, `postalCode`, `country`. The state is as QuickBase writes it, a two-letter code | 28 to 33 |
+| `shipping` | A list of the shipping addresses that have something in them, at most two. Each has the same six names as `office`, then `which`: the number 1 for the shipping address, 2 for the second | 35 to 40; 47 to 52 |
+| `shippingNotApplicable`, `secondShippingNotApplicable` | true when that address's "Not applicable" box is ticked | 60, 61 |
+| `rates` | `nonUnionST`, `nonUnionOT`, `unionST`, `unionOT` | 41 to 44 |
+| `mobilization` | The text as written | 21 |
+| `ratesValidThrough` | The date | 20 |
+| `shopStatus` | Shop or labor status | 19 |
+| `pricingNotes` | Outreach pricing notes | 63 |
+| `tier2Charge` | `basis`, `unit`, `unitOther`, `amount`, `relation` | 54 to 58 |
+| `coverageNote` | The written coverage note | 26 |
+| `travelNote`, `travelNoteNotApplicable` | The note; true when its box is ticked | 53, 62 |
+| `warehousing` | `available`; and `at`, a list in the order QuickBase lists the choices | 45, 59 |
+| `emr`, `emrNotApplicable` | The EMR as written; true when its box is ticked | 22, 23 |
+| `paperwork` | `coiOnFile`, `coiValidThrough`, `agreementOnFile` | 9, 10, 11 |
+| `notes`, `anythingElse` | The two notes | 12, 24 |
+| `contacts` | A list of the installer's contacts, departed ones included. Each has `name`, `title`, `email`, `email2`, `phone`, `roles`, `procedure`, `departed` and `confirmedRecord` | Contacts 6 to 15 |
+| `row` | The people for a row. See below | Worked out by the job |
+| `territory` | `states`, a list in order of state; and `countyCount`, how many counties in all. Each state has `state`, `country`, `tier1Counties` and `tier2Counties`, the last two being how many counties the installer covers there at each tier. Left out for an installer with no territory rows | Territory 6, 7 and 11, with the county list |
+
+- **The order of `contacts`.** A contact's `roles` are a list in the full-listing order of
+  section 4.8. The contacts themselves are in order of each one's first role in that
+  order, then by name. A contact with no role comes last, and a contact with no name comes
+  after those with one. Departed contacts are in the list like the others.
+- **`row`** has up to three names. `quoting` and `scheduling` each hold `contact`, a number
+  saying which contact fills the place. The number is the contact's position in the
+  installer's `contacts` list as written: 0 is the first contact, 1 the second. The page
+  must not put the list in another order before using the number. For a stand-in the
+  place also holds `standIn`, written as true, and `role`, the role the stand-in is
+  labeled with; `role` is left out for a stand-in that has no role. A place with nobody in
+  it is left out. `gap` is `quoting`, `scheduling` or `both` when a role is missing. When
+  one person fills both places the two numbers are the same, and the page shows that
+  person once.
+- **A state** in `territory` is the two-letter code the county list gives for the county,
+  ON for Ontario. A country is the code the county list gives.
+
+`territory.json` holds `"schema"` and `"states"`, a list in order of state code. Each state
+has `state`, `country`, and `counties`, a list in order of county id. Each county has `id`,
+then `tier1Installers` and `tier2Installers`: the ids of the installers that cover it at
+each tier, in text order. Only states and counties that at least one installer covers are
+listed. A county's name is not repeated here; it is in `counties.json`.
+
+- **A county covered twice.** If Territory holds two rows for the same installer and
+  county, the installer is written once for that county, at Tier 1 if either row says
+  Tier 1. The number of such extra rows is in `build.json`. There were none on October 6.
+- **What is asked for.** The job asks QuickBase for the parts of an address and not for
+  the address column itself. It asks Territory for the installer, the county id and the
+  tier, and takes a county's name, state and country from the county list, so that there
+  is one source for them.
+
+`build.json` holds:
+
+| Name | Holds |
+|---|---|
+| `schema` | 1 |
+| `builtAt` | When the files were made, in UTC and to the second, as `2026-10-07T09:20:31Z`. The only value that differs between two runs on unchanged data. The page shows it as a date in Eastern time |
+| `counts` | `installers`; `contacts`, departed ones included; `territoryRows`, as QuickBase counts them; `duplicateTerritoryRows`; `installersWithTerritory`; `installersWithoutTerritory`; `countiesCovered`; and `byStatus`, a list of the five statuses in QuickBase's order, each with `status` and `installers` |
+| `gaps` | `noQuoting`, `noScheduling`, `neither`: the gap counts of section 4.8. An installer counted in `neither` is counted in the other two as well |
+| `checks` | A list of the seven checks of section 3.5, in its order. Each has `check`, its number; `name`; and `passed`. In a published file every check reads passed, because a failed run publishes nothing. The one exception: when the count guard was skipped for a run, the first check has `skipped` in place of `passed` |
+| `files` | A group of two named values, `installers.json` and `territory.json`, each holding that file's fingerprint: a short code (SHA-256, in lower-case letters) that changes if one character of the file changes |
+
+The seven names in `checks` are fixed: "Counts have not fallen"; "Every contact and
+territory row has its installer"; "Every county is in the county list"; "No installer id
+twice"; "Every installer has a company and a known status"; "The same data gives the same
+files"; "Columns keep their label and type".
+
+`counties.json`, in `public\geo\`, is not written by the job. It is built once, by its own
+script, from the application form's county list, and follows the same rules of plain text
+and order. It holds `"schema"`; `"boundaryVersions"`, a list of the names of the boundary
+files the counties were drawn from, which on October 6 were `cb_2025_us_county_500k` and
+`lcd_000a21a_e`; `"states"`, a list of `code`, `name` and `country` for
+the 50 states, the District of Columbia and Ontario, in order of code; and `"counties"`,
+one to a line in order of id, each with `id`, `name` as the application form's list has it,
+`state` (the two-letter code) and `country`.
+
 ### 3.7 The data path, now and later
 
 Joe's rulings of October 6: QuickBase is the source of truth; the page is refreshed once a
@@ -332,6 +492,33 @@ tables          GitHub's scheduler     into the repository    republishes
   be put in its place later without changing anything else.
 - **The freshness line** shows when the job last ran and passed. `build.json` therefore
   changes every day, even when no installer record has changed.
+- **The hour.** The schedule is 09:20 UTC every day. That is 5:20 AM Eastern in summer and
+  4:20 AM in winter. Twenty past, because GitHub is busiest on the hour and may start a
+  run late. (Cowork's call, for Joe to overrule.)
+- **The key's name on GitHub** is `QB_USER_TOKEN`. GitHub stores it hidden and hands it
+  only to the job; GitHub calls this a repository secret. The realm and the app id are
+  written in the file in `.github\workflows\` that tells GitHub how to run the job. Neither
+  is a secret.
+- **The schedule is switched on in two steps.** First Joe starts the job by hand on
+  GitHub. The next prompt checks the files that run published, by acceptance checks J2 and
+  J10 to J14, and only then adds the daily schedule. (Cowork's call, for Joe to overrule.)
+- **The first run and the count guard.** On the first run there is no last good run, and
+  the first check asks only for at least one installer. After that the last good run is
+  the `counts` in the `build.json` already in `public\data\`. An earlier `build.json` that
+  cannot be read fails the check. A run on the laptop has no last good run.
+- **When a count has really fallen.** A run started by hand has a box to tick that skips
+  the count guard for that one run. The job must still read at least one installer. The
+  scheduled run never skips the guard. Ticking the box is Joe's call. (Cowork's call, for
+  Joe to overrule.)
+- **The sixth check** is made from one read of QuickBase: what was read is turned into the
+  contents of the files twice, and the two results are compared.
+- **On the laptop the job reads the key the way the other scripts do,** from `.env.local`
+  in the folder above the repository. That file is outside the repository, so the key is
+  still in no file the repository holds. On GitHub the job reads the key from the secret
+  and never looks for that file.
+- **A change by hand to `public\data\`** is caught two ways. A check refuses any change
+  there that a person makes on the laptop. And the fingerprints in `build.json` show a
+  file that no longer matches.
 - **A live pull was considered and not chosen.** It would need a server program on each
   host, rebuilt for Azure at the move, and it would leave the page with nothing new to show
   when QuickBase is down. Next-morning freshness does not need it.
@@ -425,7 +612,9 @@ A full view for one installer, replacing the pop-up.
   instead, labeled as not confirmed on the map.
 - **Paperwork:** installer agreement on file, valid certificate of insurance on file, and
   the date the certificate is valid through, when filled. (Cowork's call, for Joe to
-  overrule. How many records have these filled has not been counted.)
+  overrule. On October 6, 64 records answered the agreement question, 45 answered the
+  certificate question, and none had a certificate date. How current those answers are is
+  not known. See section 8.)
 - **Other:** warehousing, travel note, EMR, notes.
 - A field with no value is left out rather than shown as a dash.
 
@@ -508,6 +697,48 @@ control opens the rest, each with its roles.
   dispatch; then contacts with no role.
 - **The nightly job counts** how many installers have no quoting contact, no scheduling
   contact, and neither. "About this data" shows all three.
+
+**How the rules combine.** Added in the eighth revision, so that the job and the page
+choose the same people. Each is Cowork's call, for Joe to overrule. Where these lines and
+the bullets above differ, these lines say how the bullets are applied.
+
+- **The job chooses the people for a row** and writes the choice into `installers.json`.
+  The page shows what the job chose. The rules are tested on made-up installers when the
+  job is built.
+- **Three steps, in this order.** First, set aside every contact marked departed and every
+  entry whose only role is Emergency dispatch. Second, fill the two places from the
+  contacts who hold the two roles. Third, fill a place whose role is missing with a
+  stand-in.
+- **A role is missing** when no contact left after the first step holds it. It is not
+  missing because the contact who holds it cannot be reached.
+- **"First by name"** means by the Name column, ignoring capital letters and spaces at
+  either end. A contact with no name comes after those with one. Names that are the same,
+  capitals aside, are put in order by the name as written, and after that by QuickBase's
+  record numbers.
+- **A contact who cannot be reached fills a place only when nobody who can be reached
+  holds that role.** A contact can be reached when it has a phone, an email or a second
+  email. So the people considered for a role are its holders who can be reached, or, when
+  there are none, its holders who cannot.
+- **Two different people whenever the contacts allow it.** Among the people considered,
+  the quoting place takes the first quoting contact. The scheduling place takes the first
+  scheduling contact who is not that person. If the person in the quoting place is the
+  only one considered for scheduling, and someone else is also considered for quoting,
+  the first of those others takes the quoting place and this person takes the scheduling
+  place. Only when one person is the only one considered for both roles does that person
+  cover both, shown once with both roles on the label.
+- **A person who fills one place** is labeled with that place's role, whatever other roles
+  the person holds.
+- **A stand-in** is the highest-ranked contact who can be reached and is not already on
+  the row. Contacts are ranked by the best of their roles in the next-best order, then by
+  name. A contact stands in only by a role in the next-best order, or by having no role
+  at all. So a contact whose only role is Scheduling / Coordination is never the stand-in
+  for quoting, and the other way round. A stand-in is labeled with the role that ranked
+  it.
+- **When both roles are missing,** the quoting place takes the highest-ranked stand-in
+  and the scheduling place the next. With only one stand-in to be had, the scheduling
+  place is empty. One marker covers both.
+- **The gap counts** count a role as missing whether or not a stand-in was found. An
+  installer with neither role is counted in all three.
 
 ### 4.9 ZIP lookup
 
@@ -600,6 +831,12 @@ already exists in the application form (`places.json`), so it needs no new data.
 | 10 | Replace the old page | Easy | Same address as today |
 | 11 | Second phase: address search | Moderate | The Census lookup cannot be called the ordinary way from a web page, so it needs a workaround or a small relay |
 
+**As of the eighth revision.** Step 2 was done on October 6: checks R1 to R8 pass, and the
+GitHub half of R6 waits for the job. The job now chooses the contacts for a row, so the
+contact rules of section 4.8 are built and tested in step 3, and step 5 shows the result.
+The county list, `counties.json`, is built in step 3 as well, because the job's third check
+needs it. The other map files stay in step 6.
+
 **The QuickBase feed is not the hard part.** Reading three tables once a day is the
 simplest piece here. The real work is the views and the phone layout.
 
@@ -638,12 +875,26 @@ simplest piece here. The real work is the views and the phone layout.
 - **Seven installers who did not confirm carry a "Last confirmed" date:** 5 dormant, 1
   inactive, 1 held. By ruling the Index does not show the date on them. What filled it is
   not known.
-- **Receiving / Warehouse role marks:** the handoff says 40, QuickBase says 39.
+- **Receiving / Warehouse role marks:** QuickBase holds 39, counted again on October 6
+  with and without departed contacts. The 40 in the handoff came from the report written
+  when the outreach records were loaded into QuickBase.
 
-**To count, in the first prompt that reads QuickBase again:**
+**For Joe, before the Installer view is built:**
 
-- How many installers have the Tier 2 charge columns, the agreement column and the two
-  certificate-of-insurance columns filled.
+- **Whether the paperwork lines are shown as QuickBase has them.** 26 installers say a
+  valid certificate is on file and none has a date. 36 say an agreement is on file and 28
+  say it is not. How current those answers are is not known.
+
+**To settle when the page is built:**
+
+- **How a failed refresh shows.** Acceptance check T4 expects "About this data" to show a
+  failed run, and a failed run saves nothing, so T4 cannot be met as it is worded. Joe
+  rules on new wording before group T. One way: the page says the data is out of date
+  when the last good run is more than a day and a half old.
+- **Whether the Tier 2 charge line is worth showing as it stands.** 27 installers give a
+  basis and only 4 give an amount.
+- **What the Installer view shows for a ticked "Not applicable" box, and for a contact's
+  procedure.** The files carry both.
 
 **To decide later:**
 
@@ -653,7 +904,14 @@ simplest piece here. The real work is the views and the phone layout.
 - What staff should do when they find a wrong value: who they tell, and who corrects
   QuickBase.
 
-**Closed in this revision:**
+**Closed in the eighth revision:**
+
+- How many installers have the Tier 2 charge columns, the agreement column and the two
+  certificate columns filled: counted (section 3.3).
+- Whether the repository folder exists: it does. It was created on October 6, and checks
+  R1 to R8 pass. The GitHub half of R6 waits for the job.
+
+**Closed in the sixth and seventh revisions:**
 
 - The column names and field ids: read from QuickBase, 0 differences from the plan.
 - What was built since September 9: nothing.
@@ -703,5 +961,13 @@ simplest piece here. The real work is the views and the phone layout.
   to it.
 - GitHub's scheduler. As far as Cowork knows it can start a scheduled run late when
   GitHub is busy. Not measured.
+- **Sections 3.6 and 3.7 hold Cowork's design for the job,** and the two blank counts in
+  section 3.3 are worked out by Cowork. They are not Claude Code's reading of QuickBase.
+- Reading more than one batch of records with the repository's own QuickBase client.
+  QuickBase hands records over in batches, which it calls pages. The kickoff run read
+  MASTER and Contacts, one page each. Territory needs several.
+- That GitHub's scheduler is switched on for the INFINIUM organization's repositories, and
+  that QuickBase accepts Joe's key from GitHub's computers. Either would show as a failed
+  first run that publishes nothing.
 - That Netlify's connection to GitHub is allowed to reach the INFINIUM repository. It is
   set up when there is a page to show.

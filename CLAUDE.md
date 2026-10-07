@@ -29,6 +29,8 @@ a prompt, stop and tell Joe. Do not pick one.
 - Claude Code runs every command. Joe runs nothing. Never ask Joe to run a command.
 - Joe types secrets into GitHub's or a host's settings himself, in his own browser. Never
   ask for a secret in a chat.
+- Joe starts the job on GitHub by hand, in his own browser, when a prompt calls for it.
+  Claude Code does not start it.
 - Prompts come from Joe. Each one is complete on its own. Do the work it names, stop where
   it says to stop, and do not start the next piece of work.
 - This work is tracked in FinishLine as `infinium-installer-index`. Joe's planning session
@@ -65,8 +67,8 @@ that one action. An earlier GO does not carry over to a later action.
 
 Two standing exceptions to item 8:
 
-- A check or a one-off script may make a temporary folder in the system temp directory,
-  and deletes it when it is done.
+- A check, a one-off script or a run of the job on the laptop may make a temporary folder
+  in the system temp directory, and deletes it when it is done.
 - If git refuses to work in this folder because of "dubious ownership", adding this one
   folder to git's safe.directory list is allowed. Say so in the report.
 
@@ -83,11 +85,17 @@ Two standing exceptions to item 8:
 - The key. On the P: drive a script reads it when it runs, from `.env.local` in the folder
   above this one. On GitHub the job reads it from the repository's secrets. It is never
   printed, logged or allowed into an error message.
+- On GitHub the key is the repository secret named `QB_USER_TOKEN`.
 
 ## Data rules
 
 - `public\data\` holds real installer records. Only the job writes there. Never edit those
   files by hand, and never print what they hold into a chat or a log.
+- On the laptop the job never writes `public\data\`. A run there puts its files in a
+  temporary folder, checks them, and deletes them. Only a run on GitHub's scheduler writes
+  `public\data\` and commits it.
+- A temporary folder that holds real installer records is deleted before the work ends,
+  and the report says so.
 - Everything else in the repository uses made-up installers: code, documents, tests,
   reports and commit messages.
   - A made-up installer id starts with `FAKE-`.
@@ -132,3 +140,7 @@ other work.
   file-writing tool or with node, never with PowerShell redirection, which writes UTF-16.
 - County ids are text and stay text. 318 of them begin with a zero.
 - A host's own settings file is added when Joe sets that host up, not before.
+- The `gh`, `vercel` and `netlify` command-line tools are not used unless a prompt from Joe
+  names the command.
+- Anything sorted is sorted by a fixed rule that gives the same order on every machine,
+  never by the machine's language settings.
