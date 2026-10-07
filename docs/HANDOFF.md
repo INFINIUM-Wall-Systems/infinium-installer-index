@@ -167,9 +167,18 @@ Pictures, each at 1440 and 1280, in `review-screens\` (not committed): `home`,
 
 ## The checks
 
-On October 7, before the work was staged: `npm run check`, `npm run check:selftest`,
-`npm run check:job`, `npm run check:published` all PASS; `npm run check:page` PASS, 24 lines.
-The results with the work staged are below, under Git.
+On October 7, with the work staged, before commit `93a3dc7`:
+
+- `npm run check`: R1 to R7 and J19 PASS (65 tracked files; R5 scanned 62); R6's GitHub half is
+  still printed as NOT YET SHOWN.
+- `npm run check:selftest`: PASS, 343 cases (259 before this run): 73 cases of the page's
+  tests (25 sound, 48 broken) and 11 of `check:page:published` (1 sound, 10 broken) are new.
+- `npm run check:job`: PASS, 66 cases in 62 tests (unchanged).
+- `npm run check:published`: PASS, 11 lines (unchanged).
+- `npm run check:page`: PASS, 24 lines, 25 cases.
+- `npm run check:page:published`: PASS, 8 lines (above).
+
+No QuickBase call was made in this run.
 
 ## J1 to J19
 
@@ -260,7 +269,11 @@ builtAt 2026-10-07T13:31:41Z. build.json gives installers 73, contacts 221, terr
 ## Git
 
 - `22eeaba`: the handoff of the job's second prompt. No commit came after it before this run.
-- This run's commits are listed below once made.
+- `93a3dc7` "The page: frame, All installers, Installer, Search, Not on the map, About this
+  data", pushed to `origin main` on October 7. GitHub answered the first two pushes with
+  "Internal Server Error" and took the third, three minutes later; its main had not moved in
+  between. Nothing under `public/data` in it.
+- This file's final results are the commit after `93a3dc7`.
 
 ## Not built
 
