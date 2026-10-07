@@ -1,0 +1,15 @@
+{
+  "name": "infinium-installer-index",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "check": "node scripts/check.mjs",
+    "check:selftest": "node scripts/check-selftest.mjs",
+    "check:columns": "node scripts/check-columns.mjs",
+    "quickbase:columns": "node job/quickbase-columns.mjs"
+  }
+}

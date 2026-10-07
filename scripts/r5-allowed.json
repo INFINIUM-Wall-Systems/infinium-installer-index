@@ -1,0 +1,4 @@
+{
+  "about": "Exact strings check R5 (scripts/checks.mjs) lets through, each with the reason it is safe. Keep this list as short as possible. Made-up installers need no entry: an id starting FAKE-, an email ending @example.com and a phone with 555-01 in the middle are allowed by the check itself.",
+  "allowed": []
+}
