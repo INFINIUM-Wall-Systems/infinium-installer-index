@@ -1,0 +1,6 @@
+{"schema":1,"state":"HI","cities":[
+{"id":"HI-ainaloa","name":"Ainaloa","state":"HI","counties":["15001"]},
+{"id":"HI-anahola","name":"Anahola","state":"HI","counties":["15007"]},
+{"id":"HI-haiku-pauwela","name":"Haiku-Pauwela","state":"HI","counties":["15009"]},
+{"id":"HI-urban-honolulu","name":"Urban Honolulu","state":"HI","counties":["15003"]}
+]}

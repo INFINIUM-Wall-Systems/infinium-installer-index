@@ -1,0 +1,20 @@
+{"schema":1,"state":"VT","cities":[
+{"id":"VT-alburgh","name":"Alburgh","state":"VT","counties":["50013"]},
+{"id":"VT-barre","name":"Barre","state":"VT","counties":["50023"]},
+{"id":"VT-bellows-falls","name":"Bellows Falls","state":"VT","counties":["50025"]},
+{"id":"VT-burlington","name":"Burlington","state":"VT","counties":["50007"]},
+{"id":"VT-canaan","name":"Canaan","state":"VT","counties":["50009"]},
+{"id":"VT-essex-junction","name":"Essex Junction","state":"VT","counties":["50007"]},
+{"id":"VT-montpelier","name":"Montpelier","state":"VT","counties":["50023"]},
+{"id":"VT-morrisville","name":"Morrisville","state":"VT","counties":["50015"]},
+{"id":"VT-newbury","name":"Newbury","state":"VT","counties":["50017"]},
+{"id":"VT-newport","name":"Newport","state":"VT","counties":["50019"]},
+{"id":"VT-north-bennington","name":"North Bennington","state":"VT","counties":["50003"]},
+{"id":"VT-rutland","name":"Rutland","state":"VT","counties":["50021"]},
+{"id":"VT-south-burlington","name":"South Burlington","state":"VT","counties":["50007"]},
+{"id":"VT-st-albans","name":"St. Albans","state":"VT","counties":["50011"]},
+{"id":"VT-vergennes","name":"Vergennes","state":"VT","counties":["50001"]},
+{"id":"VT-west-burke","name":"West Burke","state":"VT","counties":["50005"]},
+{"id":"VT-winooski","name":"Winooski","state":"VT","counties":["50007"]},
+{"id":"VT-woodstock","name":"Woodstock","state":"VT","counties":["50027"]}
+]}

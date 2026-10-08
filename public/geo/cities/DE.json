@@ -1,0 +1,13 @@
+{"schema":1,"state":"DE","cities":[
+{"id":"DE-dover","name":"Dover","state":"DE","counties":["10001"]},
+{"id":"DE-elsmere","name":"Elsmere","state":"DE","counties":["10003"]},
+{"id":"DE-georgetown","name":"Georgetown","state":"DE","counties":["10005"]},
+{"id":"DE-middletown","name":"Middletown","state":"DE","counties":["10003"]},
+{"id":"DE-milford","name":"Milford","state":"DE","counties":["10005"]},
+{"id":"DE-millsboro","name":"Millsboro","state":"DE","counties":["10005"]},
+{"id":"DE-new-castle","name":"New Castle","state":"DE","counties":["10003"]},
+{"id":"DE-newark","name":"Newark","state":"DE","counties":["10003"]},
+{"id":"DE-seaford","name":"Seaford","state":"DE","counties":["10005"]},
+{"id":"DE-smyrna","name":"Smyrna","state":"DE","counties":["10001"]},
+{"id":"DE-wilmington","name":"Wilmington","state":"DE","counties":["10003"]}
+]}

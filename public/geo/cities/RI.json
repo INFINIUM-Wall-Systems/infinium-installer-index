@@ -1,0 +1,11 @@
+{"schema":1,"state":"RI","cities":[
+{"id":"RI-ashaway","name":"Ashaway","state":"RI","counties":["44009"]},
+{"id":"RI-central-falls","name":"Central Falls","state":"RI","counties":["44007"]},
+{"id":"RI-cranston","name":"Cranston","state":"RI","counties":["44007"]},
+{"id":"RI-east-providence","name":"East Providence","state":"RI","counties":["44007"]},
+{"id":"RI-melville","name":"Melville","state":"RI","counties":["44005"]},
+{"id":"RI-pawtucket","name":"Pawtucket","state":"RI","counties":["44007"]},
+{"id":"RI-providence","name":"Providence","state":"RI","counties":["44007"]},
+{"id":"RI-warwick","name":"Warwick","state":"RI","counties":["44003"]},
+{"id":"RI-woonsocket","name":"Woonsocket","state":"RI","counties":["44007"]}
+]}

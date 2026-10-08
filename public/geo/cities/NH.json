@@ -1,0 +1,16 @@
+{"schema":1,"state":"NH","cities":[
+{"id":"NH-bartlett","name":"Bartlett","state":"NH","counties":["33003"]},
+{"id":"NH-berlin","name":"Berlin","state":"NH","counties":["33007"]},
+{"id":"NH-claremont","name":"Claremont","state":"NH","counties":["33019"]},
+{"id":"NH-concord","name":"Concord","state":"NH","counties":["33013"]},
+{"id":"NH-dover","name":"Dover","state":"NH","counties":["33017"]},
+{"id":"NH-franklin","name":"Franklin","state":"NH","counties":["33013"]},
+{"id":"NH-keene","name":"Keene","state":"NH","counties":["33005"]},
+{"id":"NH-laconia","name":"Laconia","state":"NH","counties":["33001"]},
+{"id":"NH-lebanon","name":"Lebanon","state":"NH","counties":["33009"]},
+{"id":"NH-manchester","name":"Manchester","state":"NH","counties":["33011"]},
+{"id":"NH-nashua","name":"Nashua","state":"NH","counties":["33011"]},
+{"id":"NH-portsmouth","name":"Portsmouth","state":"NH","counties":["33015"]},
+{"id":"NH-rochester","name":"Rochester","state":"NH","counties":["33017"]},
+{"id":"NH-somersworth","name":"Somersworth","state":"NH","counties":["33017"]}
+]}
