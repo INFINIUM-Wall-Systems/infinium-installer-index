@@ -1,4 +1,9 @@
 {
   "about": "Exact strings check R5 (scripts/checks.mjs) lets through, each with the reason it is safe. Keep this list as short as possible. Made-up installers need no entry: an id starting FAKE-, an email ending @example.com and a phone with 555-01 in the middle are allowed by the check itself.",
-  "allowed": []
+  "allowed": [
+    {
+      "text": "joe.lull@infiniumwalls.com",
+      "reason": "Joe Lull's own work address, shown on About this data and on every Installer view so staff can report a wrong value (specification sections 4.6 and 4.11, Joe's ruling of October 8, 2026). Not an installer's."
+    }
+  ]
 }

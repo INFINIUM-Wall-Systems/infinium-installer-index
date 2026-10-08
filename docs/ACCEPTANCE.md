@@ -1,12 +1,17 @@
 # INFINIUM Installer Index — Acceptance Checks
 
-**Date:** Tuesday, October 6, 2026
+**Date:** Tuesday, October 6, 2026; third version Thursday, October 8, 2026
 **Owner:** Joe Lull
-**Status:** agreed. Joe gave GO on October 6, 2026, on draft 2 with no changes. The letters
-and numbers of the checks are now fixed. Draft 2 followed Joe's rulings on the data path:
-the daily job runs on GitHub and saves the data files into the repository; the test copy
-is on Netlify; protecting the test copy is not part of this work.
-**Goes with:** `claude/INSTALLER-INDEX-SPEC-2026-10-06.md`, seventh revision
+**Status:** third version, October 8, 2026. Joe gave GO on October 6, 2026, on draft 2 with
+no changes, and the letters and numbers of the checks are fixed. The third version goes
+with the specification's ninth revision, the redesign Joe ruled on October 8: V2, V5, V13,
+M1, M4, M5, M6, M7, M8, M9 and M11 are reworded, V17 to V20 and M14 to M21 are added, and
+one threshold is added. No check is dropped and no letter or number changes. Joe agrees
+the third version by giving the page's third prompt to Claude Code. Draft 2 followed Joe's
+rulings on the data path: the daily job runs on GitHub and saves the data files into the
+repository; the test copy is on Netlify; protecting the test copy is not part of this
+work.
+**Goes with:** `claude/INSTALLER-INDEX-SPEC-2026-10-06.md`, ninth revision
 **FinishLine:** `infinium-installer-index`
 **In the repository this is:** `docs\ACCEPTANCE.md`
 
@@ -96,10 +101,10 @@ Checked at 1440 and 1280 pixels wide.
 | # | Check |
 |---|---|
 | V1 | Every view has its own address. Pasting an address into a new tab shows the same view. |
-| V2 | "All installers" lists every installer in `installers.json`, alphabetical, with both column sets and a working status filter. |
+| V2 | "All installers" lists every installer in `installers.json` that its filters and boxes let through, in the order of the file (alphabetical), in the columns of each of the three views (section 4.5 of the specification). With both "Also show" boxes ticked, "Not on the map" unticked and no filter, it lists all of them. |
 | V3 | Column titles stay visible while scrolling and are never under the search bar. |
 | V4 | No table is wider than its panel. No text is cut off without a way to read it. |
-| V5 | The Installer view shows every filled field named in section 4.4 of the specification and leaves out every empty one. Checked on the record with the most filled fields and the record with the fewest. |
+| V5 | The Installer view shows every filled field named in section 4.6 of the specification and leaves out every empty one, apart from the three signals of its overview, which always show. Checked on the record with the most filled fields and the record with the fewest, in all three views. |
 | V6 | Contacts on a row follow section 4.8. One made-up installer per rule: both roles held; one person in both; quoting missing with a stand-in; scheduling missing with a stand-in; both missing; no stand-in available; a departed contact; a contact with no phone or email; two people in one role; a contact with no role. Each shows what the rule says. |
 | V7 | The "Last confirmed" date shows only on a record whose status is CONFIRMED BY PARTNER. |
 | V8 | Search by state matches whole names and whole two-letter codes only. Typing "oh" returns no installer whose only match is those letters inside another word. |
@@ -107,10 +112,14 @@ Checked at 1440 and 1280 pixels wide.
 | V10 | Every search result shows on screen the value that matched. Nothing hidden is searched. |
 | V11 | A search with no match says so and lists what can be searched. |
 | V12 | The "Rates expired" marker shows when, and only when, the valid-through date is before today. Mobilization is shown as written. |
-| V13 | "Not on the map" lists exactly the installers with no territory rows. |
+| V13 | "Not on the map" in All installers, with both "Also show" boxes ticked, lists exactly the installers with no territory rows. |
 | V14 | The freshness line shows the date in `build.json`. "About this data" shows the counts, the three gap counts and the result of every check. |
 | V15 | No script error in any view. |
 | V16 | With the data files missing or unreadable, the page says the data could not be loaded. It does not show an empty directory as if no installers existed. |
+| V17 | Every old address that section 4.1 of the specification names opens the view it says, and replaces its step in the browser's history. |
+| V18 | The view switch shows Estimating, Project management and Records on a place's view, the Installer view and All installers. Each view changes the columns of section 4.5 or the order of section 4.6, and never who is listed or in what order. The view is carried in the address and remembered in the browser; with nothing remembered, or a browser that keeps nothing, the page opens in Estimating. |
+| V19 | All installers with no box ticked lists exactly the CONFIRMED BY PARTNER and PENDING - UPDATE EXPECTED installers. Each "Also show" box adds exactly its statuses, "Not on the map" narrows to the installers with no territory rows, and the count beside each box is the data's. A search lists matches of every status, each with its status tag. |
+| V20 | In every view, every Installer view has its sections in the order section 4.6 gives, a jump bar with a link to each, the three signals of its overview in words, and the line naming Joe with his email address as a mail link. About this data carries the same line. |
 
 ## M. Map, state, county and ZIP views
 
@@ -118,19 +127,27 @@ FinishLine milestone: **Map, state and county views working.**
 
 | # | Check |
 |---|---|
-| M1 | On Home, each state's shade matches the number of installers with at least one territory row in that state. Checked for every state and Ontario by script. |
+| M1 | On Find installers, each state's shade matches the number of CONFIRMED BY PARTNER and PENDING - UPDATE EXPECTED installers with territory in that state: at least one Tier 1 county there. Checked for every state and Ontario by script. |
 | M2 | Clicking a state opens its State view. Ontario can be reached. |
 | M3 | The State view draws only that state's counties and loads only that state's shapes. The whole-country file is never requested. |
-| M4 | Each county's shade matches the number of installers serving it. Checked for every county by script. |
-| M5 | Clicking a county outlines it and narrows the list to exactly the installers with a territory row for that county. Checked for every county by script, including one whose id begins with a zero and one Ontario division. |
-| M6 | Typing a county name in the box does exactly what a click does. "Show all" clears the choice. |
-| M7 | With a county chosen, Tier 1 installers come first, then Tier 2, alphabetical within each. With no county chosen, the order and the tier counts follow section 4.2. |
-| M8 | The line at the foot of every list shows the number of installers with no territory rows, taken from the data, and links to "Not on the map". Shown to fail if the number is typed into the page. |
-| M9 | A county with no installers says so. Checked with made-up data, since no county is in that position today. |
+| M4 | Each county's shade matches the number of installers in that county's Tier 1 list. Checked for every county by script. |
+| M5 | Clicking a county outlines it and narrows the Tier 1 list to exactly the CONFIRMED BY PARTNER and PENDING - UPDATE EXPECTED installers that have the county as Tier 1. The Tier 2 button then lists exactly those that have it as Tier 2 and not as Tier 1. Checked for every county by script, including one whose id begins with a zero and one Ontario division. |
+| M6 | Typing a county name in the box does exactly what a click does. "All of Ohio" (the state's name) clears the choice. |
+| M7 | The Tier 1 list is alphabetical, and so is the Tier 2 list below it once the button is pressed. The tier line of each entry follows section 4.4, with and without a county chosen and for a ZIP in several counties. |
+| M8 | The line at the foot of every place's list shows the number of installers with no territory rows, taken from the data, and opens All installers listing exactly those installers ("Not on the map" and both "Also show" boxes ticked). Shown to fail if the number is typed into the page. |
+| M9 | A county with no installer says so. A county with no Tier 1 installer says so, and still offers the Tier 2 button when a Tier 2 installer lists it. Checked with made-up data, since no county is in either position today. |
 | M10 | Five digits in the search box gives the county or counties for that ZIP. Checked against the ZIP list for 50 ZIP codes, including ones that cross a county line and ones that begin with a zero. |
-| M11 | A ZIP that crosses a county line names every county it touches and lists each installer once. |
+| M11 | A ZIP that crosses a county line names every county it touches. Its Tier 1 list holds each installer with territory in any of them, once; its Tier 2 list holds each of the rest that has any of them as Tier 2, once. |
 | M12 | A ZIP that is not in the list, and a ZIP outside the mapped area, each say so in the words of section 4.9. |
 | M13 | The ZIP list is loaded only when a ZIP is typed. |
+| M14 | Every list of the installers for a place (a state, a county, a ZIP code, a city) first shows only the Tier 1 installers, with a button under them that reads "View Tier 2 Installers Available for Travel". Pressing it lists the Tier 2 installers below the Tier 1 list, no installer in both; pressing it again hides them; every place opens with them hidden. A place that no Tier 2 installer lists shows no button and says so. Checked for every state and every county by script, and with the mouse and the keyboard in a browser. |
+| M15 | Wherever a view gives an installer's territory (the Installer view, the Territory in and Territory columns, a search result found by territory, the counts a map shows) it counts Tier 1 counties only, and shows any Tier 2 counties apart, as available for travel. Checked on every made-up installer, and by counts on the real files. |
+| M16 | Find installers draws the map of the United States and Ontario as soon as it opens, at US level, with nothing pressed, on the right half of the page beside the location box. Shown at 1440 and 1280 in a browser. |
+| M17 | The location box offers every county typed as its name followed by its state's code, and a county typed by its name alone when nine or fewer states share that name, a ZIP, and a state by name or code (and a city, when city lookup is built), each labeled with its kind, a county name used in several states once per state, and never an office city. Each suggestion leads to the same view as the map does. Checked for every county and state by script. |
+| M18 | A place's view holds in its Tier 1 and Tier 2 lists only CONFIRMED BY PARTNER and PENDING - UPDATE EXPECTED installers; puts DORMANT - NO RESPONSE installers that have the place at either tier under "Did not respond to the August outreach"; lists installers not on the map with an office in the place's state under their own heading; and never lists INACTIVE or HELD - BUSINESS DECISION installers. Checked for every state and county by script. |
+| M19 | On the Project management row the field contact and the receiving contact follow section 4.8 of the specification, and each missing paperwork item is shown on its own. One made-up installer per case. |
+| M20 | Results come first: on a place's view at 1440 by 900 and at 1280 by 800, the header and the location bar together are at most 150 pixels tall and the first row of the Tier 1 list starts within 360 pixels of the top. Measured in a browser. |
+| M21 | City lookup, when built: for 50 cities taken from the city files by a fixed rule, ones in several counties among them when the files hold any, the view names exactly the counties the files give. When not built: the location box offers no city and its hint does not mention cities. |
 
 ## P. Phone layout and readability
 
@@ -206,3 +223,4 @@ FinishLine milestone: **Address search added.**
 - **P7:** 44 pixels.
 - **A3:** 10 seconds.
 - **M10 and A1:** 50 ZIP codes; 20 addresses.
+- **M20:** 150 pixels for the header and location bar; 360 pixels to the first row.

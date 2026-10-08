@@ -1,11 +1,12 @@
 # INFINIUM Installer Index — Specification for the New Lookup
 
-**Date:** Tuesday, October 6, 2026
+**Date:** Tuesday, October 6, 2026; ninth revision Thursday, October 8, 2026
 **Owner:** Joe Lull
-**Status:** eighth revision, October 6, 2026. Joe agreed the seventh revision the same day
-with no changes. The eighth adds what the run that created the repository found (the
-kickoff run) and what the daily job needs written down. Joe agrees the eighth revision by
-giving the daily job's prompt to Claude Code.
+**Status:** ninth revision, October 8, 2026. Joe agreed the eighth revision of October 6 by
+giving the daily job's prompt to Claude Code. The ninth adds Joe's ruling of October 8 that
+an installer's territory is what it chose as Tier 1, and writes in the eight rulings the
+page's second prompt built on October 7. Joe agrees the ninth revision by giving the page's
+third prompt to Claude Code.
 **Name:** INFINIUM Installer Index. Joe renamed it on October 6, 2026; it was INFINIUM
 Installer Intel from September 9. The page it replaces is INFINIUM Partner Finder.
 **FinishLine:** `infinium-installer-index`
@@ -19,6 +20,52 @@ inventory of QuickBase and the P: folder)
 **Checks the build must pass:** `claude/INSTALLER-INDEX-ACCEPTANCE-2026-10-06.md`
 **Supersedes, where they conflict:** `claude/INSTALLER-INTEL-SPEC-AND-SCHEMA-2026-09-09.md`
 and `claude/INSTALLER-INTEL-DECISIONS-2026-09-09.md`. Section 9 says what carries over.
+
+**What changed in the ninth revision**
+
+The views are redesigned. Joe reviewed the page as built on October 7, an outside review
+of it, and Cowork's proposal, and ruled on October 8, 2026. The design record is
+`claude/INSTALLER-INDEX-DESIGN-REVIEW-2026-10-08.md`; the screens Joe agreed are the
+canvas "Installer Index Redesign". The job, the data files and their shapes, and the map
+and ZIP files do not change.
+
+- **Territory is Tier 1.** An installer's territory is the counties it chose as Tier 1. Its
+  Tier 2 counties are where it is available for travel. Every list for a place shows the
+  Tier 1 installers, and a button, "View Tier 2 Installers Available for Travel", lists the
+  Tier 2 installers below them. Section 4.0.
+- **Two tabs, two search boxes.** The tabs are Find installers and All installers. A
+  project location (ZIP, county, state, city) goes in the box on Find installers or a
+  place's view; a company or person goes in the box in the header, which opens All
+  installers. Office city never counts as coverage. Sections 4.1, 4.3 and 4.7.
+- **Find installers opens with the US and Ontario map drawn,** on the right half, beside
+  the location box. Section 4.3.
+- **A view switch: Estimating, Project management, Records.** It changes what a row
+  shows and the order of an installer's page, never who is listed. Sections 4.2 and 4.5.
+- **One layout for a place,** whether reached by state, county, ZIP or city: results first,
+  the county map as a narrow column beside them. Section 4.4.
+- **Which statuses a place lists:** CONFIRMED BY PARTNER and PENDING - UPDATE EXPECTED in
+  the lists; DORMANT - NO RESPONSE below them; INACTIVE and HELD - BUSINESS DECISION only
+  in All installers. Section 4.4.
+- **The Installer view is one page in sections,** ordered by the view, with an overview
+  at the top. Section 4.6.
+- **All installers absorbs Search results and Not on the map,** with two toggles for the
+  installers who did not respond and those inactive or on hold. Section 4.7.
+- **City lookup** is built if the application form's place list carries each place's
+  county. Section 4.10.
+- **The look** is denser and puts results first. Section 5.
+- **The eight rulings of the page's second prompt** (October 7) are written in: the maps
+  are drawn by the page itself from the application form's outlines, with no map library;
+  a list of every state and Ontario on Find installers; the ZIP list in ten files; the
+  credits on About this data; how an email address is matched; a link to a state's view
+  from a search that names it; and links to a state's view wherever a view names a state
+  an installer covers.
+- **Joe's other rulings:** rates are US dollars; INFINIUM's own crews are installers like
+  any other; Joe is who staff tell about a wrong value, and his email address is shown.
+- **What the data files held on October 7** is added to section 3.3, and three open items
+  about installers whose map selections reach nearly the whole map are added to section 8.
+- **Kept from the eighth revision:** every rule of sections 3, 4.8 and 4.9 not named here,
+  the addresses that exist (section 4.1 says how old ones now open), and every check of
+  sections 3.5 and 3.6.
 
 **Notes at agreement (October 6, 2026)**
 
@@ -95,9 +142,10 @@ and how current their record is. It replaces the INFINIUM Partner Finder page at
 
 It keeps the old page's look. Its views are new, built around what QuickBase now holds and
 the old page never had: 73 installers with a record status, contacts as people with roles,
-and territory by county with Tier 1 and Tier 2.
+and coverage by county: Tier 1, which is the installer's territory, and Tier 2, where it is
+available for travel.
 
-## 2. Joe's rulings (October 6, 2026)
+## 2. Joe's rulings (October 6 and 8, 2026)
 
 | Question | Ruling |
 |---|---|
@@ -122,6 +170,15 @@ and territory by county with Tier 1 and Tier 2.
 | Address search | Wanted. Second phase. It uses the US Census Bureau's free address lookup. |
 | Contacts on each row | By role: the Quoting / Estimating contact and the Scheduling / Coordination contact, with a "show all" control for the rest. **When a role is missing, the next-best contact is shown with their real role, plus a short marker such as "No quoting contact on record."** Section 4.8 has the rules. |
 | "Last confirmed" date | **Shown only on records whose status is CONFIRMED BY PARTNER.** |
+| Territory | **October 8, 2026: what an installer chose as Tier 1 is its territory. What it chose as Tier 2 is where it is available for travel.** Every search for a place lists the Tier 1 installers, and a button, "View Tier 2 Installers Available for Travel", lists the Tier 2 installers below them. Section 4.0. |
+| Views | **October 8, 2026:** two tabs, Find installers and All installers. "Not on the map" is no longer a view of its own; it is a choice in All installers. Search results are shown in All installers. Section 4. |
+| Finding a place | **October 8, 2026:** both ways from the first page: type a ZIP, county, state or city, or use the US and Ontario map, which is drawn as soon as the page opens, at US level, on the right half. Sections 4.3 and 4.10. |
+| The view switch | **October 8, 2026:** Estimating, Project management and Records. Estimating and Project management are for the two groups who use the Index; Records is for the person who keeps the records right. Section 4.2. |
+| Statuses in a place's lists | **October 8, 2026:** CONFIRMED BY PARTNER and PENDING - UPDATE EXPECTED in the lists; DORMANT - NO RESPONSE below them, under "Did not respond to the August outreach"; INACTIVE and HELD - BUSINESS DECISION only in All installers, behind a toggle. Sections 4.4 and 4.7. |
+| Rates on the estimating row | **October 8, 2026:** all four, always. Rates are US dollars. |
+| The project management row | **October 8, 2026:** scheduling, field and receiving contacts, paperwork, and the travel note. |
+| INFINIUM's own crews | **October 8, 2026:** loaded into QuickBase and read as any other installer. The first, INFINIUM Installs, was added that day. |
+| A wrong value | **October 8, 2026:** staff tell Joe Lull, and his email address is shown on About this data and on every installer's page. |
 
 ## 3. How it works
 
@@ -259,7 +316,7 @@ shows the job's numbers, never these.
 | Installers with two or more people in one role | 14 for quoting, 15 for scheduling |
 | Installers with no contact at all | 0 |
 | Territory rows | 17,745: Tier 1 7,817, Tier 2 9,928; United States 17,599, Canada 146 |
-| Installers with territory | 52. Without: 21 |
+| Installers with territory | 52 with a county at either tier. Without: 21 |
 | States and provinces covered | 52: the 50 states, the District of Columbia and Ontario |
 | Counties covered | 3,193 of the map's 3,193. Every county has at least one installer today |
 | Rates filled | Non-Union ST 45; Non-Union OT 46; Union ST 52; Union OT 51. All four 34. None 9 |
@@ -272,6 +329,23 @@ shows the job's numbers, never these.
 | COI Valid Through | 0 filled |
 
 Contact counts by installer leave out departed contacts.
+
+**What the data files held on October 7, 2026,** for the ninth revision. Cowork read the
+published files once, by script, and kept counts only. Like the table above, these
+describe that day; the page counts again from the files.
+
+| What | Count |
+|---|---|
+| Installers with territory: at least one Tier 1 county | 51 |
+| Installers with Tier 2 counties and no Tier 1 county | 1. It marked 348 counties in 12 states, its home state among them, all as Tier 2 |
+| Installers with no county at either tier | 21 |
+| Counties with at least one Tier 1 installer | 3,193 of 3,193 |
+| Installers whose counties, at either tier, number 3,000 or more | 4. The next most is 1,207 |
+| Of those four, all Tier 1 | 2. One has every US county as Tier 1 and no Ontario division; the other every county on the map but 9 in Alaska |
+| Of those four, mostly Tier 2 | 2. One is Tier 1 in 2 counties, the other in 24, each in its own home state |
+| Counties whose only Tier 1 installers are the two that are all Tier 1 | 2,225 |
+| Counties by number of Tier 1 installers | 1: 9; 2 to 3: 2,943; 4 to 6: 206; 7 to 10: 35; 11 or more: 0 |
+| States and Ontario by number of installers with territory there | 1: 0; 2 to 3: 32; 4 to 6: 17; 7 to 10: 2; 11 or more: 1 |
 
 ### 3.4 The repository
 
@@ -309,8 +383,9 @@ infinium-installer-index\
   pass one day and fail the next.
 - **`public\geo\` is committed.** It holds public map and postal data and nothing about
   any installer.
-- **`vendor\`** holds the two map libraries the application form already uses, copied in.
-  The page loads nothing from another site.
+- **`vendor\`** holds the fonts and nothing else. The maps are drawn by the page's own code
+  as plain SVG, from the files in `public\geo\`, with no map library (the second prompt's
+  ruling 1). The page loads nothing from another site.
 - **A host's own settings file** is added when that host is set up, not before.
 
 ### 3.5 The nightly job's checks
@@ -344,13 +419,16 @@ drive and rebuilt only when boundaries change:
 
 | File | Holds | Built from |
 |---|---|---|
-| County shapes, one file per state or province | The county outlines for one state | `installer-application\public\data\counties.topo.json` (US Census Bureau 2025 county boundaries; Statistics Canada 2021 census divisions for Ontario) |
+| `counties\<code>.json`, one file per state or province | The county outlines for one state, drawn north up in a frame of its own | `installer-application\public\data\counties.topo.json` (US Census Bureau 2025 county boundaries; Statistics Canada 2021 census divisions for Ontario) |
 | `counties.json` | Every county: id, name, state, country | `installer-application\public\data\counties.meta.json` |
-| The state map | The US map on Home | The old page's own state map |
-| The ZIP list | Each ZIP code and the county or counties it falls in | `coverage-map\data\geo\zip-to-county.csv` (US Census Bureau 2020 ZIP-to-county file, aligned to the 2025 county boundaries) |
+| `states-map.json` | The map on Find installers: the states, the District of Columbia and Ontario | The state outlines in the same `counties.topo.json` (the second prompt's ruling 2). Ontario is a shape in its true place; Alaska and Hawaii are drawn smaller in the lower left |
+| `zips\0.json` to `zips\9.json` | Each ZIP code and the county or counties it falls in, split by the ZIP code's first digit | `coverage-map\data\geo\zip-to-county.csv` (US Census Bureau 2020 ZIP-to-county file, aligned to the 2025 county boundaries) |
 
 The county shapes are split by state because the whole-country file is 990,334 bytes, too
-heavy to send to a phone to draw one state. (Cowork's call, for Joe to overrule.)
+heavy to send to a phone to draw one state. (Cowork's call, for Joe to overrule.) The ZIP
+list is split by first digit for the same reason, and only the file a ZIP needs is fetched
+(ruling 4). Two scripts in `job\`, `build-shapes.mjs` and `build-zips.mjs`, make these
+files. They are run by hand when boundaries change, never by the daily job.
 
 **The shape of the files.** (Cowork's call, for Joe to overrule.) The page is built on this
 shape, so it changes only by a new revision of this specification. A file is a set of
@@ -425,6 +503,11 @@ then installer id. Each installer has:
   person once.
 - **A state** in `territory` is the two-letter code the county list gives for the county,
   ON for Ontario. A country is the code the county list gives.
+- **Territory in the files, and on the page.** In the data files, `territory` and the
+  counts `installersWithTerritory`, `installersWithoutTerritory` and `countiesCovered` in
+  `build.json` mean county rows at either tier. Those names stay as they are. On the page,
+  territory means Tier 1 (section 4.0), and the page works out its own counts from the two
+  tiers the files carry.
 
 `territory.json` holds `"schema"` and `"states"`, a list in order of state code. Each state
 has `state`, `country`, and `counties`, a list in order of county id. Each county has `id`,
@@ -530,119 +613,326 @@ tables          GitHub's scheduler     into the repository    republishes
 
 Every view has its own web address, so a view can be bookmarked or sent to a colleague.
 
-### 4.1 Home
+### 4.0 Territory and travel
 
-- Header as today: logo, title, one line of description. The title reads "Installer Index".
-- Search box, pinned at the top. It takes a name, a place or a ZIP code (sections 4.5 and
-  4.9).
-- **A line saying how current the data is:** "Installer records from QuickBase, refreshed
-  October 6, 2026." The date comes from `build.json`.
-- **The map.** US states plus Ontario, shaded by how many installers cover each. Clicking a
-  state opens the State view.
-- **Two buttons under the map:** "All installers" and "Not on the map".
-- Footer as today.
+Joe's ruling, October 8, 2026.
 
-### 4.2 State
+- **An installer's territory is the counties it chose as Tier 1.** Wherever a view speaks of
+  territory, counts it, shades a map by it, or lists the installers who serve a place, it
+  means Tier 1.
+- **The counties it chose as Tier 2 are where it is available for travel.** A view says so
+  in those words, "available for travel", and never counts them as territory.
+- **Every list of the installers for a place** (a state, a county, a ZIP code, a city, and a
+  search that names a state) shows the Tier 1 installers only. Under them is a button that
+  reads "View Tier 2 Installers Available for Travel". Pressing it lists, below the Tier 1
+  installers and under a heading of their own, those that have the place as Tier 2 and not
+  as Tier 1. Pressing it again hides them; while they show, it reads "Hide Tier 2
+  Installers". Every place opens with them hidden. The button is not part of the view's
+  address. (The second label, and that the button is not part of the address, are
+  Cowork's calls, for Joe to overrule.)
+- **No installer is listed twice for one place.** An installer with at least one of the
+  place's counties as Tier 1 is in the Tier 1 list, even if it has others there as Tier 2.
+- **When no installer has the place as Tier 2,** there is no button, and one line says "No
+  Tier 2 installer lists this area for travel."
+- **When no installer has the place as Tier 1,** the list says "No Tier 1 installer serves
+  Summit County, Ohio." and the button follows. When no installer has the place at either
+  tier, the list says "No installer serves Summit County, Ohio." and there is no button.
+- **An installer with Tier 2 counties and no Tier 1 county** has no territory. It is in the
+  Tier 2 lists of its places, in All installers and in its Installer view. It is not "not
+  on the map": that choice holds the installers with no county at either tier.
+- **Statuses.** The Tier 1 and Tier 2 lists of a place hold installers whose status is
+  CONFIRMED BY PARTNER or PENDING - UPDATE EXPECTED, and every count and map shade of a
+  place counts those same installers. Section 4.4 says where the others go.
+- **The data files do not change.** The page works out territory, travel and status from
+  what the files already carry (section 3.6).
 
-Reached by clicking a state, or by its address.
+### 4.1 Every view: the frame, the tabs and the addresses
 
-- Heading: "Installers in Ohio". With a county chosen: "Installers in Summit County, Ohio".
-- **A county map of the state.** The same county map the application form uses, showing
-  only this state and shaded by how many installers serve each county. Clicking a county
-  outlines it and narrows the list to the installers who serve it. "Show all of Ohio" clears
-  the choice.
-- **A box to type a county name,** beside the map. It does the same thing as a click, for
-  people using a keyboard or a phone, where a small county is hard to tap.
-- **The list.** One entry per installer serving the state, or the chosen county:
-  - Company (opens the Installer view)
-  - Tier (see "How tier is shown" below)
-  - Counties covered in this state, as a count
-  - Office city and state
-  - Contacts, by role, as in section 4.8
-  - Four hourly rates and mobilization
-  - Record status, and a "Rates expired" marker when the valid-through date has passed
-- **How tier is shown and ordered.** Tier belongs to an installer in a county, so one
-  installer can be Tier 1 in some counties of a state and Tier 2 in others.
-  - With a county chosen, the entry shows the tier for that county. Tier 1 installers come
-    first, then Tier 2, alphabetical within each.
-  - With no county chosen, the entry shows both counts, such as "Tier 1 in 40 counties,
-    Tier 2 in 12". Installers with any Tier 1 county in the state come first, alphabetical
-    within each group. (Cowork's call, for Joe to overrule.)
-- **A fixed line at the foot of every list:** "21 installers have no mapped territory and
-  may also serve this area," linking to "Not on the map". It always shows, so a list of
-  three never hides a fourth installer. **The number comes from the data, never typed in.**
-- A county with no installers says so plainly. No county is in that position today, and
-  the page must still handle it.
-- **On a phone** the list and the county box come first, and the map is drawn when asked
-  for. The page loads one state's shapes at a time.
+- **Header,** on every view, pinned at the top: the INFINIUM logo, the title "Installer
+  Index", two tabs, **Find installers** and **All installers**, and at the right a box
+  labeled "Find a company or person" (section 4.7). The tab of the view you are on is
+  marked.
+- **Footer,** on every view: the freshness line ("Installer records from QuickBase,
+  refreshed October 9, 2026.", with the date from `build.json` and the out-of-date wording
+  of the first prompt's ruling 8) and a link to About this data.
+- **Every view has its own address,** so it can be bookmarked or sent. The addresses:
 
-### 4.3 All installers
+| Address | View |
+|---|---|
+| `#/` | Find installers |
+| `#/state/<code>` | A state, by its two-letter code; ON for Ontario |
+| `#/state/<code>?county=<id>` | That state with one county chosen |
+| `#/zip/<five digits>` | A ZIP code |
+| `#/city/<id>` | A city, when city lookup is built (section 4.10) |
+| `#/installer/<installer id>` | One installer |
+| `#/installers` | All installers |
+| `#/about` | About this data |
 
-One directory, replacing the old contact table, rate table and unreachable master table.
+- **Choices ride on the address** as `?` items, in this order where more than one applies:
+  on a state's view `county` (a county id); then `view` (`est`, `pm` or `rec`); then for
+  All installers `q` (what was typed), `office` and `territory` (a state code),
+  `dormant=1`, `inactive=1` and `map=off`; and on an Installer view `from` (the place it
+  was opened from, written as the place's own address without its `#`, encoded as an
+  address item's value is encoded, so that its own `?` and `=` survive). An item that is
+  not one of these, or a value that does not fit it, gives the not-found view.
+- **Dates** on rows, signals and lists are written short, as "Feb 28, 2027"; the
+  freshness line writes the month in full, as "October 9, 2026".
+- **Old addresses keep working.** `#/search?q=<text>` opens `#/installers?q=<text>`, and
+  five digits open the ZIP's address; `#/not-on-the-map` opens
+  `#/installers?dormant=1&inactive=1&map=off`; `#/installers?set=rates` and `?set=contact` open All installers
+  in the Estimating view; `#/installers?status=<status>` opens All installers with the
+  toggle that status needs ticked. Each is replaced in the browser's history, not added.
 
-- Every installer, alphabetical.
-- **Two column sets, switched by the same two buttons the old page has:**
-  - "Contact info": Company · Status · Office city and state · Contacts by role, as in
-    section 4.8 · States covered
-  - "Rates": Company · Status · Non-union ST · Non-union OT · Union ST · Union OT ·
-    Mobilization · Rates valid through · Shop or labor status
-- **Mobilization is text in QuickBase, not a dollar amount.** It is shown as written and
-  wraps inside its column.
-- A filter for record status.
-- Column titles stay visible while scrolling and are never hidden by the search bar.
-- On a phone each installer is a card, not a row.
+### 4.2 The view switch
 
-### 4.4 Installer
+- **Three views: Estimating, Project management and Records.** A switch of three buttons
+  shows them, on a place's view, on the Installer view and on All installers. The view you
+  are in is marked.
+- **A view changes what a row shows** (section 4.5) **and the order of an installer's
+  page** (section 4.6). It never changes who is listed, nor in what order.
+- **The view is remembered** in that browser, and carried in the address as `view=`. An
+  address with `view=` opens that view and remembers it. An address without it opens the
+  remembered view, or Estimating when nothing is remembered. (Estimating as the first view
+  is Cowork's call, for Joe to overrule.) If the browser will not keep it, the page still
+  works and opens in Estimating.
+- **Changing the view** replaces the address in the browser's history; it does not add a
+  step to Back. The focus stays on the switch.
 
-A full view for one installer, replacing the pop-up.
+### 4.3 Find installers
 
-- **Top:** company name and record status. The date last confirmed is shown only when the
-  status is CONFIRMED BY PARTNER (Joe's ruling).
-- **Contacts:** every contact, one block per person with name, title, roles, phone, email
-  and second email. They are listed in the order of section 4.8. A person marked departed
-  is shown as departed. The person who confirmed the record is marked. A contact with no
-  role says "Role not recorded".
-- **Addresses:** office, and shipping addresses where held.
-- **Rates:** four tiles as today, then mobilization, rates valid through, shop or labor
-  status, and any pricing notes.
-- **Tier 2 charge:** what the installer charges for Tier 2 work, from the five Tier 2
-  columns, when filled. (Cowork's call, for Joe to overrule.)
-- **Territory:** each state covered, with its county count by tier. A state opens to list its
-  counties. For an installer with no mapped territory, the written coverage note is shown
-  instead, labeled as not confirmed on the map.
-- **Paperwork:** installer agreement on file, valid certificate of insurance on file, and
-  the date the certificate is valid through, when filled. (Cowork's call, for Joe to
-  overrule. On October 6, 64 records answered the agreement question, 45 answered the
-  certificate question, and none had a certificate date. How current those answers are is
-  not known. See section 8.)
-- **Other:** warehousing, travel note, EMR, notes.
-- A field with no value is left out rather than shown as a dash.
+Address `#/`. The page the Index opens on.
 
-### 4.5 Search results
+- **Heading** "Find installers for a project", and one line: "Type where the job is, or
+  open a state on the map."
+- **Two halves, side by side,** each about half the width on a desktop screen:
+  - **Left: the location box,** labeled "Project location", with the hint "ZIP code,
+    county, state or city." Section 4.3.1 says how it works. Under it, three counts from the
+    files: installers in all, a link to `#/installers?dormant=1&inactive=1`; installers
+    with counties on the map at either tier, not a link; and installers not on the map, a
+    link to `#/installers?dormant=1&inactive=1&map=off`.
+  - **Right: the map** of the United States and Ontario, the one built on October 7, **drawn
+    as soon as the page opens,** at US level, filling the half's width. Each state is
+    shaded by how many installers have territory there (section 4.0) and is a link to that
+    state's view. Its legend sits under it. Nothing must be pressed to show it.
+- **Under both halves:** "Every state and Ontario", every state by name with its number
+  of installers with territory there, each a link to its view (ruling 3). It is closed by
+  default and opens with one click.
 
-- Typing in the box lists matching installers in the same layout as the State view,
-  contacts included.
-- When the match is on a contact who is not one of the two on the row, that contact is
-  shown as well, so the reason for the match is visible.
-- It matches on company name, contact name, email, phone, office city, and state.
-  - A state is matched as a whole name or a whole two-letter code, never as letters inside
-    another word.
-  - A company name, contact name or city is matched from the start of any word in it, so
-    "in" does not find "Martin". (Cowork's call, for Joe to overrule.)
-  - An email is matched anywhere in the address. A phone is matched on its digits.
-  - Exactly five digits is treated as a ZIP code (section 4.9).
-- It matches only what a view shows. Nothing hidden is searched.
-- No match says so and lists what can be searched.
+#### 4.3.1 The location box
 
-### 4.6 Not on the map
+The same box is on Find installers and, as "Change location", at the top of a place's view.
 
-The installers with no territory rows: those who never confirmed, and those who confirmed
-without marking a map. Each shows its status and any written coverage note. 21 today.
+- **What it takes:** a ZIP code, a county, a state, or a city (section 4.10).
+- **Suggestions show as you type,** from the second letter, at most 10, each labeled with
+  its kind: "County", "ZIP", "State" or "City". A county reads "Cuyahoga County, Ohio"; a
+  city reads "Cuyahoga Falls, Ohio · Summit County". Typing the word "county" is not
+  needed. A county or city name used in several states is offered once per state.
+- **A state after the name narrows it.** What is typed may end with a state's name or
+  two-letter code, with or without a comma: "washington oh" and "Washington County, Ohio"
+  offer only Ohio's. When more than 10 match, the list shows the first 10 and one line:
+  "More match. Add the state, as in Washington OH."
+- **Matching** is from the start of any word of the name, capitals and accents aside, and
+  a state also by its whole two-letter code. Five digits offer the ZIP and nothing else.
+- **Order:** ZIP first, then states, then counties, then cities; within each, by name, then
+  by state.
+- **Each suggestion is a link** to its address. Enter takes the first. The arrow keys move
+  through them and Escape closes them. A suggestion list is announced to a screen reader
+  as it changes.
+- **Nothing matches:** one line says so and names what can be typed.
+- **Office city is never a match here.** The location box finds places, never companies.
 
-### 4.7 About this data
+### 4.4 Installers for a place
 
-When the data was refreshed, the counts, the gap counts of section 4.8, and the result of
-each nightly check. Reached from the freshness line on Home.
+Reached from the location box, the map, a link, or an address: a state, a state with one
+county chosen, a ZIP code, or a city. One layout for all of them, results first.
+
+From the top:
+
+1. **The location bar:** the place's name as the heading ("Summit County, Ohio",
+   "Ohio", "ZIP 44149"), a tag saying its kind, a link to the whole state when a county is
+   chosen ("All of Ohio"), and the "Change location" box (section 4.3.1).
+2. **One summary line:** "6 installers with territory in Summit County, Ohio · 3 more
+   available for travel", the two numbers being the two lists' lengths. A ZIP or city in
+   several counties lists those counties here instead, each a link to that county's view,
+   the largest share first.
+3. **The view switch** (section 4.2), on the same line as the summary on a wide screen.
+4. **Two columns on a screen 1100 pixels wide or more:** the lists, taking the width; and
+   the county map of the state, in a column at most 320 pixels wide on the right, with
+   the box "Find a county in Ohio" under it. The map is shaded by how many installers have
+   each county as Tier 1, and the chosen county is outlined. A button "Hide map" folds the
+   column away and gives the lists the full width; "Show map" brings it back. On a
+   narrower screen the map starts folded. For a ZIP or city in several counties the map
+   shows the state of the first county, with each of the ZIP's counties outlined.
+
+The lists, in this order:
+
+1. **Tier 1,** under the heading "Tier 1 · territory includes Summit County", in the
+   columns of the view (section 4.5).
+2. **The Tier 2 button,** with one line beside it: "3 installers list Summit County as
+   Tier 2." When pressed, **Tier 2,** under the heading "Tier 2 · available for travel to
+   Summit County", in the same columns, with the Tier 2 charge added in the Estimating
+   view.
+3. **"Did not respond to the August outreach"**: installers whose status is DORMANT - NO
+   RESPONSE and who have the place at either tier. One line each: company (a link), its
+   tier for the place, its office city and state. Left out when there are none.
+4. **"Not on the map, with an office in Ohio"**: installers with no county at either tier
+   whose office is in the place's state, other than INACTIVE and HELD - BUSINESS DECISION.
+   One line each: company (a link), office city, and the coverage note, labeled, when there
+   is one. Left out when there are none.
+5. **The foot line,** always, last: "21 installers are not on the map and may also serve
+   this area." (or "1 installer is not on the map…"), the number taken from the data, a
+   link to `#/installers?dormant=1&inactive=1&map=off`, which lists exactly those.
+
+- **INACTIVE and HELD - BUSINESS DECISION installers are never in a place's view.**
+- **A PENDING - UPDATE EXPECTED installer** carries a "Pending update" tag beside its
+  company name.
+- **Each list is in the order of the installers file,** which is alphabetical by company.
+- **The tier line,** under the company in every row (Cowork's wording, for Joe to
+  overrule):
+  - In a Tier 1 list: "Tier 1 · 40 counties in Ohio", and when it also has Tier 2 counties
+    in the state, "Tier 1 · 40 counties in Ohio, and available for travel to 12 more". The
+    count is for the whole state, with or without a county chosen.
+  - In a Tier 2 list: "Tier 2 · available for travel to 12 counties in Ohio".
+  - For a ZIP or city in several counties, it names the counties instead: "Tier 1 ·
+    territory in Summit County and Portage County", with ", and available for travel to
+    Stark County" when it has another of them as Tier 2; in the Tier 2 list, "Tier 2 ·
+    available for travel to Stark County".
+  - One county is "1 county".
+- **On a phone** the lists and the location bar come first, and the map is drawn when
+  asked for (group P, later).
+
+### 4.5 What a row shows, by view
+
+The same rows serve a place's lists (section 4.4) and All installers (section 4.7). Rates
+are US dollars per hour, shown with two decimals and right-aligned in figures of equal
+width; a blank rate reads "Not given". Long text is clipped to two lines and shown whole
+on hover and in the Installer view. Every row's company name is a link to the Installer
+view, carrying `from=` when the row is in a place's list.
+
+**Estimating**
+
+| Column | What it shows |
+|---|---|
+| Installer | Company; "Pending update" tag when it applies; the tier line in a place's list; office city and state |
+| Quote contact | The quoting place of the row (section 4.8): role, name, title, phone, email; a stand-in labeled with its own role and the marker; "Show all contacts" |
+| Non-union ST / OT | The two non-union rates |
+| Union ST / OT | The two union rates |
+| Mobilization | As written |
+| Rates valid through | The date, and "Expired" when it has passed |
+| Tier 2 charge | In a Tier 2 list only: whichever of the five Tier 2 parts are filled, joined with " · "; "Not given" when none is |
+
+**Project management**
+
+| Column | What it shows |
+|---|---|
+| Installer | As in Estimating |
+| Scheduling contact | The scheduling place of the row (section 4.8), shown as the quote contact is; "Show all contacts" |
+| Field contact | The field contact (section 4.8): name, title, phone; "No field contact on record" when there is none |
+| Receiving | "Warehousing: Yes", "Warehousing: No" or "Warehousing: Not recorded", with where when given; then the receiving contact (section 4.8) by name and phone, or "No receiving contact on record" |
+| Paperwork | "No agreement on file" when the agreement answer is No; "No certificate of insurance on file" when the certificate answer is No; each shown, never one for both. A blank answer reads "Agreement not recorded" or "Insurance not recorded". Both Yes: "Agreement and insurance on file" |
+| Travel note | As written; "Not applicable" when its box is ticked and it is empty |
+
+**Records**
+
+| Column | What it shows |
+|---|---|
+| Installer | Company, a status tag, and "Last confirmed" with its date for a CONFIRMED BY PARTNER record |
+| Rates valid through | The date, and "Expired"; "Not given" |
+| Agreement | Yes, No, or Not recorded |
+| Certificate of insurance | "On file", with "valid through" and the date when given; No; or Not recorded |
+| EMR | As written; "Not applicable" when its box is ticked; "Not given" |
+| Contact gaps | "No quoting contact" and "No scheduling contact", from the row's gap; "None" |
+| Territory | "Tier 1 in 40 counties", with "· travel to 12" when it has Tier 2 counties; "Travel only (Tier 2)"; or "Not on the map" |
+
+Amber, always with words, marks what is missing or expired: "Expired", the paperwork
+markers, the contact markers and the contact gaps. Nothing is marked by color alone.
+
+### 4.6 Installer
+
+Address `#/installer/<installer id>`, with `view=` and `from=` when they apply.
+
+- **A back link,** "Back to Summit County, Ohio", when the address carries `from=`, going
+  to that place's address. Without `from=`, no back link; the browser's Back still works.
+- **The overview,** at the top, always first:
+  - Company, a status tag, and the view switch.
+  - One line: office city and state; "Last confirmed" and its date when the status is
+    CONFIRMED BY PARTNER; shop or labor status.
+  - **Three signals,** each always shown, each in words: **Rates** ("Valid through Feb 28,
+    2027", "Expired Sep 1, 2026", or "Not given"); **Installer agreement** ("On file",
+    "Not on file", or "Not recorded"); **Certificate of insurance** ("On file", with "valid
+    through" and the date when given; "Not on file"; or "Not recorded").
+  - With `from=`: "From your search: Tier 1 in Summit County, Ohio" (or "Tier 2 · available
+    for travel to Summit County, Ohio"; or "Did not respond to the August outreach").
+- **A jump bar** under the overview, pinned under the header as the page scrolls: one link
+  to each section, in the section order of the view.
+- **The sections, one page, no tabs,** in this order:
+  - Estimating: Contacts · Rates and travel · Coverage · Logistics and locations ·
+    Documents and record.
+  - Project management: Contacts · Logistics and locations · Coverage · Documents and
+    record · Rates and travel.
+  - Records: Documents and record · Contacts · Rates and travel · Coverage · Logistics and
+    locations.
+- **Contacts.** One card per current contact: roles, name, title, phone, email, second
+  email, procedure, and "Confirmed this record" when ticked; "Role not recorded" for a
+  contact with no role. Order: in Estimating, the quoting contacts first; in Project
+  management, scheduling, then field, then receiving; then everyone else in the full order
+  of section 4.8. In Records, the full order of section 4.8. One person in several roles is
+  one card with every role on it. Departed contacts are under "Former contacts", closed by
+  default, each marked "Departed".
+- **Rates and travel.** The four rate tiles, labeled "USD per hour"; then mobilization,
+  rates valid through (with "Expired"), shop or labor status, outreach pricing notes, the
+  Tier 2 charge (whichever parts are filled, ruling 4), and the travel note.
+- **Coverage.** Two columns: **Territory (Tier 1)** and **Available for travel (Tier 2)**,
+  each with its county total, then each state with its count, opening to "Open the map of
+  Ohio" (ruling 8) and the counties by name. A column with no counties says "None". The
+  coverage note follows, labeled "Coverage note"; for an installer with no county at either
+  tier the note stands alone, labeled "Coverage note, not confirmed on the map".
+- **Logistics and locations.** Office address; shipping address and second shipping
+  address, or "Not applicable" when the box is ticked and the address is empty;
+  warehousing, and where; the receiving contact.
+- **Documents and record.** Installer agreement on file; certificate of insurance on file;
+  certificate valid through; EMR (or "Not applicable"); record status; last confirmed
+  (CONFIRMED BY PARTNER only); notes; anything else. Last, always: "Something wrong here?
+  Tell Joe Lull, joe.lull@infiniumwalls.com", the address a mail link.
+- **A field with no value is left out,** except the three signals of the overview, which
+  always show.
+
+### 4.7 All installers
+
+Address `#/installers`, with the items of section 4.1.
+
+- **Heading** "All installers".
+- **Filters,** in one row above the table:
+  - **Office in:** any state, or one state. Matches the office state.
+  - **Territory in:** any state, or one state. Matches an installer with Tier 1 counties
+    there.
+  - **Also show:** two boxes, both unticked when the page opens: "Did not respond to the
+    August outreach" (DORMANT - NO RESPONSE) and "Inactive or on hold" (INACTIVE and HELD -
+    BUSINESS DECISION). Each shows its count beside it.
+  - **Narrow to:** one box, "Not on the map": only installers with no county at either tier.
+    It shows its count beside it.
+- **With no box ticked,** the table holds CONFIRMED BY PARTNER and PENDING - UPDATE
+  EXPECTED installers. Ticking a box adds its installers; "Not on the map" then narrows
+  what is shown.
+- **The view switch,** and a count line: "Showing 57 of 74".
+- **The table:** every installer that passes, in the order of the installers file, in the
+  columns of the view (section 4.5). In Estimating and Project management a last column,
+  **Territory in**, lists the state codes where it has Tier 1 counties, each a link to that
+  state's view (ruling 8); "Travel only (Tier 2)" or "Not on the map" otherwise. Column
+  titles stay visible while the table scrolls.
+- **Search.** What is typed in the header box opens All installers with `q=`. The search
+  rules of the eighth revision's section 4.5 stand, with ruling 6 for email addresses: a
+  company name, contact name or office city from the start of a word; a phone by its
+  digits; a state by its whole name or code, finding an installer with its office there or
+  territory there. A match shows the value that matched and "Matched on …", and a match on
+  a contact not on the row shows that contact. A search that names a state shows "Open the
+  map of Ohio" above the table (ruling 7). A result found by territory says "Territory
+  includes Ohio: 40 counties", with ", and available for travel to 12 more". Exactly five
+  digits go to the ZIP's view instead.
+- **While a search is typed, every status is searched,** whatever the boxes say; each
+  result carries its status tag.
+- **No match** says so and lists what can be searched.
+- **On a phone** each installer is a card (group P, later).
 
 ### 4.8 How contacts are shown
 
@@ -658,8 +948,8 @@ is people with roles.
 had no scheduling contact and 23 had neither. A gap line alone would leave 31 of 73 rows
 with a blank where staff need a person to call.
 
-**On a row** (State view, Search results, ZIP results, and the "Contact info" columns of
-All installers) there are two places:
+**On a row** (a place's lists and All installers, in the Estimating and Project management
+views) there are two places:
 
 1. **Quoting / Estimating**
 2. **Scheduling / Coordination**
@@ -740,38 +1030,114 @@ the bullets above differ, these lines say how the bullets are applied.
 - **The gap counts** count a role as missing whether or not a stand-in was found. An
   installer with neither role is counted in all three.
 
+**The field contact and the receiving contact.** Added in the ninth revision for the Project
+management row. The page, not the job, chooses them from the installer's `contacts`, so
+neither the job nor the files change. (Cowork's call, for Joe to overrule.)
+
+- The **field contact** is the first current contact, by the "first by name" rule above,
+  who holds Field / Installation and can be reached; when none can be reached, the first
+  who holds it. None holds it: "No field contact on record". No stand-in is used.
+- The **receiving contact** is chosen the same way from Receiving / Warehouse. None holds
+  it: "No receiving contact on record".
+- A departed contact is never chosen. One person may be the scheduling, field and receiving
+  contact at once; each column shows them.
+
 ### 4.9 ZIP lookup
 
 At launch, by Joe's ruling of October 6.
 
-- Typing exactly five digits in the search box looks the ZIP up in the ZIP list. Nothing is
-  sent anywhere; the list is a file beside the page.
-- **One county:** the page opens that state with the county chosen, under a heading such as
-  "Installers serving ZIP 44221 — Summit County, Ohio".
-- **More than one county:** a ZIP can cross a county line. The page names every county the
-  ZIP touches, largest share of the ZIP first, and lists the installers who serve any of
-  them. An installer is listed once, at its best tier among those counties, with the
-  counties it serves named. (Cowork's call, for Joe to overrule.)
+- Five digits in the location box, or in the company box, go to the ZIP's address. Nothing
+  is sent anywhere; the ZIP list is ten files beside the page, by a ZIP code's first digit,
+  and only the one a ZIP needs is fetched, when its address is opened (ruling 4).
+- **One county:** that county's view (section 4.4), under the heading "ZIP 44221 · Summit
+  County, Ohio".
+- **More than one county:** a place view whose summary names every county the ZIP touches,
+  largest share first, each a link to that county's view; its lists hold the installers
+  with territory in any of them, each once, as section 4.4 says. (Cowork's call, for Joe
+  to overrule.)
 - **Not found:** the page says so, and says what the list leaves out: ZIP codes that are
   only post office boxes, ZIP codes belonging to a single organization, military ZIP codes,
   and Canadian postal codes.
 - **A ZIP outside the map:** the ZIP list covers Puerto Rico and the US island areas, which
   the county map leaves out. The page says the ZIP is outside the mapped area.
-- The ZIP list is loaded only when a ZIP is typed.
 
 **How sure the ZIP list is.** It is the Census Bureau's 2020 ZIP-to-county file: 46,969
 rows, 33,791 ZIP codes. A Census ZIP area is close to, but not exactly, the area the Postal
 Service delivers to. For a job site near a county line, the street-address search of the
 second phase is the exact answer.
 
+### 4.10 City lookup
+
+Built now if the place list allows it; otherwise it waits, and nothing else changes.
+
+- **The source:** the application form's place list, `places.json`, 6,242 places
+  (`installer-application`, read at a fixed commit). It is built into the Index only if
+  its places carry the county or counties they lie in, by the ids of `counties.json`, or
+  carry what the build can turn into them without another source, and at least 95 of
+  every 100 places resolve to a county that way. Places that do not resolve are left out
+  and counted. If the list does not allow it, city lookup is not built in this revision, the location box offers ZIP, county and state, and
+  its hint does not mention cities.
+- **When built:** a script in `job\`, run by hand like the map scripts, writes the cities
+  into `public\geo\`, fetched only when the location box first holds two characters; each city
+  has an id, its name, its state and its counties. A city in one county opens that
+  county's view under the heading "Cuyahoga Falls, Ohio · Summit County". A city in
+  several counties is a place view like a ZIP in several counties.
+- **What it will not do:** the 6,242 places are not every place, so a small town or an
+  unincorporated area may be missing; the location box's hint then says to try the ZIP.
+  Ontario cities are not in the list.
+
+### 4.11 About this data
+
+Reached from the footer of every view.
+
+- When the data was refreshed, the counts, the gap counts of section 4.8, and the result of
+  each nightly check.
+- The counts are labeled as the files mean them (section 3.6): "Installers with counties
+  on the map, at either tier" for `installersWithTerritory`, "Installers not on the map" for
+  `installersWithoutTerritory`, and "Counties with an installer, at either tier" for
+  `countiesCovered`. Beside them, three counts the page works out: "Installers with
+  territory (Tier 1)", "Installers available for travel only (Tier 2)", and installers by
+  status.
+- **Where the maps come from,** in exactly these three lines (the second prompt's ruling 5):
+  - County and state outlines: U.S. Census Bureau, 2025 cartographic boundary files.
+  - Ontario census divisions: adapted from Statistics Canada, 2021 Census boundary files.
+    This does not constitute an endorsement by Statistics Canada of this product.
+  - ZIP codes: U.S. Census Bureau, 2020 ZIP Code Tabulation Area to county relationship
+    file. A Census ZIP area is close to, but not exactly, the area the Postal Service
+    delivers to.
+- When city lookup is built, a fourth line, exactly: "Cities: the place list of
+  INFINIUM's installer application form."
+- **"Something wrong in a record? Tell Joe Lull, joe.lull@infiniumwalls.com."** The address
+  is a mail link.
+
 ## 5. The look
 
 Taken from the review, with five changes that fix defects it measured.
 
 **Kept:** the INFINIUM greens and grays, Montserrat for headings and Roboto for text, the
-white header with its green bar and rule, the pinned search box, the white rounded panels
-with a soft shadow, the dark table header, the four rate tiles, the US state map and its
-shading.
+white header with its green bar and rule, the pinned header, the white panels, the dark
+table header, the four rate tiles, a US state map and its shading.
+
+**The ninth revision's look** (Joe, October 8, 2026, from the agreed screens):
+
+- **Results first.** On a place's view, the header and the location bar together are at
+  most 150 pixels tall at 1440 by 900 and at 1280 by 800, and the first row of the Tier 1 list starts
+  within 360 pixels of the top of the page at 1440 by 900 and at 1280 by 800. No map, banner
+  or large heading stands above a list.
+- **Denser and quieter.** Panels with a light gray border (`#D9D9D9`), corners of 8 pixels,
+  no shadow; the page ground `#F4F5F2`. Body text 15 pixels, table text 14, labels 12 to 13,
+  nothing under 12. Company and contact names in bold; titles and labels in gray under
+  them.
+- **Numbers line up.** Rates right-aligned, two decimals, in figures of equal width.
+- **Color means one thing each.** Green (`#76A134`) for the brand bar, the selected tab,
+  focus rings, the map, and the outline of the Tier 2 button; charcoal (`#282828`) for the
+  selected view in the view switch and the table header; amber text (`#6E4300`) on a pale
+  amber ground (`#FFF1D6`) for anything missing or expired, always with words; status tags
+  in gray, "Pending update" in amber.
+- **Width.** Content at most 1,400 pixels wide, so the Estimating row fits at 1280 without
+  scrolling sideways.
+- **Buttons and switches** are at least 44 pixels tall where they are the main control of
+  a view (the Tier 2 button, the view switch, the location box).
 
 **Changed:**
 
@@ -783,19 +1149,20 @@ shading.
 | Pinch-to-zoom turned off | Zoom allowed | People need to enlarge text |
 | Names, map and pop-up not usable from a keyboard | Everything reachable by Tab; Escape closes anything that opens | Measured: no keyboard access at all |
 
-**The state map's origin.** The old page's US map appears to come from Simplemaps: a file
-beside it, `installer-lookup\dev\assets\us.svg`, has the same frame and carries the note
-"Free for Commercial Use". That is inferred from the file, not stated in the page. The
-note is kept with the map.
+**The state map's origin.** The map on Find installers is no longer the old page's drawing. The page
+draws it from the US Census Bureau's state outlines and Statistics Canada's for Ontario,
+credited on About this data (the second prompt's rulings 2 and 5). The old page's map
+appeared to come from Simplemaps; nothing of it is used.
 
 ## 6. Launch and second phase
 
 **At launch:** everything in section 4. A place is found by clicking the state and then the
 county, by typing a county name, or by typing a ZIP code.
 
-**Second phase: address search.** A street address is typed, on Home or in a State view.
-The county it falls in is outlined on the map and its installers are listed, Tier 1 first.
-From Home, the lookup jumps to the right state.
+**Second phase: address search.** A street address is typed, on Find installers or in a place's view.
+The county it falls in is outlined on the map and its installers are listed as section 4.0
+says: Tier 1, with the button for Tier 2.
+From Find installers, the lookup jumps to the right state.
 
 - **The service:** the US Census Bureau's address lookup (Joe's ruling). It is free, needs
   no account, and returns the county for an address. Its documentation was last updated in
@@ -810,8 +1177,7 @@ From Home, the lookup jumps to the right state.
 - **If the service is down or cannot place an address,** the page says so and the map still
   works.
 
-**Still to decide:** whether typing only a city should also work. A list of 6,242 places
-already exists in the application form (`places.json`), so it needs no new data.
+**City lookup:** settled in the ninth revision, section 4.10.
 
 **Not planned:** editing anything. The lookup only displays. Changes are made in QuickBase.
 
@@ -836,6 +1202,10 @@ GitHub half of R6 waits for the job. The job now chooses the contacts for a row,
 contact rules of section 4.8 are built and tested in step 3, and step 5 shows the result.
 The county list, `counties.json`, is built in step 3 as well, because the job's third check
 needs it. The other map files stay in step 6.
+
+**As of the ninth revision.** Steps 4, 5 and 6 were built on October 7 on a desktop screen
+and are on the Netlify test copy. The ninth revision redesigns the views of steps 5 and 6,
+as section 4 says, and adds city lookup to step 6 when the place list allows it.
 
 **The QuickBase feed is not the hard part.** Reading three tables once a day is the
 simplest piece here. The real work is the views and the phone layout.
@@ -881,9 +1251,24 @@ simplest piece here. The real work is the views and the phone layout.
 
 **For Joe, before the Installer view is built:**
 
-- **Whether the paperwork lines are shown as QuickBase has them.** 26 installers say a
+- **Closed in the ninth revision (section 4.5).** Whether the paperwork lines are shown as QuickBase has them. 26 installers say a
   valid certificate is on file and none has a date. 36 say an agreement is on file and 28
   say it is not. How current those answers are is not known.
+
+**For Joe and the outreach import, raised October 8 (section 3.3):**
+
+- **Two installers have Tier 1 across nearly the whole map.** Since territory is Tier 1,
+  both are in the Tier 1 list of nearly every place, and in 2,225 counties they are the
+  only Tier 1 installers. Whether each truly works everywhere at Tier 1, or marked the
+  whole map by mistake, is for the outreach import to confirm. The page shows what
+  QuickBase holds.
+- **One installer chose no Tier 1 county.** It marked 348 counties in 12 states, its home
+  state among them, all as Tier 2, so it is in no Tier 1 list, even where its office is.
+  Whether it meant some of them as Tier 1 is for the outreach import to confirm.
+- **Two more installers marked nearly the whole map, almost all as Tier 2.** They are in
+  the Tier 2 list of nearly every place. One of them left out Alaska, Hawaii and 37 other
+  counties and divisions scattered across the map, which looks accidental rather than
+  chosen.
 
 **To settle when the page is built:**
 
@@ -898,11 +1283,23 @@ simplest piece here. The real work is the views and the phone layout.
 
 **To decide later:**
 
-- Whether city lookup is added (section 6).
+- Whether city lookup is added: settled in the ninth revision, section 4.10.
 - Whether the 16 company names the old page splits by market match how QuickBase lists
   those installers.
-- What staff should do when they find a wrong value: who they tell, and who corrects
-  QuickBase.
+- What staff should do when they find a wrong value: settled in the ninth revision, they
+  tell Joe (section 2). Who corrects QuickBase is still to decide.
+
+**Closed in the ninth revision:**
+
+- What territory means on the page: Tier 1 (Joe, October 8). Tier 2 is where an installer
+  is available for travel.
+- How the maps are drawn, where the Home map comes from, and how the ZIP list is split:
+  as the page's second prompt built them on October 7.
+- Which views the Index has, what each row shows by view, and which statuses a place lists
+  (Joe, October 8; section 4).
+- Whether the paperwork lines are shown as QuickBase has them: yes, as words, with "Not
+  recorded" for a blank (section 4.5).
+- Currency: US dollars (Joe, October 8).
 
 **Closed in the eighth revision:**
 
@@ -945,13 +1342,14 @@ simplest piece here. The real work is the views and the phone layout.
 - The old page as "a reference for visual identity only." Its look is kept by ruling.
 - Reading installer records through Dave's internal API. Nothing has decided that; the job
   reads the tables Joe created.
-- City search at launch. It is undecided.
+- City search at launch. It was undecided; the ninth revision settles it (section 4.10).
 
 ## 10. What is not verified
 
 - **Everything in section 3 is Claude Code's reading of QuickBase on October 6,** relayed
   as a report. Cowork checked that the report's figures agree with each other. It did not
-  see QuickBase.
+  see QuickBase. The exception is the October 7 table in section 3.3, which is Cowork's
+  own count of the published data files, not of QuickBase.
 - How `partnerfinder.infiniumiq.ai` is published. Claude Code saw only that it sends a
   visitor to Microsoft sign-in.
 - That the live page and the `dev` copy on the P: drive are the same generation. They
