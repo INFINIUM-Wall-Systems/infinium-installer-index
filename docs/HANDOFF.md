@@ -293,10 +293,15 @@ Before anything changed in this run, all passed: `npm run check`, `npm run check
 cases), `npm run check:job` (66 cases in 62 tests), `npm run check:published` (11 lines),
 `npm run check:page` (46 lines) and `npm run check:page:published` (13 lines).
 
-With the redesign staged, before the commit of the views, all passed: `npm run check` (R1 to R7
-and J19), `npm run check:selftest` (483 cases), `npm run check:job` (66 cases in 62 tests,
-unchanged), `npm run check:published` (11 lines, unchanged), `npm run check:page` (56 lines, 57
-cases) and `npm run check:page:published` (17 lines).
+With all the work staged, before commit `9f01cb8`, all passed:
+
+- `npm run check`: R1 to R7 and J19 PASS (188 tracked files; R5 scanned 185, the city files and
+  the one allowed address among them); R6's GitHub half still printed as NOT YET SHOWN.
+- `npm run check:selftest`: PASS, 483 cases (421 before this run).
+- `npm run check:job`: PASS, 66 cases in 62 tests (unchanged).
+- `npm run check:published`: PASS, 11 lines (unchanged).
+- `npm run check:page`: PASS, 56 lines, 57 cases (46 lines before this run).
+- `npm run check:page:published`: PASS, 17 lines (above; 13 before this run).
 
 No QuickBase call was made in this run.
 
@@ -380,8 +385,11 @@ build.json 1,745. The files held 73 installers in this run.
 - `25cfd7d` "Specification revision 9 and acceptance checks version 3: the redesign".
 - `d7fa2f2` "City lookup's files: public/geo/cities, built from the place list".
 - `6187b87` "The page: the views of the ninth revision, and their tests".
+- `9f01cb8` "The page: the redesign of the ninth revision": the picture commands and their
+  measures, the last changes after looking at the pictures, README.md and this file.
 - Each pushed to `origin main` with the five checks passing. Nothing under `public/data` in any
-  of them. The pictures, the README and this file follow in the run's last two commits.
+  of them. No "Daily data refresh" came in between. This file's final results are the commit
+  after `9f01cb8`.
 
 ## Not built
 
