@@ -1,13 +1,16 @@
 /**
- * Search: section 4.5 of docs\SPEC.md, with the rulings of the page's first prompt.
+ * Search: section 4.7 of docs\SPEC.md (the eighth revision's section 4.5 standing), with the
+ * rulings of the page's first and second prompts. What is typed in the box in the header.
  *
  *   - Nothing is searched until two characters are typed.
- *   - Exactly five digits is a ZIP code, which this build does not look up.
+ *   - Exactly five digits is a ZIP code, which opens the ZIP's view instead.
  *   - A company, a contact's name or an office city is matched as one phrase: the words typed
  *     must match words that follow one another in it, each from the start of a word, so "in"
  *     does not find "Martin". Capitals, accents and apostrophes are not minded.
  *   - A state is matched by its whole name or its whole two-letter code only. It finds an
- *     installer whose office is in that state, and one whose territory includes it.
+ *     installer whose office is in that state, and one whose territory includes it: territory
+ *     is Tier 1 (section 4.0), so an installer with only Tier 2 counties there is not found by
+ *     territory.
  *   - An email address (and a second email) is matched from the start of any word of the part
  *     before the @, where a period, a hyphen, an underscore or a plus sign parts the words; or
  *     from the start of the part after the @; or anywhere in it when what is typed holds an @
@@ -23,7 +26,9 @@
  * Nothing here touches a browser object, so node can load it and test it.
  */
 import { digits } from './format.js';
-import { stateName } from './data.js';
+import { officeStateIs } from './data.js';
+
+export { officeStateIs };
 
 export const MIN_CHARACTERS = 2;
 export const MIN_PHONE_DIGITS = 3;
@@ -69,13 +74,6 @@ export function stateQuery(model, q) {
     if (typeof s.name === 'string' && s.name.toLowerCase() === wanted) return s.code;
   }
   return null;
-}
-
-/** Whether an office state, as QuickBase writes it, is a state: by its code or its name. */
-export function officeStateIs(model, officeState, code) {
-  if (typeof officeState !== 'string') return false;
-  const s = officeState.trim().toLowerCase();
-  return s === code.toLowerCase() || s === String(stateName(model, code)).toLowerCase();
 }
 
 /** The digits of a phone query, or null when what is typed is not a phone number. */
@@ -145,10 +143,8 @@ export function search(model, rawQ) {
     const city = phraseMatch(office.city, typed);
     if (city) matches.push({ field: 'city', range: city });
     if (state && officeStateIs(model, office.state, state)) matches.push({ field: 'officeState', state });
-    if (state && installer.territory && Array.isArray(installer.territory.states)
-      && installer.territory.states.some((s) => s && s.state === state)) {
-      matches.push({ field: 'territory', state });
-    }
+    const mine = model.coverage && model.coverage.get(installer.id);
+    if (state && mine && mine.has(state) && mine.get(state).tier1.length > 0) matches.push({ field: 'territory', state });
     (Array.isArray(installer.contacts) ? installer.contacts : []).forEach((c, contact) => {
       if (!c || typeof c !== 'object') return;
       const name = phraseMatch(c.name, typed);

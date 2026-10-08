@@ -6,8 +6,9 @@
  *     the way the job's tests do, into a temporary folder whose name begins installer-index-;
  *   - ways to walk the tree of elements a view gives back, and to change a copy of it, for the
  *     broken cases;
- *   - what section 4.4 of docs\SPEC.md says the Installer view shows for an installer, written
- *     out here apart from the page's own code.
+ *   - what section 4.6 of docs\SPEC.md says the Installer view shows for an installer, written
+ *     out here apart from the page's own code;
+ *   - the map, ZIP and city files of public\geo, as the page holds them once fetched.
  *
  * Nothing here reads public\data, the real key or QuickBase.
  */
@@ -138,22 +139,49 @@ export const transformed = (render, f) => (route, model, opts) => {
   return { ...out, node: mapTree(out.node, f) };
 };
 
-/* ================================================================ section 4.4, written out apart */
+/* ================================================================ the map, ZIP and city files */
+
+/** A file of public\geo, read as the page reads it once fetched. */
+const geoDoc = (rel) => JSON.parse(readFileSync(join(ROOT, 'public', ...rel.split('/')), 'utf8'));
+let everyFile = null;
+/** Every map, ZIP and city file, as { path: { state: 'ok', doc } }: what the page holds once it has fetched them. */
+export function geoFiles() {
+  if (!everyFile) {
+    everyFile = { 'geo/states-map.json': { state: 'ok', doc: geoDoc('geo/states-map.json') } };
+    for (const s of JSON.parse(COUNTIES_TEXT).states) {
+      everyFile[`geo/counties/${s.code}.json`] = { state: 'ok', doc: geoDoc(`geo/counties/${s.code}.json`) };
+      everyFile[`geo/cities/${s.code}.json`] = { state: 'ok', doc: geoDoc(`geo/cities/${s.code}.json`) };
+    }
+    for (let d = 0; d <= 9; d++) everyFile[`geo/zips/${d}.json`] = { state: 'ok', doc: geoDoc(`geo/zips/${d}.json`) };
+  }
+  return everyFile;
+}
+
+/** The city files alone, as the location box is handed them: { path: doc }. */
+export function cityDocs() {
+  const out = {};
+  for (const [path, f] of Object.entries(geoFiles())) if (path.startsWith('geo/cities/')) out[path] = f.doc;
+  return out;
+}
+
+/* ================================================================ section 4.6, written out apart */
 
 const CONFIRMED = 'CONFIRMED BY PARTNER';
 const filled = (v) => v !== undefined && v !== null && v !== '';
 const group = (v) => (v && typeof v === 'object' && !Array.isArray(v) ? v : {});
 
 /**
- * The fields section 4.4 names that the Installer view must show for an installer, by the
+ * The fields section 4.6 names that the Installer view must show for an installer, by the
  * name each has in installers.json, with the value and its kind: [{ name, value }]. With the
  * rulings: "Last confirmed" only for CONFIRMED BY PARTNER; a ticked "Not applicable" box shows
  * for an empty field (ruling 5); whichever Tier 2 parts are filled (ruling 4); the paperwork as
- * QuickBase has it (ruling 3); the coverage note whenever it is filled (ruling 10).
+ * QuickBase has it (ruling 3); the coverage note whenever it is filled (ruling 10); and the
+ * record status, which every installer has.
  */
 export function expectedFields(i) {
   const out = [];
   const add = (name, value) => out.push({ name, value });
+  if (filled(i.status)) add('status', i.status);
   if (i.status === CONFIRMED && filled(i.lastConfirmed)) add('lastConfirmed', i.lastConfirmed);
   if (Object.keys(group(i.office)).length) add('office', i.office);
   const ship = (which) => (Array.isArray(i.shipping) ? i.shipping.find((s) => s && s.which === which) : undefined);
@@ -173,7 +201,7 @@ export function expectedFields(i) {
 }
 
 /** Every field name expectedFields can give. */
-export const FIELD_NAMES = ['lastConfirmed', 'office', 'shipping', 'secondShipping', 'rates.nonUnionST', 'rates.nonUnionOT', 'rates.unionST',
+export const FIELD_NAMES = ['status', 'lastConfirmed', 'office', 'shipping', 'secondShipping', 'rates.nonUnionST', 'rates.nonUnionOT', 'rates.unionST',
   'rates.unionOT', 'mobilization', 'ratesValidThrough', 'shopStatus', 'pricingNotes', 'tier2Charge.basis', 'tier2Charge.unit',
   'tier2Charge.unitOther', 'tier2Charge.amount', 'tier2Charge.relation', 'coverageNote', 'paperwork.agreementOnFile',
   'paperwork.coiOnFile', 'paperwork.coiValidThrough', 'warehousing.available', 'warehousing.at', 'travelNote', 'emr', 'notes',
@@ -196,6 +224,11 @@ export const spelledDate = (d) => {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(d);
   return m ? `${MONTHS[Number(m[2]) - 1]} ${Number(m[3])}, ${m[1]}` : d;
 };
+/** 2026-10-07 as Oct 7, 2026, the short way rows, signals and lists write a date (section 4.1). */
+export const shortSpelled = (d) => {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(d);
+  return m ? `${MONTHS[Number(m[2]) - 1].slice(0, 3)} ${Number(m[3])}, ${m[1]}` : d;
+};
 /** 87.35 as $87.35, written out apart from the page. */
 export const dollars = (n) => `$${n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
 
@@ -211,7 +244,7 @@ export function valueChecks(name, value) {
       .map((k) => ({ name: `${name}.${k}`, piece: String(value[k]), value: value[k] }));
   }
   if (name.startsWith('rates.')) return [{ name, piece: dollars(value), value }];
-  if (['lastConfirmed', 'ratesValidThrough', 'paperwork.coiValidThrough'].includes(name)) return [{ name, piece: spelledDate(value), value }];
+  if (['lastConfirmed', 'ratesValidThrough', 'paperwork.coiValidThrough'].includes(name)) return [{ name, piece: shortSpelled(value), value }];
   if (Array.isArray(value)) return value.map((v) => ({ name, piece: String(v), value: v }));
   return [{ name, piece: String(value), value }];
 }

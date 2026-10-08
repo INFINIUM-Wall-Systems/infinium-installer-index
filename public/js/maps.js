@@ -1,6 +1,6 @@
 /**
- * The maps, drawn by the page itself as plain SVG from the files of public\geo: the Home map of
- * the states and Ontario (geo/states-map.json) and each state's county map
+ * The maps, drawn by the page itself as plain SVG from the files of public\geo: the map of the
+ * states and Ontario on Find installers (geo/states-map.json) and each state's county map
  * (geo/counties/<code>.json). No map library and no map tiles. Each state and each county is a
  * link with its own address, so a click, the Enter key and a pasted address all do the same
  * thing.
@@ -50,18 +50,64 @@ export function countyMapUsable(doc, code) {
     && doc.counties.every((c) => isGroup(c) && typeof c.id === 'string' && typeof c.path === 'string');
 }
 
+/**
+ * The size, in the map's units, a state's code is written at on Find installers. The map there
+ * fills half the page, about 570 pixels wide at 1280: at this size a code is drawn at 12 pixels or
+ * more (section 5). The map file's own labelSize was chosen for a map twice as wide.
+ */
+export const HOME_CODE_SIZE = 220;
+
+/** The rings of a path written M x,y l dx,dy,... z: [[x, y], ...] for each ring. */
+function ringsOf(path) {
+  const rings = [];
+  for (const m of String(path).matchAll(/M(-?\d+),(-?\d+)(?:l([-\d,]+))?z/g)) {
+    let x = Number(m[1]);
+    let y = Number(m[2]);
+    const ring = [[x, y]];
+    if (m[3]) {
+      const n = m[3].split(',').map(Number);
+      for (let i = 0; i + 1 < n.length; i += 2) { x += n[i]; y += n[i + 1]; ring.push([x, y]); }
+    }
+    rings.push(ring);
+  }
+  return rings;
+}
+
+/** How far a point lies from the nearest edge of a path. */
+export function edgeDistance(path, x, y) {
+  let min = Infinity;
+  for (const ring of ringsOf(path)) {
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const [ax, ay] = ring[j];
+      const [bx, by] = ring[i];
+      const dx = bx - ax;
+      const dy = by - ay;
+      const len = dx * dx + dy * dy;
+      const t = len ? Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / len)) : 0;
+      min = Math.min(min, Math.hypot(x - (ax + t * dx), y - (ay + t * dy)));
+    }
+  }
+  return min;
+}
+
+/** Whether a two-letter code at a size fits at a point a distance d from the edge: its box, half its diagonal (job\build-shapes.mjs's rule). */
+export const codeFits = (d, size) => d >= Math.hypot(0.72 * size, 0.42 * size);
+
 /** The two paths app.js fills in for the shape under the pointer or the focus. */
 const overlays = () => [h('path', { class: 'map-ring', d: '' }), h('path', { class: 'map-hover', d: '' })];
 
-/** The Home map: each state shaded by how many installers have territory in it, and a link to its view. */
+/**
+ * The map on Find installers: each state shaded by how many installers have territory in it
+ * (section 4.0: Tier 1, and the statuses a place lists), and a link to its view.
+ */
 export function homeMap(model, doc) {
-  const size = goodNumber(doc.labelSize) ? doc.labelSize : 130;
+  const size = HOME_CODE_SIZE;
   return h('svg', { class: 'map map-home', viewBox: `0 0 ${doc.width} ${doc.height}`, role: 'group', 'aria-label': 'Map of the United States and Ontario', 'data-width': doc.width },
     doc.states.map((s) => {
       const n = model.stateCounts.get(s.code) ?? 0;
       const step = shadeStep(n);
-      const label = `${stateName(model, s.code)}: ${installersWord(n)}`;
-      const fits = s.fits === true && Array.isArray(s.label) && s.label.length === 2;
+      const label = `${stateName(model, s.code)}: ${installersWord(n)} with territory`;
+      const fits = s.fits === true && Array.isArray(s.label) && s.label.length === 2 && codeFits(edgeDistance(s.path, s.label[0], s.label[1]), size);
       return h('a', { href: stateHash(s.code), class: 'map-link', 'data-shape': s.code, 'data-step': step, 'data-count': n, 'aria-label': label },
         h('title', {}, label),
         h('path', { class: `shade shade-${step}`, d: s.path }),
@@ -71,24 +117,26 @@ export function homeMap(model, doc) {
 }
 
 /**
- * A state's county map: each county shaded by how many installers serve it, and a link to the
- * state with that county chosen. The chosen county is marked, and its outline is drawn again,
+ * A state's county map: each county shaded by how many installers have it as territory (Tier 1,
+ * the statuses a place lists), and a link to the state with that county chosen. The chosen county,
+ * or each county of a ZIP code or city in several, is marked, and its outline is drawn again,
  * heavy, over the map last: not a link, so the order of Tab does not change.
  */
 export function countyMap(model, code, doc, chosen = null) {
-  const chosenShape = chosen ? doc.counties.find((c) => c.id === chosen) : null;
+  const picked = new Set(Array.isArray(chosen) ? chosen : chosen ? [chosen] : []);
+  const chosenShapes = doc.counties.filter((c) => picked.has(c.id));
   return h('svg', { class: 'map map-county', viewBox: `0 0 ${doc.width} ${doc.height}`, role: 'group', 'aria-label': `Map of the counties of ${stateName(model, code)}`, 'data-width': doc.width },
     doc.counties.map((c) => {
       const n = countyCount(model, c.id);
       const step = shadeStep(n);
       const county = model.countyById.get(c.id);
-      const label = `${county ? county.name : c.id}: ${installersWord(n)}`;
+      const label = `${county ? county.name : c.id}: ${installersWord(n)} with territory`;
       return h('a', { href: stateHash(code, c.id), class: 'map-link', 'data-shape': c.id, 'data-step': step, 'data-count': n,
-        'aria-label': label, 'aria-current': c.id === chosen ? 'true' : null },
+        'aria-label': label, 'aria-current': picked.has(c.id) ? 'true' : null },
       h('title', {}, label),
-      h('path', { class: `shade shade-${step}${c.id === chosen ? ' chosen' : ''}`, d: c.path }));
+      h('path', { class: `shade shade-${step}${picked.has(c.id) ? ' chosen' : ''}`, d: c.path }));
     }),
-    chosenShape ? h('path', { class: 'chosen-outline', d: chosenShape.path, 'data-chosen': chosen }) : null,
+    chosenShapes.map((c) => h('path', { class: 'chosen-outline', d: c.path, 'data-chosen': c.id })),
     overlays());
 }
 

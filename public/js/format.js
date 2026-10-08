@@ -52,6 +52,13 @@ export function longDate(date) {
   return `${MONTHS[Number(m[2]) - 1]} ${Number(m[3])}, ${m[1]}`;
 }
 
+/** A date written like 2026-10-07, short, as on rows, signals and lists (section 4.1): Oct 7, 2026. */
+export function shortDate(date) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(date));
+  if (!m || Number(m[2]) < 1 || Number(m[2]) > 12) return String(date);
+  return `${MONTHS[Number(m[2]) - 1].slice(0, 3)} ${Number(m[3])}, ${m[1]}`;
+}
+
 /** builtAt, a UTC time like 2026-10-07T09:20:31Z, as milliseconds; NaN when it does not read so. */
 export function builtAtMs(builtAt) {
   if (typeof builtAt !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(builtAt)) return NaN;

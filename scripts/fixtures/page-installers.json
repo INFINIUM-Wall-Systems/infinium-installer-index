@@ -34,7 +34,29 @@
       "office": { "city": "Akron", "state": "OH", "country": "US" },
       "rates": { "nonUnionST": 88, "nonUnionOT": 112 },
       "mobilization": "Per diem 85, plus travel at cost", "ratesValidThrough": "2026-10-06",
-      "case": "rates valid through October 6, 2026; both roles missing with one stand-in" }
+      "case": "rates valid through October 6, 2026; both roles missing with one stand-in" },
+    { "id": "FAKE-107", "company": "Travelwide Partitions", "status": "CONFIRMED BY PARTNER", "lastConfirmed": "2026-09-28",
+      "office": { "city": "Canton", "state": "OH", "country": "US" },
+      "rates": { "nonUnionST": 84, "nonUnionOT": 109.5 }, "ratesValidThrough": "2027-02-28",
+      "tier2Charge": { "basis": "Made-up basis: a day rate for travel", "amount": 350, "relation": "On top of my mobilization fee" },
+      "case": "Tier 2 counties and no Tier 1 county; the only installer of Portage County (39133), at Tier 2" },
+    { "id": "FAKE-108", "company": "Quietwater Interiors", "status": "DORMANT - NO RESPONSE",
+      "office": { "city": "Cuyahoga Falls", "state": "OH", "country": "US" },
+      "case": "DORMANT - NO RESPONSE with territory in a county others serve: Tier 1 in Summit County, Tier 2 in Portage County" },
+    { "id": "FAKE-109", "company": "Holdfast Wall Co", "status": "INACTIVE",
+      "office": { "city": "Kent", "state": "OH", "country": "US" },
+      "case": "INACTIVE with Tier 1 in a county others serve (Summit County): never in a place's view" },
+    { "id": "FAKE-110", "company": "Lakeshore Glazing Partners", "status": "CONFIRMED BY PARTNER", "lastConfirmed": "2026-09-30",
+      "office": { "city": "Toledo", "state": "OH", "country": "US" },
+      "coverageNote": "Made-up coverage note: northwest Ohio and southern Michigan.",
+      "case": "not on the map, with an office in a state the others cover" },
+    { "id": "FAKE-111", "company": "Northgate Partition Co", "status": "PENDING - UPDATE EXPECTED",
+      "office": { "city": "Hudson", "state": "OH", "country": "US" },
+      "rates": { "nonUnionST": 96.25, "unionST": 128 }, "mobilization": "Made-up: flat 500 within the county", "ratesValidThrough": "2027-03-31",
+      "travelNote": "Made-up travel note: crews stay over for jobs beyond two hours.",
+      "warehousing": { "available": "No" },
+      "paperwork": { "coiOnFile": "No", "agreementOnFile": "Yes" },
+      "case": "PENDING - UPDATE EXPECTED in a place's Tier 1 list; its only field contact cannot be reached; two receiving contacts, the first by name unreachable; agreement Yes with certificate No" }
   ],
   "contacts": [
     { "parent": "FAKE-101", "name": "Augustin Roth", "title": "Estimator", "roles": ["Q"], "email": "a.roth@example.com" },
@@ -47,7 +69,17 @@
     { "parent": "FAKE-104", "name": "Pat \"Red\" Quinlan", "title": "Estimator", "roles": ["Q"], "email": "pat.quinlan@example.com" },
     { "parent": "FAKE-104", "name": "Sue Ng", "title": "Coordinator", "roles": ["S"], "phone": "(814) 555-0125" },
     { "parent": "FAKE-105", "name": "Ivo Brandt", "title": "Owner", "roles": ["Q", "S"], "email": "i.brandt@example.com" },
-    { "parent": "FAKE-106", "name": "Kit Ames", "title": "Owner", "roles": ["L"], "email": "k.ames@example.com" }
+    { "parent": "FAKE-106", "name": "Kit Ames", "title": "Owner", "roles": ["L"], "email": "k.ames@example.com" },
+    { "parent": "FAKE-107", "name": "Opal Strand", "title": "Estimator", "roles": ["Q"], "email": "o.strand@example.com", "phone": "(330) 555-0126" },
+    { "parent": "FAKE-107", "name": "Reid Mallory", "title": "Scheduler", "roles": ["S", "R"], "phone": "(330) 555-0127" },
+    { "parent": "FAKE-108", "name": "Tess Varga", "title": "Owner", "roles": ["L"], "email": "t.varga@example.com" },
+    { "parent": "FAKE-109", "name": "Uli Grant", "title": "Owner", "roles": ["L", "Q"], "phone": "(330) 555-0128" },
+    { "parent": "FAKE-110", "name": "Vera Lund", "title": "Estimator", "roles": ["Q", "S"], "email": "v.lund@example.com" },
+    { "parent": "FAKE-111", "name": "Wren Abernathy", "title": "Estimator", "roles": ["Q"], "email": "w.abernathy@example.com" },
+    { "parent": "FAKE-111", "name": "Yosef Calder", "title": "Scheduler", "roles": ["S"], "phone": "(216) 555-0131" },
+    { "parent": "FAKE-111", "name": "Zara Fielding", "title": "Field lead", "roles": ["F"] },
+    { "parent": "FAKE-111", "name": "Bram Dockery", "title": "Receiving lead", "roles": ["R"], "phone": "(216) 555-0132" },
+    { "parent": "FAKE-111", "name": "Ada Dockery", "title": "Receiving clerk", "roles": ["R"] }
   ],
   "territory": [
     { "parent": "FAKE-101", "county": "25021", "tier": "Tier 1" },
@@ -56,6 +88,14 @@
     { "parent": "FAKE-102", "county": "39045", "tier": "Tier 2" },
     { "parent": "FAKE-102", "county": "42003", "tier": "Tier 2" },
     { "parent": "FAKE-102", "county": "CA-3506", "tier": "Tier 1" },
-    { "parent": "FAKE-105", "county": "18003", "tier": "Tier 1" }
+    { "parent": "FAKE-105", "county": "18003", "tier": "Tier 1" },
+    { "parent": "FAKE-107", "county": "39153", "tier": "Tier 2" },
+    { "parent": "FAKE-107", "county": "39133", "tier": "Tier 2" },
+    { "parent": "FAKE-107", "county": "39151", "tier": "Tier 2" },
+    { "parent": "FAKE-108", "county": "39153", "tier": "Tier 1" },
+    { "parent": "FAKE-108", "county": "39133", "tier": "Tier 2" },
+    { "parent": "FAKE-109", "county": "39153", "tier": "Tier 1" },
+    { "parent": "FAKE-111", "county": "39153", "tier": "Tier 1" },
+    { "parent": "FAKE-111", "county": "39035", "tier": "Tier 1" }
   ]
 }

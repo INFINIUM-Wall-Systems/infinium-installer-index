@@ -114,12 +114,15 @@ export const MEASURE = `(() => {
     const panel = t.closest('.panel');
     if (panel && t.getBoundingClientRect().width > panel.clientWidth + 1) out.wide.push(desc(t));
   }
+  // Long text clipped to two lines (section 4.5) has a way to read it: it is whole on hover, its
+  // title holding every word of it.
+  const readable = (el) => el.matches('[data-clamp]') && el.getAttribute('title') === el.textContent;
   for (const el of document.querySelectorAll('body *')) {
     if (el.closest('.visually-hidden') || closedAway(el) || el.closest('svg')) continue;
     const cs = getComputedStyle(el);
     if (cs.display === 'none' || !el.getClientRects().length) continue;
     if (cs.overflowX !== 'visible' && el.scrollWidth > el.clientWidth + 1) out.cut.push(desc(el) + ' (sideways)');
-    if (cs.overflowY !== 'visible' && el.scrollHeight > el.clientHeight + 1) out.cut.push(desc(el) + ' (downward)');
+    if (cs.overflowY !== 'visible' && el.scrollHeight > el.clientHeight + 1 && !readable(el)) out.cut.push(desc(el) + ' (downward)');
     if ((el.tagName === 'TD' || el.tagName === 'TH') && el.scrollWidth > el.clientWidth + 1) out.cut.push(desc(el) + ' (spills out of its cell)');
     if (cs.textOverflow === 'ellipsis' && el.scrollWidth > el.clientWidth) out.cut.push(desc(el) + ' (cut with an ellipsis)');
   }
@@ -169,7 +172,7 @@ export const MEASURE = `(() => {
 export const STICKY = `new Promise((ok) => {
   window.scrollTo(0, Math.min(1200, document.documentElement.scrollHeight - innerHeight));
   requestAnimationFrame(() => requestAnimationFrame(() => {
-    const bar = document.querySelector('.searchbar').getBoundingClientRect();
+    const bar = document.querySelector('.site-header').getBoundingClientRect();
     const ths = [...document.querySelectorAll('table.grid thead th')];
     const bad = ths.filter((th) => { const r = th.getBoundingClientRect(); return !(r.top >= bar.bottom - 1 && r.top < innerHeight && r.bottom > bar.bottom); }).length;
     ok({ scrolled: Math.round(window.scrollY), titles: ths.length, bad, barBottom: Math.round(bar.bottom), firstTop: ths.length ? Math.round(ths[0].getBoundingClientRect().top) : null });

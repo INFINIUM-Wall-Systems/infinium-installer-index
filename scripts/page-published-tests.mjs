@@ -60,4 +60,8 @@ test('page published', 'check:page:published runs the page\'s plain functions ov
     broken('Summit County shaded as if nobody served it', 'county maps FAIL: 1 of 3193 counties', () => run(folder(), withRender(transformed(renderView, (n) => (n.attrs['data-shape'] === '39153' ? { ...n, attrs: { ...n.attrs, 'data-step': 0 } } : n))))),
     broken('a foot line with a number written in', 'foot line FAIL', () => run(folder(), withRender(transformed(renderView, (n) => (hasClass(n, 'foot-line') ? { ...n, attrs: { ...n.attrs, 'data-foot': 21 } } : n))))),
     broken('a map that shades every state a step darker', 'steps FAIL', () => run(folder(), withRender(transformed(renderView, (n) => (n.attrs['data-shape'] && n.attrs['data-step'] < 5 ? { ...n, attrs: { ...n.attrs, 'data-step': n.attrs['data-step'] + 1 } } : n))))),
+    broken('Tier 2 lists left out', 'tier lists FAIL', () => run(folder(), dropping((n) => n.attrs['data-part'] === 'tier2'))),
+    broken('"Did not respond" left out', 'side lists FAIL', () => run(folder(), dropping((n) => n.attrs['data-part'] === 'dormant'))),
+    broken('a "Did not respond" box that adds nobody', 'boxes FAIL', () => run(folder(), withRender((r, m, o) => renderView(r.view === 'installers' ? { ...r, dormant: false } : r, m, o)))),
+    broken('About this data counting Tier 2 as territory', 'territory FAIL', () => run(folder(), withRender(transformed(renderView, (n) => (n.tag === 'tr' && n.attrs['data-count'] === 'page:tier1' ? { ...n, children: [n.children[0], { tag: 'td', attrs: {}, children: ['99'] }] } : n))))),
   ]);

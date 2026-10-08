@@ -16,25 +16,20 @@
 <a class="skip" href="#content">Skip to content</a>
 <header class="site-header">
   <div class="wrap header-inner">
-    <a class="brand" href="#/"><img src="img/infinium-logo-tagline.svg" width="302" height="56" alt="INFINIUM Wall Systems: Installer Index home"></a>
-    <div class="titles">
-      <h1>Installer Index</h1>
-      <p class="desc">Look up INFINIUM's installers: who installs where, who to call, what they charge, and how current each record is.</p>
+    <a class="brand" href="#/"><img src="img/infinium-logo-tagline.svg" width="302" height="56" alt="INFINIUM Wall Systems: Installer Index, Find installers"></a>
+    <h1 class="site-title">Installer Index</h1>
+    <nav class="tabs" aria-label="Views">
+      <a class="tab" id="tab-find" href="#/">Find installers</a>
+      <a class="tab" id="tab-all" href="#/installers">All installers</a>
+    </nav>
+    <div class="who" role="search">
+      <label class="visually-hidden" for="q">Find a company or person</label>
+      <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 15.5 21 21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="Find a company or person">
     </div>
   </div>
-  <div class="wrap"><div class="rule"></div></div>
 </header>
-<div class="searchbar" role="search">
-  <div class="wrap">
-    <label class="visually-hidden" for="q">Search installers</label>
-    <div class="box">
-      <svg class="search-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 15.5 21 21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="Search by company, contact, email, phone, city, state or ZIP code">
-    </div>
-  </div>
-</div>
-<div class="wrap"><p id="fresh" class="fresh"></p></div>
-<main id="content" class="wrap" tabindex="-1"><p class="loading"><span class="solid">Loading the installer records…</span></p></main>
-<footer class="site-footer"><div class="wrap"><span class="solid">© INFINIUM Wall Systems • Installer Index</span></div></footer>
+<main id="content" class="wrap" tabindex="-1"><p class="loading">Loading the installer records…</p></main>
+<footer class="site-footer"><div class="wrap footer-inner"><p id="fresh" class="fresh"></p><p class="copy">© INFINIUM Wall Systems • Installer Index</p></div></footer>
 </body>
 </html>
