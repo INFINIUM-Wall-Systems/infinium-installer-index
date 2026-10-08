@@ -1,89 +1,91 @@
 # Handoff: state for the next Claude Code chat
 
-**Written:** October 7, 2026, at the end of the page's second prompt (Joe's prompt "The page,
-part 2", revision 1: the map, the State view, counties and ZIP codes).
+**Written:** October 8, 2026, at the end of the page's third prompt (Joe's prompt "The page,
+part 3. The redesign.", revision 1).
 
 ## Where things stand
 
-- **The map views are built**, as far as acceptance group M, on a desktop screen: the map on
-  Home of the states and Ontario, with its legend and a list of every state; the State view,
-  with its county map, its county box and its list; and ZIP lookup. Also the shape files and the
-  ZIP list in `public\geo\`, and one repair to search (an email is matched by its words).
-- **The desktop views of the first prompt** stand as they were, with the changes this prompt
-  names: links to a state's view (ruling 8), the line under a search that names a state
-  (ruling 7), ZIP codes named in the search box's hint, Home's line and the list of what can be
-  searched, and the credits on About this data (ruling 5). Joe looked at them on the Netlify
-  test copy with the real records and said to go on.
-- **Checked four ways, on made-up installers or by counts only:** `npm run check:page` (46
-  lines), `npm run page:pictures` and the new `npm run page:pictures:maps` (Microsoft Edge
-  without a window, against a local server that serves made-up installers only), and
-  `npm run check:page:published` (13 lines over the real files, counts only).
+- **The redesign of the ninth revision is built**, on a desktop screen: `docs\SPEC.md` (ninth
+  revision) and `docs\ACCEPTANCE.md` (third version) are in the repository, byte for byte as the
+  prompt carried them.
+- **Territory is Tier 1.** A place (a state, a county, a ZIP code, a city) lists its Tier 1
+  installers, then the button "View Tier 2 Installers Available for Travel" and, hidden until
+  pressed, the Tier 2 ones. Its lists, counts and map shades hold only CONFIRMED BY PARTNER and
+  PENDING - UPDATE EXPECTED; DORMANT - NO RESPONSE ones are under "Did not respond to the August
+  outreach"; installers not on the map with an office in the place's state under their own
+  heading; INACTIVE and HELD - BUSINESS DECISION only in All installers, behind a box.
+- **Two tabs**, Find installers and All installers; the box "Find a company or person" in the
+  header opens All installers; the location box finds places. Find installers draws its map as
+  it opens, in the right half. The view switch (Estimating, Project management, Records) changes
+  the columns of a row and the order of the Installer view, which is one page in five sections
+  with an overview and a jump bar.
+- **City lookup is built:** the place list carries each place's county; 6,242 of 6,242 resolve.
+- **Checked four ways, on made-up installers or by counts only:** `npm run check:page` (56
+  lines), `npm run page:pictures` and `npm run page:pictures:maps` (Microsoft Edge without a
+  window, against a local server that serves made-up installers only), and
+  `npm run check:page:published` (17 lines over the real files, counts only).
 - **The page was never loaded, pictured or copied with the real records on the laptop.**
-- **Next:** Joe goes through the layout of the whole page on the Netlify test copy, then the
-  phone layout.
+- **Next:** Joe goes through the redesign on the Netlify test copy, then the phone layout.
 - **The daily job** runs on GitHub every day at 09:20 UTC. Nothing it runs or tests changed.
 
 ## What the repository holds
 
-- `CLAUDE.md`, `docs\SPEC.md` (eighth revision) and `docs\ACCEPTANCE.md`: Joe's text,
-  unchanged.
-- `README.md`, for Kuna: now also how the maps are drawn and that nothing comes from another
-  site; the files of `public\geo\`, what made each, how to make them again and where their
-  sources lie; the credits; and `npm run page:pictures:maps`.
-- `public\`: `index.html`; `css\fonts.css`, `css\site.css`; `js\app.js` (the only part that
-  touches the browser), `data.js`, `routes.js`, `search.js`, `contacts.js`, `views.js`,
-  `maps.js` (new: the maps), `format.js`, `html.js`; `img\`; `vendor\fonts\` (the fonts alone);
-  `geo\counties.json` (unchanged), `geo\states-map.json`, `geo\counties\` (52 files) and
-  `geo\zips\` (10 files), all new; `data\` (only the job writes it).
-- `job\`: `build-shapes.mjs` and `build-zips.mjs` are new, run by hand, never by the daily job.
-  Nothing the daily job loads changed.
+- `CLAUDE.md` (unchanged), `docs\SPEC.md` (ninth revision) and `docs\ACCEPTANCE.md` (third
+  version): Joe's text.
+- `README.md`, for Kuna: now the views of the redesign, the addresses and their items, what
+  territory means on the page, the files the page reads, the city files and their script, and
+  the fourth credit.
+- `public\`: `index.html` (the header with the two tabs and the box, the footer with the
+  freshness line); `css\site.css` (the look of section 5); `js\app.js` (the only part that touches
+  the browser, and the only one that reads or writes its storage), `data.js`, `routes.js`,
+  `search.js`, `places.js` (new: the location box), `contacts.js`, `views.js`, `maps.js`,
+  `format.js`, `html.js`; `geo\cities\` (new, 52 files); the rest of `geo\`, `img\` and
+  `vendor\fonts\` unchanged; `data\` (only the job writes it).
+- `job\build-cities.mjs` (new): run by hand, never by the daily job. Nothing the daily job loads
+  changed.
 - `scripts\`:
-  - new: `map-tests.mjs` (the tests of the map work, in `check:page`), `page-browser.mjs` (what
-    both picture commands share), `page-pictures-maps.mjs` (`npm run page:pictures:maps`).
-  - changed: `check-page.mjs` (runs the map tests too), `page-tests.mjs` (V9 and V11 brought to
-    the new rules; the email test), `check-page-published.mjs` (5 map lines),
-    `page-published-tests.mjs` (their self-test cases), `page-pictures.mjs` (on the shared
-    harness; its views wait for their maps), `check-selftest.mjs` (runs the map tests),
-    `package.json` (`page:pictures:maps` added).
-  - unchanged: `checks.mjs`, `check.mjs`, `job-tests.mjs`, `job-standins.mjs`, `check-job.mjs`,
-    `published-tests.mjs`, `check-published.mjs`, `serve-made-up.mjs`, `page-standins.mjs`, the
-    two job fixtures, `fixtures\page-installers.json`, `r5-allowed.json` (still empty).
+  - changed: `page-tests.mjs` and `map-tests.mjs` (the tests of `check:page`, brought to the
+    ninth revision), `page-standins.mjs`, `fixtures\page-installers.json` (five made-up
+    installers added), `check-page-published.mjs` and `page-published-tests.mjs` (17 lines),
+    `page-browser.mjs`, `page-pictures.mjs`, `page-pictures-maps.mjs`, `r5-allowed.json` (one entry:
+    Joe's own work address, which the page shows on About this data and every Installer view).
+  - unchanged: `checks.mjs`, `check.mjs`, `check-selftest.mjs`, `check-page.mjs`, `job-tests.mjs`,
+    `job-standins.mjs`, `check-job.mjs`, `published-tests.mjs`, `check-published.mjs`,
+    `serve-made-up.mjs`, the two job fixtures.
 
-## The map and ZIP files (public\geo)
+## The map, ZIP and city files (public\geo)
 
-Built by hand, by `node job/build-shapes.mjs` and `node job/build-zips.mjs`. The same sources
-give the same bytes (built twice, same SHA-256).
+Built by hand, by `node job/build-shapes.mjs`, `node job/build-zips.mjs` and
+`node job/build-cities.mjs`. The same sources give the same bytes (built twice, same SHA-256).
 
 | What | Files | Bytes |
 |---|---|---|
-| `states-map.json`, the Home map | 1 | 88,825 |
+| `states-map.json`, the map on Find installers | 1 | 88,825 |
 | `counties\<code>.json`, one county map for each of the 52 | 52 | 494,809 in all; the largest `ON.json`, 63,148; the smallest `DC.json`, 165 |
 | `zips\0.json` to `zips\9.json`, the ZIP list by first digit | 10 | 1,387,970 in all; the largest `4.json`, 160,619 |
-| In all | 63 | 1,971,604 |
+| `cities\<code>.json`, the city list by state | 52 | 476,225 in all; the largest `TX.json`, 37,100; `ON.json` holds no city |
 
-- **Outlines:** `public/data/counties.topo.json` of `installer-application` at `a6fc6db`
-  (990,334 bytes; 10,141 arcs; 3,193 county outlines and 52 state outlines, the states already
-  joined; quantized TopoJSON in longitude and latitude), read with `git show` and held in
-  memory. Its county ids are those of `counties.json`: each of the 3,193 has one shape, in its
-  own state's file.
-- **What was done to them:** each arc projected, put into its frame, rounded to whole units, and
-  a point that repeats the one before dropped. No further thinning (the source is already
-  simplified): the Home map keeps 14,887 of 15,414 points, the county maps 49,568 of 49,883.
-  Paths are written `M x,y l dx,dy,... z`, whole numbers, a comma between every two, so that
-  R5 reads no phone number in them.
-- **Projections:** the Home map, 9,600 by 7,377 units: the 48 adjoining states, the District of
-  Columbia and Ontario in one Albers equal-area conic (parallels 29.5 and 45.5 degrees north,
-  centred on 96 west); Alaska (its own conic, parallels 55 and 65, at 0.35 of the main scale)
-  and Hawaii (parallels 8 and 18, at 0.8) in the lower left, each below every state above it.
-  Codes fit on 44 states; not on CT, DC, DE, HI, MA, MD, NJ and RI, which the list under the
-  map covers. Each state's map: an Albers conic centred on the state, parallels at one sixth
-  and five sixths of its span of latitude, north up, fitted into 6,400 by 5,600 units with a
-  margin of 60, centred. For Alaska, 360 is taken from a longitude above zero (the source holds
-  none: it was clipped at 180 west).
-- **ZIP list:** `coverage-map\data\geo\zip-to-county.csv`, read where it lies: 2,437,863 bytes;
-  46,969 rows; 33,791 ZIP codes; 3,233 county codes, 3,144 of them in the county list. Outside
-  the map, by first digit: 0: 138 (PR 132, VI 6); 9: 11 (GU 7, MP 3, AS 1); every other digit
-  0; none beginning 06. No ZIP has some counties in the list and some not.
+- **Outlines and ZIP codes:** as the second prompt built them, unchanged (`counties.topo.json`
+  of `installer-application` at `a6fc6db`; `coverage-map\data\geo\zip-to-county.csv`).
+- **Cities:** `public/data/places.json` of `installer-application` at `a6fc6db`, read with
+  `git --no-optional-locks -C ..\installer-application show` and held in memory: 148,060 bytes;
+  the fields `generated`, `source`, `min_population`, `rule`, `order`, `place_count`,
+  `county_count`, `labelled`, `labelled_note`, `names` (6,242), `counties` (6,242, one
+  five-digit county id each), `lat` and `lon` (1,500 each). 6,242 places, 6,242 resolve to a
+  county of `counties.json` and 0 do not; 3,134 counties; 51 states (the 50 and the District of
+  Columbia). One id was given "-2" (two places of one name in one state). As one file the list is
+  474,274 bytes, over 400,000, so it is split by state, one file for each of the 52 codes; the
+  page asks only for the files of the states that could match what is typed.
+- **Each city:** `id` (the state code, a hyphen, and the name in lower case with every run of
+  characters other than a to z and 0 to 9 one hyphen), `name` as the list writes it, `state`,
+  `counties`. In order of state, then name, then county id. No number in the files, so R5 reads
+  none as a phone.
+- Four names in the place list hold characters that read as an accent written twice over (an
+  "Ã" followed by another character). They are written as the list has them.
+- **The map's codes:** the map on Find installers is half the page wide now, so the page writes
+  a state's code at 220 units of the map (the file's own size, 130, was chosen for a map twice as
+  wide) and only where it fits at that size, by the build's own rule: 42 of the 52 (VT and NH no
+  longer fit). Nothing in the map files changed.
 
 ## The logo and the fonts
 
@@ -102,205 +104,199 @@ Copied byte for byte from `installer-application` at commit `a6fc6db`, by node r
 | `public\vendor\fonts\roboto-latin.woff2` | 43,136 | `1404ca348bd75ef836f4dd8b6f2cc719458642d1237c368296b2fc652dca47dc` |
 | `public\vendor\fonts\roboto-latin-ext.woff2` | 29,392 | `cedb374b05a35034cf96db185db4eeb8f8ce49e1a56197673702ff11b5533d6e` |
 
-- All four font files are variable fonts with a weight axis from 100 to 900 (read from each
-  file's own axis table), so `css\fonts.css` declares `font-weight: 100 900` and every weight
-  the look calls for (Montserrat 600, 700, 800; Roboto 400, 500, 700) is carried. No nearest
-  weight was needed.
-- The two SVG files carry only the fixed names that mark an SVG's kind
-  (`http://www.w3.org/2000/svg`, `http://www.w3.org/1999/xlink`), and LF line endings.
-- R5 and R6 read the fonts and the PNGs as text and found nothing; neither check nor
-  `r5-allowed.json` was changed.
-
 ## How the page works
 
 - `app.js` fetches the four files (`data/build.json`, `data/installers.json`,
-  `data/territory.json`, `geo/counties.json`), by addresses relative to the page, and hands
-  them to `data.js`, which checks that each reads as JSON with `"schema": 1`. Otherwise the page
-  shows only "The installer data could not be loaded" and "Please try again shortly."
-- Every view is a plain function in `views.js` that takes the route, the data and the time, and
-  gives back a tree of elements. `html.js` turns the tree into markup in one place and makes
-  every value taken from the data safe there.
-- Addresses: `#/`, `#/installers`, `#/installers?set=rates`, `#/installers?status=<status>`
-  (joined with `set` as `?set=rates&status=...`), `#/installer/<installer id>`,
-  `#/search?q=<text>`, `#/not-on-the-map`, `#/about`. Anything else, an unknown status, or an
-  installer id not in the file gives the not-found view. Typing in the search box shows results
-  as you type; the first letter adds one step to Back, the rest replace it.
+  `data/territory.json`, `geo/counties.json`) and hands them to `data.js`, which checks that each
+  reads as JSON with `"schema": 1`. Otherwise the page shows only "The installer data could not be
+  loaded" and "Please try again shortly." When the page starts at `#/`, `geo/states-map.json` is
+  fetched beside them, so the map is drawn with the view.
+- `data.js` works out, once, what territory means on the page: the five statuses are written
+  there and nowhere else in the page's code (`STATUS`); `LISTED` is CONFIRMED BY PARTNER and
+  PENDING - UPDATE EXPECTED; `placeLists` gives a place's Tier 1, Tier 2, DORMANT and
+  not-on-the-map lists; the state and county counts for the maps count LISTED Tier 1 only.
+- Every view is a plain function in `views.js` that takes the route, the data, the time, the
+  files fetched so far and the view of the switch (`mode`: `est`, `pm` or `rec`), and gives back
+  a tree of elements and the tab to mark. `html.js` turns the tree into markup in one place and
+  makes every value taken from the data safe there.
+- **Addresses** (`routes.js`): `#/`, `#/state/<code>`, `#/state/<code>?county=<id>`,
+  `#/zip/<five digits>`, `#/city/<id>`, `#/installer/<id>`, `#/installers`, `#/about`. Items, in
+  this order: `county`; `view`; for All installers `q`, `office`, `territory`, `dormant=1`,
+  `inactive=1`, `map=off`; on an Installer view `from` (a place's own address, encoded). Anything
+  else gives the not-found view. The first prompt's addresses parse to their new routes marked
+  `old`; `app.js` puts the address the page writes in place of any address written another way,
+  with `history.replaceState`, so an old address leaves no step of its own.
+- **The view switch:** three links to the same address with `view=` changed. `app.js` replaces
+  the history entry, remembers the choice in local storage (inside try/catch), draws the view
+  again and keeps the focus on the switch. An address without `view=` opens the remembered view,
+  or Estimating.
+- **The Tier 2 button** is drawn with the Tier 2 list hidden; `app.js` turns it in place (label,
+  `aria-expanded`, the list's `hidden`), keeps the focus on it, does not scroll and does not touch
+  the address. A new address draws the view afresh, so a place always opens with Tier 2 hidden;
+  when a map's file comes, only the map's part (`[data-map-slot]`) is filled in.
+- **The map column** of a place: 300 pixels wide on a screen 1,100 wide or more, folded on a
+  narrower one; "Hide map" and "Show map" are a button `app.js` turns, remembered only while the
+  page is open, never in the address.
+- **The location box** (`places.js`): suggestions from the second letter, at most 10, ZIP, then
+  states, counties, cities, each with its kind; a state at the end of what is typed narrows it.
+  `app.js` fetches the city files a typed text needs, moves through the suggestions with the
+  arrow keys, takes the first with Enter, and closes them with Escape.
+- **The box in the header**: what is typed opens All installers with `q=`, keeping its other
+  choices; five digits the ZIP's view. The first letter adds one step to Back, the rest replace it.
+- **All installers**: "Office in" and "Territory in" (Tier 1) are lists of the states; "Also show"
+  has two boxes, "Narrow to" one; each choice replaces the address and keeps the focus. While a
+  search is typed every status is searched and each result carries its status tag.
+- **The field and receiving contacts** of the Project management row are chosen by the page in
+  `contacts.js`, by the job's "first by name" rule written out again there.
 - Eastern time is worked out from the United States daylight-time rule, not the machine's
-  settings. It agrees with node's own time-zone data at every 90 minutes of 2026 and 2027
-  (11,680 times, in `check:page`).
-- The map work adds `#/state/<code>`, `#/state/<code>?county=<id>` and `#/zip/<five digits>`;
-  `#/search?q=<five digits>` shows what the ZIP's own address shows. A code or a county id not
-  in the county list, a county of another state, and a ZIP that is not five digits give the
-  not-found view. The search box gives a ZIP's address for five digits, spaces around them
-  aside, and a search's for anything else (`boxAddress` in `routes.js`); typing a ZIP adds one
-  step to Back.
-- Which files an address needs beyond the four is `filesFor` in `views.js`: Home the Home map;
-  a State view its own shape file; a ZIP its ZIP file, then, for a ZIP in one county, that
-  state's shape file. `app.js` fetches each once and keeps it. The list shows at once; when a
-  map's file comes, only the map's part (`[data-map-slot]`) is filled in, and marked
-  `data-map="drawn"`, or `"failed"` with one line saying the map could not be drawn.
-- `maps.js` draws the maps as plain SVG markup (svg, g, a, path, text, title): each state or
-  county a link to its address, shaded on the five steps (1; 2 to 3; 4 to 6; 7 to 10; 11 up)
-  in the old page's greens, white with a line-coloured border for none. The border and green
-  ring of the shape under the pointer or the focus are drawn by `app.js` on two empty paths at
-  the end of the map, so no neighbour hides them. The chosen county's heavy outline is drawn
-  again over the map last, not a link.
+  settings, as before.
 
-## The rulings of the second prompt, as built
+## The rulings of the second prompt, as built now
 
-1. The county maps are drawn as plain SVG from the application form's county outlines, not
-   with its map library. `public\vendor\` holds only the fonts.
-2. The Home map is drawn from the same outlines. Ontario is a shape in its true place, above the
-   Great Lakes.
-3. Under the Home map, "Every state and Ontario": all 52 by name with their code, each with its
-   number of installers ("3 installers", "1 installer", "no installer") and a link to its view.
+1. The maps are drawn as plain SVG from the application form's outlines, with no map library.
+2. The map on Find installers is drawn from the same outlines; Ontario in its true place.
+3. "Every state and Ontario", under the two halves of Find installers, closed by default: all 52,
+   each with its number of installers with territory (Tier 1) there and a link to its view.
 4. The ZIP list is ten files by first digit; only the one needed is loaded.
-5. About this data has a part "Where the maps come from" with the three lines of step 4f.
-6. An email is matched from the start of any word before the @ (a period, hyphen, underscore
-   or plus sign parts the words), from the start of the part after the @, or anywhere when
-   what is typed holds an @ or a period.
-7. A search that names a state shows, above its results, "Open the map of <state>".
-8. In States covered the codes are links; in the Installer view, the first line inside each
-   state is "Open the map of <state>", and the line that opens it holds no link; a search
-   result found by territory links the state's name to its view.
+5. About this data, "Where the maps come from": the three lines, and the fourth for cities.
+6. An email is matched by its words, as before.
+7. A search that names a state shows "Open the map of <state>" above the results in All
+   installers.
+8. "Territory in" holds links to the states' views; in the Installer view the first line inside
+   each state is "Open the map of <state>"; a result found by territory links the state's name.
 
-## The rulings of the first prompt, as built
+## The rulings of the first prompt, as built now
 
-1. Search by state finds an installer whose office is in that state and one whose territory
-   includes it. A result found by territory shows "Territory includes <state>: Tier 1 in N
-   counties, Tier 2 in M".
-2. A departed contact is searched; a result that matched one shows that contact under
-   "Matched contact", marked "Departed". Departed contacts never appear on a row.
-3. Paperwork is a panel headed "Paperwork, as recorded in QuickBase": installer agreement on
-   file; valid certificate of insurance on file; certificate valid through, when filled.
-4. The Tier 2 charge panel shows whichever of basis, charge unit, charge unit as described,
-   charge amount and charge relation are filled; none filled, no panel.
-5. A ticked "Not applicable" box with its field empty shows "Not applicable" for the shipping
-   address, the second shipping address, the travel note and the EMR. A value is shown when
-   there is one.
-6. A contact's procedure shows under that contact, labeled "Procedure", wherever the contact
-   is shown.
-7. "Rates expired" compares the valid-through date with today's date in Eastern time.
-8. More than 36 hours after builtAt, the line reads "Installer records from QuickBase. Not
-   refreshed since <date>." with the label "Out of date".
+1. A search by state finds an installer whose office is there and one whose territory (Tier 1)
+   is there; a result found by territory says "Territory includes Ohio: 40 counties", with ",
+   and available for travel to 12 more".
+2. A departed contact is searched; a result that matched one shows it under "Matched contact",
+   marked "Departed". Departed contacts never appear on a row; in the Installer view they are
+   under "Former contacts".
+3. The paperwork is in "Documents and record" as QuickBase has it; the Project management row
+   and the overview's signals say it in words.
+4. The Tier 2 charge shows whichever of its five parts are filled.
+5. A ticked "Not applicable" box with its field empty shows "Not applicable".
+6. A contact's procedure shows under that contact, labeled "Procedure".
+7. "Expired" compares the valid-through date with today's date in Eastern time.
+8. More than 36 hours after builtAt, the freshness line reads "Installer records from QuickBase.
+   Not refreshed since <date>." with the label "Out of date". It is in the footer now.
 9. The logo and the icons are in `public\img\`.
-10. The coverage note: for an installer with no territory it stands in the territory panel,
-    labeled "Coverage note, not confirmed on the map"; with territory it follows the states,
-    labeled "Coverage note".
+10. The coverage note: for an installer with no county at either tier it stands alone, labeled
+    "Coverage note, not confirmed on the map"; with counties it follows the Tier 1 and Tier 2
+    columns, labeled "Coverage note".
 
-## V1 to V16
-
-| Check | Where it stands |
-|---|---|
-| V1 | Shown by test (`check:page` V1: 12 addresses give their view and give back the same address; 10 unknown addresses give not-found; 152 links lead to a view) and by measure in a browser (10 addresses opened fresh; Back and Forward; typing adds one step to Back). Waits for Joe's eye on the Netlify test copy |
-| V2 | Shown by test: every installer in the file's order (the job's order: company, then id), both column sets with the columns of section 4.3, the status filter for each status. On the real files every installer has a row in both sets (73) |
-| V3 | Shown by measure in a browser at 1440 and 1280, both column sets; shown failing on a copy with a broken style |
-| V4 | Shown by measure in a browser in 15 views at both widths, made-up installers; shown failing on a copy with a broken style. Waits for Joe's eye on the Netlify test copy with the real records |
-| V5 | Shown by test on a made-up installer with everything filled (27 fields) and one with as little as the files allow, and every made-up installer; on the real files, 73 Installer views show every filled field and no empty one |
-| V6 | Shown by test, one made-up installer for each case the check names (13 rows) |
-| V7 | Shown by test, including a hand-made DORMANT entry carrying a date; on the real files, shown on 54, all CONFIRMED BY PARTNER |
-| V8 | Shown by test |
-| V9 | Shown by test |
-| V10 | Shown by test |
-| V11 | Shown by test |
-| V12 | Shown by test, today handed in: a date of today is not expired, the day before is, in all three places; mobilization as written |
-| V13 | Shown by test; on the real files, 21 listed, as build.json counts |
-| V14 | Shown by test, including 03:30 UTC as the day before in Eastern time, and ruling 8 at 35 and 37 hours; on the real files, About shows all 15 counts and gap counts and the 7 checks |
-| V15 | Shown by measure in a browser on made-up installers: no script error in any view. Waits for Joe's eye on the Netlify test copy with the real records |
-| V16 | Shown by test (a file missing, not JSON, schema not 1: 7 cases) and in a browser picture with `installers.json` missing |
-
-## M1 to M13
+## V1 to V20
 
 Each waits as well for Joe's eye on the Netlify test copy with the real records, which is how
-group M's milestone is met.
+group V's milestone is met.
 
 | Check | Where it stands |
 |---|---|
-| M1 | Shown by test: all 52 shaded at the step for the installers territory.json gives them; the steps at their edges; the five colours; a code on every step at least 4.5 to 1. On the real files: 52 at their step (`home map`). In a browser: every code at least 13px and 9.8 to 1 as drawn |
-| M2 | Shown by test: every state and Ontario links to its view, on the map and in the list. In a browser: a click on Ohio opens it; Enter on five states of the map |
-| M3 | Shown by test: each of the 52 State views asks for its own shape file alone. In a browser: Ohio, Texas, Ontario and the District of Columbia each fetched their own file alone |
-| M4 | Shown by test for all 3,193 counties. On the real files: 3,193 at their step (`county maps`) |
-| M5 | Shown by test for all 3,193 counties chosen in turn, 01001 and the Ontario divisions among them; 3,178 of them served by none of the made-up installers. On the real files: each county, chosen, lists as many installers as territory.json gives it |
-| M6 | Shown by test for all 3,193 names: the box gives the same address as the county's link; matched from the start of a word, capitals aside; "Show all of Ohio" gives Ohio's address |
-| M7 | Shown by test on a model changed by hand, so that the file's order and the tiers' differ; the file's order is alphabetical by company |
-| M8 | Shown by test: the number from the data (25, then 1 with its own wording); a number written in fails. On the real files: 21, build.json's number (`foot line`) |
-| M9 | Shown by test: Adams County, Ohio; El Paso County, Texas; the District of Columbia. On the real files no county is unserved today |
-| M10 | Shown by test: 50 ZIP codes by a fixed rule, 12 crossing a county line and 5 beginning with a zero |
-| M11 | Shown by test on a model changed by hand: ZIP 44203, three counties, each installer once at its best tier |
-| M12 | Shown by test, in section 4.9's words; pictured in a browser (49999, 00601) |
-| M13 | Shown by test (11 addresses ask for no ZIP file; a ZIP for the one file of its first digit), and by measure in a browser |
+| V1 | By test (15 addresses give their view and give back the same address; 18 unknown addresses, items and values give not-found; every link leads to a view, in the three views) and by measure in a browser (10 addresses opened fresh; a click on a tab, Back and Forward; typing in the header adds one step to Back) |
+| V2 | By test: with both boxes ticked every installer in the file's order, in the columns of each view; six sets of choices list exactly what they let through. On the real files: every installer has a row in the three views; the 8 ways of ticking the boxes list as many as the files give |
+| V3 | By measure in a browser at 1440 and 1280, in the three views; shown failing on a copy with a broken style |
+| V4 | By measure in a browser, 34 views at both widths, made-up installers; long text clipped to two lines has its whole text on hover; shown failing on a broken style. Waits for Joe's eye with the real records |
+| V5 | By test on FAKE-102 (most filled) and FAKE-103 (fewest) and every made-up installer, in all three views; on the real files every Installer view in all three views |
+| V6 | By test: one made-up installer per case (13), in Estimating and in Project management |
+| V7 | By test, a hand-made DORMANT entry carrying a date among them; on the real files 54, all CONFIRMED BY PARTNER |
+| V8 | By test: whole names and codes only; territory is Tier 1 (an installer with only Tier 2 there is not found by territory) |
+| V9 | By test |
+| V10 | By test, in the three views |
+| V11 | By test |
+| V12 | By test: "Expired" on the rows, in the Installer view and its Rates signal; mobilization as written |
+| V13 | By test; on the real files 21 listed, as build.json counts |
+| V14 | By test; on the real files About this data shows the 15 counts and gap counts and the 7 checks |
+| V15 | By measure in a browser on made-up installers. Waits for Joe's eye with the real records |
+| V16 | By test (7 cases) and the picture `data-not-loaded` |
+| V17 | By test (13 old addresses) and by measure in a browser (4 old addresses replaced in history); shown failing on a copy that does not replace them |
+| V18 | By test (six views in three views each) and by measure in a browser (clicks, Back, a fresh tab, nothing remembered); shown failing on a copy whose switch adds a step to Back |
+| V19 | By test and by measure in a browser (a click, Space, the focus kept); shown failing on a copy whose boxes do nothing; on the real files, as many as the files give for every way of ticking |
+| V20 | By test: every made-up installer in every view; About this data |
 
-## npm run check:page:published, on the real files (October 7)
+## M1 to M21
+
+Each waits as well for Joe's eye on the Netlify test copy with the real records.
+
+| Check | Where it stands |
+|---|---|
+| M1 | By test: all 52 at the step for their LISTED Tier 1 installers; colours; a code on every step at least 4.5 to 1. On the real files: 52 at their step. In a browser: every code at least 13px and 7.00 to 1 as drawn |
+| M2 | By test; in a browser a click on Ohio opens it |
+| M3 | By test (52 State views) and by measure in a browser (Ohio, Texas, Ontario, the District of Columbia) |
+| M4 | By test, all 3,193 counties; on the real files, 3,193 at their step |
+| M5 | By test, all 3,193 counties chosen in turn (Tier 1 and Tier 2 exactly); on the real files each county's Tier 1 list as many as the files give |
+| M6 | By test (all 3,193 names; "All of Ohio") |
+| M7 | By test on a model changed by hand: with and without a county chosen, and a ZIP in several counties |
+| M8 | By test: the number from the data, in its two wordings; its link lists exactly those installers. On the real files 21 |
+| M9 | By test with made-up data: Adams County, Ohio, El Paso County, Texas, the District of Columbia (nobody); Portage County, Ohio (Tier 2 only). Pictured: `place-county-nobody`, `place-county-no-tier1` |
+| M10 | By test, 50 ZIP codes |
+| M11 | By test on a model changed by hand: ZIP 44203, three counties |
+| M12 | By test; pictured (49999, 00601) |
+| M13 | By test and by measure in a browser |
+| M14 | By test for every state and county, and by measure in a browser with the mouse and the keyboard (Tab, Enter, Space); shown failing on a copy whose button keeps its label. On the real files, the Tier 1 and Tier 2 lists of every place as many as the files give |
+| M15 | By test on every made-up installer; on the real files 51 with Tier 1 territory and 1 available for travel only, beside the files |
+| M16 | By measure in a browser at 1440 and 1280; shown failing on a copy whose map is below the box |
+| M17 | By test for every county (3,193 with their state's code; 2,669 by name alone) and state; by measure in a browser (typing, the arrow keys, Escape, Enter); shown failing on a copy whose arrow keys do nothing |
+| M18 | By test for every state and county; on the real files "Did not respond" and "Not on the map, with an office in" hold as many as the files give everywhere |
+| M19 | By test, one made-up installer per case (7) |
+| M20 | By measure in a browser at both sizes: the header and the location bar end at 138px at most, the first Tier 1 row at 316px at most (made-up installers). Waits for Joe's eye with the real records |
+| M21 | By test (when built): 50 cities by a fixed rule; the files hold no city in several counties |
+
+## npm run check:page:published, on the real files (October 8)
 
 | Line | Result |
 |---|---|
-| views | PASS: 73 installers: 73 with a row in both column sets, 73 found by a search for the company, 73 Installer views; 0 errors |
-| fields | PASS: 73 Installer views checked: every filled field of section 4.4 shown, and no empty one (1,029 fields shown) |
-| words | PASS: 295 views and rows checked: none holds undefined, null, NaN or [object Object] |
-| counties | PASS: 52 installers with territory, 408 states and provinces: each lists as many counties at each tier as the file's two counts |
+| views | PASS: 73 installers: 73 with a row in All installers in all three views, 73 found by a search for the company, 73 with an Installer view in all three views; 0 errors |
+| fields | PASS: 73 Installer views in each of the three views: every filled field of section 4.6 shown, and no empty one (1,156 fields shown in Estimating) |
+| words | PASS: 515 views and rows checked |
+| counties | PASS: 52 installers with counties on the map, 408 states and provinces: each lists as many counties at each tier as the file's two counts |
 | last confirmed | PASS: shows on 54; 54 are CONFIRMED BY PARTNER with a date; 0 wrong |
 | not on the map | PASS: lists 21; build.json counts 21 without territory |
 | about | PASS: the 15 counts and gap counts build.json holds, and its 7 checks |
-| rows | PASS: rows showing a stand-in 30, beside 30 from the file; nobody in a place 16, beside 16; one person in both places 12, beside 12 |
-| home map | PASS: 52 states, each at the step for its number of installers |
-| state views | PASS: 3,245 State views drawn, 52 with no county chosen and 3,193 with one |
-| county maps | PASS: 3,193 counties, each at the step for its number of installers, and each listing as many when chosen |
-| foot line | PASS: the foot line carries 21; build.json counts 21 without territory |
-| steps | PASS: counties none 0, step 1 0, step 2 96, step 3 2,499, step 4 551, step 5 47; states none 0, step 1 0, step 2 2, step 3 13, step 4 30, step 5 7; the same from the file |
+| rows | PASS: a stand-in 30, beside 30; nobody in a place 16, beside 16; one person in both 12, beside 12 |
+| home map | PASS: 52 states, each at the step for its number of installers with territory there |
+| state views | PASS: 3,245 State views drawn |
+| county maps | PASS: 3,193 counties, each at its step and its Tier 1 list as many when chosen |
+| foot line | PASS: 21; build.json counts 21 |
+| steps | PASS: counties none 0, step 1 9, step 2 2,943, step 3 206, step 4 35, step 5 0; states none 0, step 1 0, step 2 32, step 3 17, step 4 2, step 5 1; the same from the files |
+| tier lists | PASS: 3,245 places; 8,005 Tier 1 entries and 10,148 Tier 2 entries, as many as the files give |
+| side lists | PASS: 3,245 places; 0 "Did not respond" entries and 1,302 "Not on the map, with an office in" entries, as many as the files give |
+| boxes | PASS: listed/from the files, no box 56/56; M 4/4; I 59/59; I M 7/7; D 70/70; D M 18/18; D I 73/73; D I M 21/21 |
+| territory | PASS: About this data: 51 with territory (Tier 1), 1 available for travel only (Tier 2), beside the same from the files |
 
 ## In a browser
 
 Microsoft Edge 154.0.4258.62, without a window, with a throwaway profile, against
-`http://127.0.0.1` only, and told it could resolve no other host. Both commands share
-`scripts\page-browser.mjs`; each waits, for a view with a map, until the map's part is marked.
+`http://127.0.0.1` only, and told it could resolve no other host.
 
-**npm run page:pictures** (22 seconds; October 7, after the last change to the page). Every
-measure passed: V1, V3, V4, V15, no request left 127.0.0.1 (1,037 requests), text size and
-contrast (4,158 pieces of text: smallest 12px, lowest 4.98 to 1), Tab and Escape (297 links,
-buttons and fields in 6 views, the 52 states of the Home map among them, reached in order with
-a ring). V3 and V4 shown failing on a copy with a broken style. Pictures, each at 1440 and 1280:
-`home`, `all-installers-contact-info`, `all-installers-rates`, `all-installers-one-status`,
-`installer-everything-filled`, `installer-state-open`, `installer-least-filled`,
-`show-all-contacts-open`, `search-contact-not-on-row`, `search-no-match`, `search-state`,
-`not-on-the-map`, `about-this-data`, `out-of-date-line`, `data-not-loaded`.
+**npm run page:pictures** (about 110 seconds): V1, V3, V4, V15, V17, V18, V19, no request left
+127.0.0.1, text size and contrast (smallest 12px, lowest 4.87 to 1), Tab and Escape (266 links,
+buttons and fields in 5 views). V3, V4, V17, V18 and V19 shown failing on copies broken for
+each. Pictures, each at 1440 and 1280: `installer-estimating`, `installer-pm`,
+`installer-records`, `installer-state-open`, `installer-least-filled`, `installer-from-a-place`,
+`all-installers-default`, `all-installers-pm`, `all-installers-records`,
+`all-installers-all-boxes`, `all-installers-not-on-map`, `all-installers-search`,
+`all-installers-search-contact`, `all-installers-no-match`, `show-all-contacts-open`,
+`about-this-data`, `out-of-date-line`, `data-not-loaded`.
 
-**npm run page:pictures:maps** (96 seconds). Every measure passed, and each was shown failing on
-a copy of the page broken for it:
-
-| Measure | Result | Shown failing on |
-|---|---|---|
-| addresses | 10 new addresses opened fresh, each its view; a mouse click on Ohio and on Summit County, Back twice and Forward; typing a ZIP gives its address, one Back returns to Home | a copy whose router sends a state's address to not-found |
-| requests | a State view fetched its own shape file alone (Ohio, Texas, Ontario, the District of Columbia); no ZIP file before a ZIP; a ZIP the one file of its first digit; 2,589 requests, all to 127.0.0.1 | a copy that fetches a ZIP file on Home |
-| width | 19 views at both widths, every map drawn: no map wider than its panel, no sideways scroll | a copy whose map is 2,600px wide |
-| errors | no script error in any view | a copy whose map stops with an error |
-| text | every piece of text at least 12px and 4.5 to 1; 176 codes on maps measured as drawn, smallest 13px, lowest 9.80 to 1 against their own state | a copy whose codes are 6px and pale (44 codes caught) |
-| keyboard | all 52 states, and every county of Ohio, Texas, the District of Columbia and Ontario, reached with Tab in order, the green ring drawn on the shape; Enter on the first, the last and three between; the skip links move the focus past the map and leave the address alone | a copy whose states cannot be reached with Tab |
-
-Pictures, each at 1440 and 1280: `home-map`, `home-state-by-tab`, `state-OH`, `state-TX`,
-`state-AK`, `state-HI`, `state-MI`, `state-VA`, `state-LA`, `state-DC`, `state-ON`,
-`state-county-chosen` (Summit County, Ohio), `state-county-nobody-serves` (Adams County, Ohio),
-`zip-one-county` (44056), `zip-several-counties` (44203), `zip-not-in-list` (49999),
-`zip-outside-map` (00601), `about-this-data-maps`, `search-names-state`; and at 1440 each map's
-panel alone (`map-panel-*`, 13 pictures). All in `review-screens\`, not committed.
+**npm run page:pictures:maps** (about 105 seconds): M16, M20, M14, the location box, addresses,
+requests, width, errors, text, keyboard, no request left 127.0.0.1; each shown failing on a copy
+broken for it. Pictures, each at 1440 and 1280: `find-installers`, `find-installers-typing`,
+`place-county-estimating`, `place-county-pm`, `place-county-records`, `place-county-tier2-open`,
+`place-state`, `place-state-TX`, `place-state-ON`, `place-zip-several`, `place-zip-one`,
+`place-zip-not-in-list`, `place-zip-outside-map`, `place-county-no-tier1`, `place-county-nobody`,
+`place-city`. All in `review-screens\`, not committed; the pictures of the old views were deleted.
 
 ## The checks
 
-Before anything changed in this run, all passed: `npm run check` (R1 to R7 and J19),
-`npm run check:selftest` (343 cases), `npm run check:job` (66 cases in 62 tests),
-`npm run check:published` (11 lines), `npm run check:page` (24 lines) and
-`npm run check:page:published` (8 lines).
+Before anything changed in this run, all passed: `npm run check`, `npm run check:selftest` (421
+cases), `npm run check:job` (66 cases in 62 tests), `npm run check:published` (11 lines),
+`npm run check:page` (46 lines) and `npm run check:page:published` (13 lines).
 
-With all the work staged, before commit `62fda86`, all passed:
-
-- `npm run check`: R1 to R7 and J19 PASS (134 tracked files; R5 scanned 131); R6's GitHub half
-  still printed as NOT YET SHOWN.
-- `npm run check:selftest`: PASS, 421 cases (343 before this run; 78 new: 15 for the built
-  files, 6 for the email repair, 52 for M1 to M13, the addresses, the unloadable files, the four
-  rulings and the words, and 5 for the map lines of `check:page:published`).
-- `npm run check:job`: PASS, 66 cases in 62 tests (unchanged).
-- `npm run check:published`: PASS, 11 lines (unchanged).
-- `npm run check:page`: PASS, 46 lines, 47 cases.
-- `npm run check:page:published`: PASS, 13 lines (above).
+With the redesign staged, before the commit of the views, all passed: `npm run check` (R1 to R7
+and J19), `npm run check:selftest` (483 cases), `npm run check:job` (66 cases in 62 tests,
+unchanged), `npm run check:published` (11 lines, unchanged), `npm run check:page` (56 lines, 57
+cases) and `npm run check:page:published` (17 lines).
 
 No QuickBase call was made in this run.
 
@@ -371,34 +367,21 @@ prints PASS or FAIL with counts: `files`, `build.json`, `checks`, `fingerprints`
 contacts and territory rows build.json gives, whether the first check was skipped, and the
 three sizes. An error is printed by its kind and step only.
 
-On the published files, October 7:
-
-| Line | Result |
-|---|---|
-| files | PASS: the three files are there, each reads as JSON |
-| build.json | PASS: the names of section 3.6 in order, schema 1, builtAt reads as it should |
-| checks | PASS: the seven checks by number and name, each passed; the first was skipped: no |
-| fingerprints | PASS: installers.json and territory.json match their SHA-256 in build.json |
-| counts | PASS: installers 73; contacts 221; CONFIRMED BY PARTNER 54; DORMANT - NO RESPONSE 14; INACTIVE 2; PENDING - UPDATE EXPECTED 2; HELD - BUSINESS DECISION 1; with territory 52; without 21; counties covered 3,193 |
-| J11 | PASS: 3,193 county ids, all in territory.json, 0 not text, 318 begin with a zero |
-| J12 | PASS: gap counts 25, 29, 23; from the contacts' roles 25, 29, 23; from the rows' gaps 25, 29, 23 |
-| J13 | PASS: lastConfirmed on 54 installers, 0 with another status |
-| J14 | PASS: 130 row places filled, 0 hold a departed contact, 0 point at no contact; 11 contacts marked departed |
-| empties | PASS: null 0, empty text 0, empty list 0, empty group 0 |
-| dates | PASS: 112 dates, 0 not written like 2026-10-06 |
-
-builtAt 2026-10-07T13:31:41Z. build.json gives installers 73, contacts 221, territory rows
-17,745. Sizes: installers.json 119,198 bytes; territory.json 358,681; build.json 1,745.
+On the published files, October 8 (builtAt 2026-10-08T16:29:39Z): every line PASS; installers
+73, contacts 221, territory rows 17,745; CONFIRMED BY PARTNER 54, DORMANT - NO RESPONSE 14,
+INACTIVE 2, PENDING - UPDATE EXPECTED 2, HELD - BUSINESS DECISION 1; with territory 52, without
+21; counties covered 3,193. Sizes: installers.json 119,198 bytes; territory.json 358,681;
+build.json 1,745. The files held 73 installers in this run.
 
 ## Git
 
-- `6bd89ba`: the handoff of the page's first prompt. No commit came after it before this run.
-- `decdda8` "Map shapes and the ZIP list in public/geo, their two scripts and their test".
-- `57cd85d` "Search: an email is matched by its words, not anywhere in it".
-- `62fda86` "The page: the Home map, the State view, county maps and ZIP lookup".
-- All three pushed to `origin main` on October 7, each with the five checks passing. Nothing
-  under `public/data` in any of them. No "Daily data refresh" came in between.
-- This file's final results are the commit after `62fda86`.
+- `a6cc628` "Daily data refresh" by github-actions[bot], `public/data/build.json` alone, came in
+  with the pull at the start.
+- `25cfd7d` "Specification revision 9 and acceptance checks version 3: the redesign".
+- `d7fa2f2` "City lookup's files: public/geo/cities, built from the place list".
+- `6187b87` "The page: the views of the ninth revision, and their tests".
+- Each pushed to `origin main` with the five checks passing. Nothing under `public/data` in any
+  of them. The pictures, the README and this file follow in the run's last two commits.
 
 ## Not built
 
@@ -406,31 +389,36 @@ The phone layout (group P); address search (group A); the server copy (group T).
 
 ## What comes next
 
-1. Joe goes through the layout of the whole page on the Netlify test copy, the map views with
-   the real records among it (group M's look, and V1, V4 and V15 with the real records).
+1. Joe goes through the redesign on the Netlify test copy with the real records: Find
+   installers, a place in each of the three views with Tier 2 opened, the Installer view, All
+   installers with its boxes, and the location box (groups V and M, and V1, V4, V15, M16 and M20
+   with the real records).
 2. Then the phone layout (group P).
 
 ## Worth knowing
 
 - Every chat starts with `git pull`: the job commits to `main` every day.
-- The page is never opened on the laptop with the real records. `npm run page:pictures` builds
-  made-up data in temporary folders and its server has no way to serve `public\data\`;
+- The page is never opened on the laptop with the real records. The picture commands build
+  made-up data in temporary folders and their server has no way to serve `public\data\`;
   `npm run check:page:published` reads the real files with node and prints counts only.
+- The view switch is remembered in the browser's local storage under `installer-index-view`.
+  A picture or measure that must not depend on it puts `view=` in its address.
 - The page's tests and pictures make their temporary folders as `installer-index-page-*`,
-  `installer-index-browser-*`, `installer-index-broken-style-*` and
-  `installer-index-broken-<measure>-*`, and delete each by its own path.
+  `installer-index-browser-*`, `installer-index-broken-*` and `installer-index-fresh-*` (and the
+  like), and delete each by its own path.
 - `npm run page:pictures` and `npm run page:pictures:maps` each run within Claude Code's ten
-  minutes (22 and 96 seconds); run them one after the other, never in the background.
+  minutes (about 110 and 105 seconds); run them one after the other, never in the background.
 - Chrome and Edge keep at most 50 steps of history, so a measure counts a step to Back by going
   Back, not by the length of the history.
-- The made-up installers cover 15 counties; 3,178 counties and most states have none of them,
-  which is what the tests of a county nobody serves use. On the real files every county is
-  served today.
-- A broken case in `scripts\page-tests.mjs` hands the test a broken stand-in for one of the
-  page's functions, or a changed copy of what a view gave back, and carries `mustSay`.
-- An email is matched from the start of any word of the part before the @ (a period, a hyphen,
-  an underscore or a plus sign parts the words), from the start of the part after the @, or
-  anywhere once what is typed holds an @ or a period (the page's second prompt, step 3). Two
-  letters such as "co" no longer find every address ending ".com".
+- The made-up installers now number 38 (27 of the job's, 11 of the page's). FAKE-107 to FAKE-111
+  were added for the redesign: Tier 2 only (and the only installer of Portage County, Ohio, at
+  Tier 2); DORMANT with territory in Summit County; INACTIVE with Tier 1 in Summit County; not on
+  the map with an office in Ohio; PENDING with an unreachable field contact, two receiving
+  contacts and agreement Yes with certificate No.
+- A broken case in `scripts\page-tests.mjs` or `map-tests.mjs` hands the test a broken stand-in
+  for one of the page's functions, or a changed copy of what a view gave back, and carries
+  `mustSay`.
 - Title and Procedure are empty on all 221 real contacts, so those lines will not show on the
   test copy until QuickBase holds them.
+- On the real files no DORMANT - NO RESPONSE installer has a county at either tier, so "Did not
+  respond to the August outreach" shows nowhere on the test copy today.

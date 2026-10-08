@@ -138,5 +138,5 @@ export function suggestionTree(r, typed) {
         h('span', { class: 'loc-name' }, s.label, s.sub ? h('span', { class: 'loc-sub' }, ` · ${s.sub}`) : null),
         h('span', { class: 'loc-kind' }, KIND_LABELS[s.kind]))))),
     r.more ? h('p', { class: 'loc-more' }, MORE_LINE) : null,
-  ];
+  ].filter(Boolean);
 }

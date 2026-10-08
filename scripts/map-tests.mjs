@@ -24,7 +24,7 @@ import { countyMapPath, HOME_MAP, loadExtra, makeModel, zipPath } from '../publi
 import { textOf, toHtml } from '../public/js/html.js';
 import { countySuggestions, shadeStep } from '../public/js/maps.js';
 import { boxAddress, parseHash, stateHash, toHash } from '../public/js/routes.js';
-import { citiesNeeded, LOCATION_HINT, suggest } from '../public/js/places.js';
+import { citiesNeeded, LOCATION_HINT, suggest, suggestionTree } from '../public/js/places.js';
 import { filesFor, mapPart, renderView, TIER2_HIDE, TIER2_SHOW } from '../public/js/views.js';
 
 export { geoFiles };
@@ -243,7 +243,7 @@ test('built files', 'the map, ZIP and city files of public\\geo, as step 2g of t
 /* ================================================================== the views */
 
 const NOW = Date.parse('2026-10-07T16:00:00Z');
-const REAL = { render: renderView, filesFor, mapPart, parse: parseHash, toHash, boxAddress, suggestions: countySuggestions, loadExtra, suggest, citiesNeeded };
+const REAL = { render: renderView, filesFor, mapPart, parse: parseHash, toHash, boxAddress, suggestions: countySuggestions, loadExtra, suggest, citiesNeeded, tree: suggestionTree };
 const impl = (over = {}) => ({ ...REAL, ...over });
 
 /** The five steps of shading, written out by hand apart from the page: 1; 2 to 3; 4 to 6; 7 to 10; 11 up. */
@@ -847,6 +847,16 @@ async function m17(I) {
   const ohio = I.suggest(model, 'washington oh');
   const ohio2 = I.suggest(model, 'Washington County, Ohio');
   for (const r of [ohio, ohio2]) if (!r.items.length || r.items.some((x) => x.state !== 'OH')) return no('a state after the name does not narrow the suggestions to that state');
+  // The list as the box draws it: each place with its kind, the line that more match, and the
+  // line that nothing does.
+  for (const typed of ['summ', 'washington county', 'akron', '44221', 'zzqx']) {
+    const r = I.suggest(model, typed, cityDocs());
+    let html;
+    try { html = toHtml(I.tree(r, typed)); } catch { return no(`the list the box shows for "${typed}" cannot be drawn`); }
+    for (const s of r.items) if (!html.includes(`data-kind="${s.kind}"`) || !html.includes(`>${{ zip: 'ZIP', state: 'State', county: 'County', city: 'City' }[s.kind]}<`)) return no(`the list for "${typed}" does not label a place with its kind`);
+    if (r.more !== html.includes('More match. Add the state, as in Washington OH.')) return no(`the list for "${typed}" does not say, or says wrongly, that more match`);
+    if (r.none !== html.includes('Nothing matches')) return no(`the list for "${typed}" does not say, or says wrongly, that nothing matches`);
+  }
   // Never an office city, never an installer.
   for (const i of model.installers) {
     const city = i.office && i.office.city;
@@ -862,6 +872,8 @@ test('M17', 'the location box offers every county by its name and state, and by 
   [
     broken('a box that offers a county by its own address, not the map\'s', 'leading where the map does', () => m17(impl({ suggest: (m, t, c) => { const r = suggest(m, t, c); return { ...r, items: r.items.map((x) => (x.kind === 'county' ? { ...x, href: `#/state/${x.state}` } : x)) }; } }))),
     broken('a box that does not understand a state after the name', 'Autauga County AL', () => m17(impl({ suggest: (m, t, c) => suggest(m, String(t).replace(/,? [A-Z]{2}$/, ' zzzz'), c) }))),
+    broken('a list that cannot be drawn when fewer than 10 match', 'cannot be drawn', () => m17(impl({ tree: (r, t) => { const out = suggestionTree(r, t); return Array.isArray(out) && !r.more ? [...out, null] : out; } }))),
+    broken('a list that does not say more match', 'that more match', () => m17(impl({ tree: (r, t) => suggestionTree({ ...r, more: false }, t) }))),
     broken('a box that offers office cities', 'offers something that is not a place', () => m17(impl({ suggest: (m, t, c) => { const r = suggest(m, t, c); const hit = m.installers.find((i) => i.office && i.office.city === t); return hit ? { ...r, items: [...r.items, { kind: 'office', label: hit.company, href: `#/installer/${hit.id}`, state: null, id: hit.id }] } : r; } }))),
   ]);
 

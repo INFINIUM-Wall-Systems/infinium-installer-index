@@ -225,6 +225,19 @@ export function brokenCopy(h, tag, css, change = null) {
   return copy;
 }
 
+/** A copy of public\ with one file's text changed: [find, replace] pairs, each of which must be there. */
+export function scriptChange(file, pairs) {
+  return (copy) => {
+    const path = join(copy, ...file.split('/'));
+    let text = readFileSync(path, 'utf8');
+    for (const [find, replace] of pairs) {
+      if (!text.includes(find)) throw new Error(`the broken copy could not be made: ${file} does not hold the text to change`);
+      text = text.replace(find, replace);
+    }
+    return { path, text };
+  };
+}
+
 /* ================================================================== a run */
 
 /**
@@ -300,9 +313,41 @@ export async function pictureRun(name, run) {
       };
       page.size = (width, height) => send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: false });
       page.key = async (k) => {
-        const codes = { Tab: 9, Enter: 13, Escape: 27 };
-        await send('Input.dispatchKeyEvent', { type: 'keyDown', key: k, code: k, windowsVirtualKeyCode: codes[k], nativeVirtualKeyCode: codes[k], ...(k === 'Enter' ? { text: '\r' } : {}) });
-        await send('Input.dispatchKeyEvent', { type: 'keyUp', key: k, code: k, windowsVirtualKeyCode: codes[k], nativeVirtualKeyCode: codes[k] });
+        const codes = { Tab: 9, Enter: 13, Escape: 27, ' ': 32, ArrowUp: 38, ArrowDown: 40 };
+        const code = k === ' ' ? 'Space' : k;
+        const text = k === 'Enter' ? { text: '\r' } : k === ' ' ? { text: ' ' } : {};
+        await send('Input.dispatchKeyEvent', { type: 'keyDown', key: k, code, windowsVirtualKeyCode: codes[k], nativeVirtualKeyCode: codes[k], ...text });
+        await send('Input.dispatchKeyEvent', { type: 'keyUp', key: k, code, windowsVirtualKeyCode: codes[k], nativeVirtualKeyCode: codes[k] });
+      };
+      /** A click with the mouse, as a person makes it, in the middle of the first element a selector finds: false when there is none. */
+      page.click = async (selector) => {
+        const pt = await page.evaluate(`(() => { const e = document.querySelector(${JSON.stringify(selector)}); if (!e) return null; e.scrollIntoView({ block: 'center' }); const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; })()`);
+        if (!pt) return false;
+        await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: pt.x, y: pt.y });
+        await send('Input.dispatchMouseEvent', { type: 'mousePressed', x: pt.x, y: pt.y, button: 'left', clickCount: 1 });
+        await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: pt.x, y: pt.y, button: 'left', clickCount: 1 });
+        return true;
+      };
+      /**
+       * Opens an address in a new tab of the same browser, as a person opens a link in a new tab,
+       * waits until its view is drawn, works out an expression there, and closes the tab.
+       */
+      page.inFreshTab = async (url, expression) => {
+        const { targetId } = await cdp.send('Target.createTarget', { url });
+        const { sessionId } = await cdp.send('Target.attachToTarget', { targetId, flatten: true });
+        const sendThere = (method, params = {}) => cdp.send(method, params, sessionId);
+        await sendThere('Runtime.enable');
+        const evaluate = async (expr) => {
+          const r = await sendThere('Runtime.evaluate', { expression: expr, awaitPromise: true, returnByValue: true });
+          if (r.exceptionDetails) throw new Error('a measure stopped in a fresh tab');
+          return r.result.value;
+        };
+        let value = null;
+        for (let i = 0; i < 100 && !(await evaluate("document.readyState === 'complete' && Boolean(document.getElementById('content'))")); i++) await sleep(100);
+        await evaluate(DRAWN);
+        value = await evaluate(expression);
+        await cdp.send('Target.closeTarget', { targetId });
+        return value;
       };
       /** The whole page, top to bottom, as review-screens\<name>-<width>.png. */
       page.picture = async (name, width) => {

@@ -239,7 +239,7 @@ main.wrap {
   color: var(--muted);
 }
 
-mark { background: var(--green-pale); color: inherit; border-radius: 3px; padding: 0 1px; }
+mark { background: var(--green-pale); color: var(--ink); border-radius: 3px; padding: 0 1px; }
 abbr[title] { text-decoration: none; }
 
 .chev {
@@ -304,12 +304,12 @@ table.grid { width: 100%; border-collapse: separate; border-spacing: 0; table-la
   position: sticky;
   top: var(--head-h);
   z-index: 5;
-  padding: 9px 10px;
+  padding: 9px 8px;
   background: var(--ink);
   color: #FFFFFF;
   font: 600 12px/1.3 var(--head);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   text-align: left;
   vertical-align: bottom;
   box-shadow: 1px 0 0 0 var(--ink);
@@ -334,7 +334,8 @@ table.grid { width: 100%; border-collapse: separate; border-spacing: 0; table-la
 .row-office, .row-confirmed { font: 400 13px/1.4 var(--body); color: var(--muted); }
 .money { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .rate-pair { display: grid; gap: 2px; margin: 0; }
-.rate { display: flex; justify-content: flex-end; gap: 8px; }
+.rate { display: flex; justify-content: flex-end; gap: 6px; white-space: nowrap; }
+.grid td.num { overflow-wrap: normal; }
 .rate dt { font: 600 12px/1.45 var(--head); color: var(--muted); }
 .rate dd { margin: 0; font-weight: 500; }
 .rate dd.none { font-weight: 400; color: var(--muted); }
@@ -347,18 +348,18 @@ table.grid { width: 100%; border-collapse: separate; border-spacing: 0; table-la
 /* Column widths, view by view. */
 .grid-est .c-installer { width: 25%; } .grid-est .c-quote { width: 25%; } .grid-est .c-nonUnion, .grid-est .c-union { width: 12%; }
 .grid-est .c-mobilization { width: 14%; } .grid-est .c-ratesValidThrough { width: 12%; }
-.grid-est-t2 .c-installer { width: 21%; } .grid-est-t2 .c-quote { width: 21%; } .grid-est-t2 .c-nonUnion, .grid-est-t2 .c-union { width: 11%; }
-.grid-est-t2 .c-mobilization { width: 12%; } .grid-est-t2 .c-ratesValidThrough { width: 11%; } .grid-est-t2 .c-tier2Charge { width: 13%; }
+.grid-est-t2 .c-installer { width: 18%; } .grid-est-t2 .c-quote { width: 18%; } .grid-est-t2 .c-nonUnion, .grid-est-t2 .c-union { width: 12%; }
+.grid-est-t2 .c-mobilization { width: 13%; } .grid-est-t2 .c-ratesValidThrough { width: 11%; } .grid-est-t2 .c-tier2Charge { width: 16%; }
 .grid-est-all .c-installer { width: 22%; } .grid-est-all .c-quote { width: 23%; } .grid-est-all .c-nonUnion, .grid-est-all .c-union { width: 11%; }
 .grid-est-all .c-mobilization { width: 12%; } .grid-est-all .c-ratesValidThrough { width: 11%; } .grid-est-all .c-territoryIn { width: 10%; }
 .grid-pm .c-installer { width: 22%; } .grid-pm .c-scheduling { width: 21%; } .grid-pm .c-field { width: 16%; } .grid-pm .c-receiving { width: 16%; }
 .grid-pm .c-paperwork { width: 13%; } .grid-pm .c-travelNote { width: 12%; }
 .grid-pm-all .c-installer { width: 20%; } .grid-pm-all .c-scheduling { width: 19%; } .grid-pm-all .c-field { width: 14%; } .grid-pm-all .c-receiving { width: 14%; }
 .grid-pm-all .c-paperwork { width: 12%; } .grid-pm-all .c-travelNote { width: 11%; } .grid-pm-all .c-territoryIn { width: 10%; }
-.grid-rec .c-installer, .grid-rec-all .c-installer { width: 24%; } .grid-rec .c-ratesValidThrough, .grid-rec-all .c-ratesValidThrough { width: 12%; }
-.grid-rec .c-agreement, .grid-rec-all .c-agreement { width: 10%; } .grid-rec .c-coi, .grid-rec-all .c-coi { width: 14%; }
-.grid-rec .c-emr, .grid-rec-all .c-emr { width: 9%; } .grid-rec .c-gaps, .grid-rec-all .c-gaps { width: 14%; }
-.grid-rec .c-territory, .grid-rec-all .c-territory { width: 17%; }
+.grid-rec .c-installer, .grid-rec-all .c-installer { width: 22%; } .grid-rec .c-ratesValidThrough, .grid-rec-all .c-ratesValidThrough { width: 12%; }
+.grid-rec .c-agreement, .grid-rec-all .c-agreement { width: 12%; } .grid-rec .c-coi, .grid-rec-all .c-coi { width: 14%; }
+.grid-rec .c-emr, .grid-rec-all .c-emr { width: 8%; } .grid-rec .c-gaps, .grid-rec-all .c-gaps { width: 14%; }
+.grid-rec .c-territory, .grid-rec-all .c-territory { width: 18%; }
 
 /* ------------------------------------------------------------------ contacts on a row */
 
@@ -509,7 +510,7 @@ table.grid { width: 100%; border-collapse: separate; border-spacing: 0; table-la
 .loc-bar .loc-field { flex: 1 1 auto; }
 .loc-bar .loc-label { white-space: nowrap; }
 
-.place-body { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
+.place-body { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
 .place-body[data-map-open="false"] { grid-template-columns: minmax(0, 1fr); }
 .map-col[hidden] { display: none; }
 .map-col { position: sticky; top: calc(var(--head-h) + 12px); }
