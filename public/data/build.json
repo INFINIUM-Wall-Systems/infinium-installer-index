@@ -1,10 +1,10 @@
 {
   "schema": 1,
-  "builtAt": "2026-10-09T16:13:38Z",
+  "builtAt": "2026-10-09T18:37:15Z",
   "counts": {
     "installers": 74,
     "contacts": 224,
-    "territoryRows": 17987,
+    "territoryRows": 18035,
     "duplicateTerritoryRows": 0,
     "installersWithTerritory": 54,
     "installersWithoutTerritory": 20,
@@ -75,7 +75,7 @@
     }
   ],
   "files": {
-    "installers.json": "4ec8b881b98272724252ffd0fb48d85691f7919a58aba8506cf083d421db732f",
-    "territory.json": "5ae98cde4f40e6689382e286f546c07d4605fee930d11c80369579e3ff08197a"
+    "installers.json": "5154e48133c350fac042765d4f5e0873874be231af34a22ce0ba6a43d95afc94",
+    "territory.json": "a2116213e6adbbed6b69d38011755bb38e2fe5b63a550c2e19e988e9c5255bd9"
   }
 }
