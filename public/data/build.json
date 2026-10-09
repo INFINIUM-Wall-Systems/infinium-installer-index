@@ -1,18 +1,18 @@
 {
   "schema": 1,
-  "builtAt": "2026-10-08T16:29:39Z",
+  "builtAt": "2026-10-09T14:10:26Z",
   "counts": {
-    "installers": 73,
-    "contacts": 221,
-    "territoryRows": 17745,
+    "installers": 74,
+    "contacts": 224,
+    "territoryRows": 17986,
     "duplicateTerritoryRows": 0,
-    "installersWithTerritory": 52,
+    "installersWithTerritory": 53,
     "installersWithoutTerritory": 21,
     "countiesCovered": 3193,
     "byStatus": [
       {
         "status": "CONFIRMED BY PARTNER",
-        "installers": 54
+        "installers": 55
       },
       {
         "status": "DORMANT - NO RESPONSE",
@@ -75,7 +75,7 @@
     }
   ],
   "files": {
-    "installers.json": "1c80e08944d28d838504ace3ed6bd0e91935c2c8969f88c1cb2f7a23702dc7cc",
-    "territory.json": "e78af877ceba9539498ec6619a44fc368a10c27e410c7481358dbbec41077e36"
+    "installers.json": "e07d275a712165544a8947f0552e658031b9cd85df4acb908026e9dcba7d4c1d",
+    "territory.json": "ee5c05b6b182660165550d084b8bd5d7b755e5ec27838d603233c7359a4e4e19"
   }
 }
