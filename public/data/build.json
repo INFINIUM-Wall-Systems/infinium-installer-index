@@ -1,13 +1,13 @@
 {
   "schema": 1,
-  "builtAt": "2026-10-09T14:10:26Z",
+  "builtAt": "2026-10-09T16:13:38Z",
   "counts": {
     "installers": 74,
     "contacts": 224,
-    "territoryRows": 17986,
+    "territoryRows": 17987,
     "duplicateTerritoryRows": 0,
-    "installersWithTerritory": 53,
-    "installersWithoutTerritory": 21,
+    "installersWithTerritory": 54,
+    "installersWithoutTerritory": 20,
     "countiesCovered": 3193,
     "byStatus": [
       {
@@ -75,7 +75,7 @@
     }
   ],
   "files": {
-    "installers.json": "e07d275a712165544a8947f0552e658031b9cd85df4acb908026e9dcba7d4c1d",
-    "territory.json": "ee5c05b6b182660165550d084b8bd5d7b755e5ec27838d603233c7359a4e4e19"
+    "installers.json": "4ec8b881b98272724252ffd0fb48d85691f7919a58aba8506cf083d421db732f",
+    "territory.json": "5ae98cde4f40e6689382e286f546c07d4605fee930d11c80369579e3ff08197a"
   }
 }

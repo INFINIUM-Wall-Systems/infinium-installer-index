@@ -2284,7 +2284,7 @@
 {"id":"40153","tier1Installers":["INS-069"],"tier2Installers":["INS-010","INS-034","INS-041"]}
 ]},
 {"state":"ON","country":"CA","counties":[
-{"id":"CA-3501","tier1Installers":["INS-052"],"tier2Installers":["INS-010"]},
+{"id":"CA-3501","tier1Installers":["INS-052"],"tier2Installers":["INS-010","INS-038"]},
 {"id":"CA-3502","tier1Installers":["INS-052"],"tier2Installers":["INS-010"]},
 {"id":"CA-3506","tier1Installers":["INS-052"],"tier2Installers":["INS-010"]},
 {"id":"CA-3507","tier1Installers":["INS-052"],"tier2Installers":["INS-010"]},
