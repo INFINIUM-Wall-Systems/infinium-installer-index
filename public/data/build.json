@@ -1,18 +1,18 @@
 {
   "schema": 1,
-  "builtAt": "2026-10-11T15:42:03Z",
+  "builtAt": "2026-10-12T16:02:26Z",
   "counts": {
     "installers": 74,
     "contacts": 224,
-    "territoryRows": 18035,
+    "territoryRows": 18125,
     "duplicateTerritoryRows": 0,
-    "installersWithTerritory": 54,
-    "installersWithoutTerritory": 20,
+    "installersWithTerritory": 55,
+    "installersWithoutTerritory": 19,
     "countiesCovered": 3193,
     "byStatus": [
       {
         "status": "CONFIRMED BY PARTNER",
-        "installers": 55
+        "installers": 56
       },
       {
         "status": "DORMANT - NO RESPONSE",
@@ -24,7 +24,7 @@
       },
       {
         "status": "PENDING - UPDATE EXPECTED",
-        "installers": 2
+        "installers": 1
       },
       {
         "status": "HELD - BUSINESS DECISION",
@@ -33,9 +33,9 @@
     ]
   },
   "gaps": {
-    "noQuoting": 25,
-    "noScheduling": 29,
-    "neither": 23
+    "noQuoting": 24,
+    "noScheduling": 28,
+    "neither": 22
   },
   "checks": [
     {
@@ -75,7 +75,7 @@
     }
   ],
   "files": {
-    "installers.json": "5154e48133c350fac042765d4f5e0873874be231af34a22ce0ba6a43d95afc94",
-    "territory.json": "a2116213e6adbbed6b69d38011755bb38e2fe5b63a550c2e19e988e9c5255bd9"
+    "installers.json": "bea6919c3bf1791ae96d0cf127e6d9f332322653950a16029d9ea712511288b1",
+    "territory.json": "7ba3870a42916e1abf803d27d5f33d7aa442909233016a2f7cbce69fec445d62"
   }
 }
